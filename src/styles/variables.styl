@@ -1,0 +1,306 @@
+/* ===== 基础变量定义 ===== */
+:root
+  --radius-large: 0
+  --content-delay: 150ms
+
+/* ===== 主题相关变量（极简中性灰阶，模拟 x.ai 视觉语言） =====
+   注: 保留 --hue 兼容性，但视觉调色板强制中性化以贯彻"无饱和色块"原则。
+   仅 --primary 保留细微 hue，用于 link/focus 等点缀。 */
+:root
+  --primary: oklch(0.30 0 0)
+  --page-bg: oklch(1 0 0)
+  --card-bg: transparent
+  --card-bg-transparent: transparent
+
+  --btn-content: oklch(0.25 0 0)
+  --btn-regular-bg: transparent
+  --btn-regular-bg-hover: oklch(0.94 0 0)
+  --btn-regular-bg-active: oklch(0.90 0 0)
+
+  --btn-plain-bg-hover: oklch(0.94 0 0)
+  --btn-plain-bg-active: oklch(0.90 0 0)
+
+  --btn-card-bg-hover: oklch(0.96 0 0)
+  --btn-card-bg-active: oklch(0.92 0 0)
+
+  --enter-btn-bg: transparent
+  --enter-btn-bg-hover: oklch(0.94 0 0)
+  --enter-btn-bg-active: oklch(0.90 0 0)
+
+  --deep-text: oklch(0.10 0 0)
+  --title-active: oklch(0.30 0 0)
+
+  --line-divider: oklch(0.85 0 0)
+  --line-color: oklch(0.85 0 0)
+  --meta-divider: oklch(0.75 0 0)
+  --content-meta: oklch(0.45 0 0)
+
+  --inline-code-bg: oklch(0.95 0 0)
+  --inline-code-color: oklch(0.20 0 0)
+  --selection-bg: oklch(0.85 0 0)
+  --codeblock-bg: oklch(0.97 0 0)
+  --codeblock-topbar-bg: oklch(0.93 0 0)
+
+  --license-block-bg: oklch(0.97 0 0)
+
+  --link-underline: oklch(0.85 0 0)
+  --link-hover: oklch(0.50 0 0)
+  --link-active: oklch(0.30 0 0)
+
+  --float-panel-bg: oklch(1 0 0)
+
+  --scrollbar-bg-light: rgba(0, 0, 0, 0.4)
+  --scrollbar-bg-hover-light: rgba(0, 0, 0, 0.5)
+  --scrollbar-bg-active-light: rgba(0, 0, 0, 0.6)
+
+  --scrollbar-bg-dark: rgba(255, 255, 255, 0.4)
+  --scrollbar-bg-hover-dark: rgba(255, 255, 255, 0.5)
+  --scrollbar-bg-active-dark: rgba(255, 255, 255, 0.6)
+
+  --scrollbar-bg: var(--scrollbar-bg-light)
+  --scrollbar-bg-hover: var(--scrollbar-bg-hover-light)
+  --scrollbar-bg-active: var(--scrollbar-bg-active-light)
+
+  --display-light-icon: 1
+  --display-dark-icon: 0
+
+  --admonitions-color-tip: oklch(0.55 0 0)
+  --admonitions-color-note: oklch(0.55 0 0)
+  --admonitions-color-important: oklch(0.55 0 0)
+  --admonitions-color-warning: oklch(0.55 0 0)
+  --admonitions-color-caution: oklch(0.40 0 0)
+
+  /* TOC 极简：去 badge 底色、hover 仅细线反相 */
+  --toc-badge-bg: transparent
+  --toc-btn-hover: oklch(0.94 0 0)
+  --toc-btn-active: oklch(0.90 0 0)
+  --toc-width: 14rem
+  --toc-item-active: oklch(0.20 0 0)
+
+  --color-selection-bar: linear-gradient(to right, oklch(0.20 0 0), oklch(0.50 0 0), oklch(0.80 0 0))
+
+/* 卡片"跟随主题色相"模式被废弃为 no-op */
+:root:not(.dark) body.card-follow-theme-hue
+  --card-bg: transparent
+
+/* 暗色主题：纯黑底 + 白前景，所有色块去饱和 */
+:root.dark
+  --primary: oklch(0.85 0 0)
+  --page-bg: oklch(0.08 0 0)
+  --card-bg: transparent
+  --card-bg-transparent: transparent
+
+  --deep-text: oklch(0.90 0 0)
+  --title-active: oklch(0.70 0 0)
+
+  --btn-content: oklch(0.85 0 0)
+  --btn-regular-bg: transparent
+  --btn-regular-bg-hover: oklch(0.18 0 0)
+  --btn-regular-bg-active: oklch(0.22 0 0)
+
+  --btn-plain-bg-hover: oklch(0.18 0 0)
+  --btn-plain-bg-active: oklch(0.22 0 0)
+
+  --btn-card-bg-hover: oklch(0.16 0 0)
+  --btn-card-bg-active: oklch(0.20 0 0)
+
+  --line-divider: oklch(0.25 0 0)
+  --line-color: oklch(0.25 0 0)
+  --meta-divider: oklch(0.35 0 0)
+  --content-meta: oklch(0.65 0 0)
+
+  --inline-code-bg: oklch(0.18 0 0)
+  --inline-code-color: oklch(0.85 0 0)
+  --selection-bg: oklch(0.30 0 0)
+  --codeblock-bg: oklch(0.12 0 0)
+  --codeblock-topbar-bg: oklch(0.18 0 0)
+
+  --license-block-bg: oklch(0.12 0 0)
+
+  --link-underline: oklch(0.30 0 0)
+  --link-hover: oklch(0.65 0 0)
+  --link-active: oklch(0.80 0 0)
+
+  --float-panel-bg: oklch(0.10 0 0)
+
+  --scrollbar-bg: var(--scrollbar-bg-dark)
+  --scrollbar-bg-hover: var(--scrollbar-bg-hover-dark)
+  --scrollbar-bg-active: var(--scrollbar-bg-active-dark)
+
+  --display-light-icon: 0
+  --display-dark-icon: 1
+
+  --admonitions-color-tip: oklch(0.75 0 0)
+  --admonitions-color-note: oklch(0.75 0 0)
+  --admonitions-color-important: oklch(0.75 0 0)
+  --admonitions-color-warning: oklch(0.75 0 0)
+  --admonitions-color-caution: oklch(0.85 0 0)
+
+  --toc-badge-bg: transparent
+  --toc-btn-hover: oklch(0.18 0 0)
+  --toc-btn-active: oklch(0.22 0 0)
+  --toc-item-active: oklch(0.85 0 0)
+
+  --color-selection-bar: linear-gradient(to right, oklch(0.85 0 0), oklch(0.55 0 0), oklch(0.25 0 0))
+
+/* ===== 响应式断点变量 ===== */
+:root
+  --breakpoint-xs: 320px
+  --breakpoint-sm: 480px
+  --breakpoint-md: 768px
+  --breakpoint-lg: 1024px
+  --breakpoint-xl: 1280px
+  --breakpoint-2xl: 1536px
+
+  --container-xs: 100%
+  --container-sm: 100%
+  --container-md: 100%
+  --container-lg: 1024px
+  --container-xl: 1280px
+  --container-2xl: 1536px
+
+@media (max-width: 767px)
+  :root
+    --container-width: var(--container-sm)
+    --widget-gap: 1rem
+    --sidebar-width: 100%
+
+@media (min-width: 768px) and (max-width: 1279px)
+  :root
+    --container-width: var(--container-md)
+    --widget-gap: 1.25rem
+    --sidebar-width: 100%
+
+@media (min-width: 1280px)
+  :root
+    --container-width: var(--container-lg)
+    --widget-gap: 1.5rem
+    --sidebar-width: 100%
+
+/* ===== 动画变量 ===== */
+:root
+  --ease-standard: cubic-bezier(0.4, 0, 0.2, 1)
+  --ease-decelerate: cubic-bezier(0.25, 0.46, 0.45, 0.94)
+  --ease-accelerate: cubic-bezier(0.55, 0.055, 0.675, 0.19)
+  --ease-sharp: cubic-bezier(0.4, 0, 0.6, 1)
+
+  --duration-fast: 100ms
+  --duration-normal: 150ms
+  --duration-medium: 200ms
+  --duration-slow: 250ms
+  --duration-slower: 300ms
+
+  --delay-none: 0ms
+  --delay-short: 30ms
+  --delay-medium: 60ms
+  --delay-long: 90ms
+  --delay-longer: 120ms
+
+/* ===== 间距变量 ===== */
+:root
+  --spacing-xs: 0.25rem
+  --spacing-sm: 0.5rem
+  --spacing-md: 0.75rem
+  --spacing-lg: 1rem
+  --spacing-xl: 1.25rem
+  --spacing-2xl: 1.5rem
+  --spacing-3xl: 2rem
+  --spacing-4xl: 2.5rem
+  --spacing-5xl: 3rem
+
+  --widget-gap-mobile: var(--spacing-md)
+  --widget-gap-tablet: var(--spacing-lg)
+  --widget-gap-desktop: var(--spacing-xl)
+
+  --sidebar-width-mobile: 100%
+  --sidebar-width-tablet: 100%
+  --sidebar-width-desktop: 100%
+
+/* ===== 阴影变量（极简模式下全部置零，仅保留 token 防回归） ===== */
+:root
+  --shadow-sm: none
+  --shadow-md: none
+  --shadow-lg: none
+  --shadow-xl: none
+  --shadow-2xl: none
+
+  --shadow-navbar: none
+  --shadow-navbar-dark: none
+  --shadow-button: none
+  --shadow-button-dark: none
+
+/* ===== 边框半径变量 ===== */
+:root
+  --radius-sm: 0
+  --radius-md: 0
+  --radius-lg: 0
+  --radius-xl: 0
+  --radius-2xl: 0
+  --radius-3xl: 0
+  --radius-full: 9999px
+
+/* ===== 透明度变量 ===== */
+:root
+  --opacity-0: 0
+  --opacity-5: 0.05
+  --opacity-10: 0.1
+  --opacity-20: 0.2
+  --opacity-25: 0.25
+  --opacity-30: 0.3
+  --opacity-40: 0.4
+  --opacity-50: 0.5
+  --opacity-55: 0.55
+  --opacity-60: 0.6
+  --opacity-70: 0.7
+  --opacity-75: 0.75
+  --opacity-80: 0.8
+  --opacity-85: 0.85
+  --opacity-90: 0.9
+  --opacity-95: 0.95
+  --opacity-100: 1
+
+/* ===== 模糊效果变量（极简模式下不再使用，保留 token） ===== */
+:root
+  --blur-sm: 0px
+  --blur-md: 0px
+  --blur-lg: 0px
+  --blur-xl: 0px
+  --blur-2xl: 0px
+  --blur-3xl: 0px
+
+/* ===== 变换变量 ===== */
+:root
+  --translate-xs: 0.125rem
+  --translate-sm: 0.25rem
+  --translate-md: 0.5rem
+  --translate-lg: 0.75rem
+  --translate-xl: 1rem
+  --translate-2xl: 1.5rem
+  --translate-3xl: 2rem
+
+  --scale-95: 0.95
+  --scale-98: 0.98
+  --scale-100: 1
+  --scale-105: 1.05
+  --scale-110: 1.1
+
+/* ===== 层级变量 ===== */
+:root
+  --z-dropdown: 1000
+  --z-sticky: 1020
+  --z-fixed: 1030
+  --z-modal-backdrop: 1040
+  --z-modal: 1050
+  --z-popover: 1060
+  --z-tooltip: 1070
+  --z-toast: 1080
+  --z-navbar: 20
+  --z-banner: 10
+  --z-content: 30
+
+:root
+  --gpu-transform: translateZ(0)
+  --gpu-backface: hidden
+  --animation-fill-mode: both
+  --animation-timing: var(--ease-standard)
+  --animation-duration: var(--duration-medium)

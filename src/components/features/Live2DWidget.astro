@@ -1,0 +1,284 @@
+---
+import MessageBox from "@/components/common/PioMessageBox.astro";
+import type { Live2DModelConfig } from "@/types/config";
+import { url } from "@/utils/url-utils";
+
+interface Props {
+	config: Live2DModelConfig;
+}
+
+const { config } = Astro.props;
+
+// 获取位置和尺寸配置
+const position = config.position || {
+	corner: "bottom-right" as const,
+	offsetX: 20,
+	offsetY: 20,
+};
+const size = config.size || { width: 280, height: 250 };
+---
+
+<div
+  id="live2d-widget"
+  class="live2d-widget"
+  style={`
+    width: ${size.width}px;
+    height: ${size.height}px;
+    ${position.corner?.includes("right") ? "right" : "left"}: ${position.offsetX}px;
+    ${position.corner?.includes("top") ? "top" : "bottom"}: ${position.offsetY}px;
+  `}
+>
+  <canvas id="live2d-canvas" width={size.width} height={size.height}></canvas>
+</div>
+
+<!-- 引入消息框组件 -->
+<MessageBox />
+
+<script is:inline define:vars={{ config, modelPathUrl: url(config.model.path) }}>
+  let live2dApp = null;
+  let live2dModel = null;
+
+  function loadScript(src) {
+    return new Promise((resolve, reject) => {
+      if (document.querySelector(`script[src="${src}"]`)) {
+        resolve();
+        return;
+      }
+      const s = document.createElement("script");
+      s.src = src;
+      s.onload = resolve;
+      s.onerror = reject;
+      document.head.appendChild(s);
+    });
+  }
+
+  async function initLive2D() {
+    if (!config.model || !config.model.path) {
+      console.error("No model path configured");
+      return;
+    }
+
+    try {
+      console.log("[Live2D] Loading Cubism Core...");
+      await loadScript("https://cubism.live2d.com/sdk-web/cubismcore/live2dcubismcore.min.js");
+      console.log("[Live2D] Cubism Core loaded, version:", window.Live2DCubismCore?.Version?.version);
+
+      console.log("[Live2D] Loading PixiJS...");
+      await loadScript("https://cdn.jsdelivr.net/npm/pixi.js@6.5.10/dist/browser/pixi.min.js");
+
+      console.log("[Live2D] Loading pixi-live2d-display...");
+      await loadScript("https://cdn.jsdelivr.net/npm/pixi-live2d-display/dist/cubism4.min.js");
+
+      if (!window.PIXI || !window.PIXI.live2d) {
+        console.error("[Live2D] pixi-live2d-display failed to load");
+        return;
+      }
+      console.log("[Live2D] pixi-live2d-display loaded");
+
+      const canvas = document.getElementById("live2d-canvas");
+      const size = config.size || { width: 280, height: 250 };
+
+      live2dApp = new PIXI.Application({
+        view: canvas,
+        width: size.width,
+        height: size.height,
+        backgroundAlpha: 0,
+        antialias: true,
+      });
+
+      console.log("[Live2D] PIXI app created, loading model:", modelPathUrl);
+      live2dModel = await PIXI.live2d.Live2DModel.from(modelPathUrl);
+      console.log("[Live2D] Model loaded, size:", live2dModel.width, "x", live2dModel.height);
+
+      // Auto-fit model to canvas
+      const scaleX = size.width / live2dModel.width;
+      const scaleY = size.height / live2dModel.height;
+      const fitScale = Math.min(scaleX, scaleY);
+      live2dModel.scale.set(fitScale);
+      live2dModel.anchor.set(0.5, 0.5);
+      live2dModel.x = size.width / 2;
+      live2dModel.y = size.height / 2;
+      console.log("[Live2D] Scale:", fitScale, "Position:", size.width / 2, size.height / 2);
+
+      live2dApp.stage.addChild(live2dModel);
+
+      // Click interaction — trigger random motion
+      live2dModel.on("hit", (hitAreas) => {
+        console.log("[Live2D] Hit areas:", hitAreas);
+        showMessage();
+      });
+
+      // Tap on canvas fallback for models without hit areas
+      canvas.addEventListener("click", () => {
+        showMessage();
+      });
+
+      setupDrag();
+      console.log("[Live2D] Model loaded successfully:", modelPathUrl);
+    } catch (error) {
+      console.error("[Live2D] Failed to load:", error);
+    }
+  }
+
+  function setupDrag() {
+    const container = document.getElementById("live2d-widget");
+    if (!container) return;
+
+    let isDragging = false;
+    let dragStart = { x: 0, y: 0 };
+    let containerStart = { x: 0, y: 0 };
+
+    container.addEventListener("mousedown", (e) => {
+      if (e.button !== 0) return;
+      isDragging = true;
+      dragStart = { x: e.clientX, y: e.clientY };
+      const rect = container.getBoundingClientRect();
+      containerStart = { x: rect.left, y: rect.top };
+      container.style.cursor = "grabbing";
+      e.preventDefault();
+    });
+
+    document.addEventListener("mousemove", (e) => {
+      if (!isDragging) return;
+      const clampedX = Math.max(0, Math.min(containerStart.x + e.clientX - dragStart.x, window.innerWidth - container.offsetWidth));
+      const clampedY = Math.max(0, Math.min(containerStart.y + e.clientY - dragStart.y, window.innerHeight - container.offsetHeight));
+      container.style.left = clampedX + "px";
+      container.style.right = "auto";
+      container.style.top = clampedY + "px";
+      container.style.bottom = "auto";
+    });
+
+    document.addEventListener("mouseup", () => {
+      if (isDragging) {
+        isDragging = false;
+        container.style.cursor = "grab";
+      }
+    });
+
+    container.addEventListener("touchstart", (e) => {
+      if (e.touches.length !== 1) return;
+      isDragging = true;
+      const touch = e.touches[0];
+      dragStart = { x: touch.clientX, y: touch.clientY };
+      const rect = container.getBoundingClientRect();
+      containerStart = { x: rect.left, y: rect.top };
+      e.preventDefault();
+    });
+
+    document.addEventListener("touchmove", (e) => {
+      if (!isDragging || e.touches.length !== 1) return;
+      const touch = e.touches[0];
+      const clampedX = Math.max(0, Math.min(containerStart.x + touch.clientX - dragStart.x, window.innerWidth - container.offsetWidth));
+      const clampedY = Math.max(0, Math.min(containerStart.y + touch.clientY - dragStart.y, window.innerHeight - container.offsetHeight));
+      container.style.left = clampedX + "px";
+      container.style.right = "auto";
+      container.style.top = clampedY + "px";
+      container.style.bottom = "auto";
+      e.preventDefault();
+    });
+
+    document.addEventListener("touchend", () => {
+      isDragging = false;
+    });
+
+    container.style.cursor = "grab";
+
+    window.addEventListener("resize", () => {
+      const rect = container.getBoundingClientRect();
+      const maxX = window.innerWidth - container.offsetWidth;
+      const maxY = window.innerHeight - container.offsetHeight;
+      if (rect.left > maxX) {
+        container.style.left = maxX + "px";
+        container.style.right = "auto";
+      }
+      if (rect.top > maxY) {
+        container.style.top = maxY + "px";
+        container.style.bottom = "auto";
+      }
+    });
+  }
+
+  function showMessage() {
+    const messages = config.interactive?.clickMessages || [
+      "你好！",
+      "有什么需要帮助的吗？",
+      "今天天气真不错呢！",
+      "要不要一起玩游戏？",
+      "记得按时休息哦！",
+    ];
+    const randomMessage = messages[Math.floor(Math.random() * messages.length)];
+    if (window.showModelMessage) {
+      window.showModelMessage(randomMessage, {
+        containerId: "live2d-widget",
+        displayTime: config.interactive?.messageDisplayTime || 3000
+      });
+    }
+  }
+
+  function handleResponsive() {
+    const widget = document.getElementById("live2d-widget");
+    if (!widget) return;
+    if (config.responsive?.hideOnMobile) {
+      const breakpoint = config.responsive.mobileBreakpoint || 768;
+      widget.style.display = window.innerWidth <= breakpoint ? "none" : "block";
+    }
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", () => {
+      if (!window.live2dModelInitialized) {
+        initLive2D();
+        window.live2dModelInitialized = true;
+      }
+      handleResponsive();
+    });
+  } else {
+    if (!window.live2dModelInitialized) {
+      initLive2D();
+      window.live2dModelInitialized = true;
+    }
+    handleResponsive();
+  }
+
+  window.addEventListener("resize", handleResponsive);
+
+  if (typeof window.swup !== "undefined" && window.swup.hooks) {
+    window.swup.hooks.on("content:replace", () => {
+      setTimeout(handleResponsive, 100);
+    });
+  } else {
+    document.addEventListener("swup:enable", () => {
+      if (window.swup?.hooks) {
+        window.swup.hooks.on("content:replace", () => {
+          setTimeout(handleResponsive, 100);
+        });
+      }
+    });
+  }
+</script>
+
+<style>
+  .live2d-widget {
+    position: fixed;
+    z-index: 999;
+    pointer-events: auto; /* 启用指针事件以支持拖拽 */
+    cursor: grab; /* 默认显示拖拽光标 */
+  }
+
+  #live2d-canvas {
+    pointer-events: auto;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    width: 100%;
+    height: 100%;
+  }
+
+  .live2d-widget:hover #live2d-canvas {
+    opacity: 1;
+  }
+
+  /* 拖拽时的光标样式 */
+  .live2d-widget:active {
+    cursor: grabbing;
+  }
+</style>

@@ -1,0 +1,323 @@
+---
+/**
+ * 极简门户区：将原侧边栏中的"门户级信息"以纯文本垂直堆叠展示。
+ * 每块仅用 [ LABEL ] 小标签 + 细线分隔，无卡片填充。
+ *
+ * 包含：Profile / Announcement / Stats / Categories / Tags
+ * 重组件（Music / Calendar / Live2D / Spine）由右下浮动坞触达，不在此处。
+ */
+import { Icon } from "astro-icon/components";
+import ImageWrapper from "@/components/common/ImageWrapper.astro";
+import NumberTicker from "@/components/common/NumberTicker.svelte";
+import TypewriterText from "@/components/features/TypewriterText.astro";
+import { profileConfig, siteConfig } from "@/config";
+import I18nKey from "@/i18n/i18nKey";
+import { i18n } from "@/i18n/translation";
+import {
+	getCategoryList,
+	getSortedPosts,
+	getTagList,
+} from "@/utils/content-utils";
+import { getTagUrl, url } from "@/utils/url-utils";
+
+const posts = await getSortedPosts();
+const categories = await getCategoryList();
+const tags = await getTagList();
+
+let totalWords = 0;
+for (const post of posts) {
+	if (post.body) {
+		const text = post.body
+			.replace(/```[\s\S]*?```/g, "")
+			.replace(/`[^`]*`/g, "")
+			.replace(/\s+/g, " ")
+			.trim();
+		const cn = text.match(/[一-龥]/g) || [];
+		const en = text.match(/[a-zA-Z]/g) || [];
+		totalWords += cn.length + en.length;
+	}
+}
+
+const siteStartDate = siteConfig.siteStartDate || "2025-01-01";
+const latestPost = posts[0];
+
+// 计算运行天数（服务端计算）
+const startDate = new Date(siteStartDate);
+const today = new Date();
+const diffTime = Math.abs(today.getTime() - startDate.getTime());
+const runningDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+// 计算活跃天数
+let lastUpdateDays = 0;
+let isToday = false;
+if (latestPost) {
+	const lastPost = latestPost.data.published;
+	const timeSinceLastPost = Math.abs(today.getTime() - lastPost.getTime());
+	lastUpdateDays = Math.floor(timeSinceLastPost / (1000 * 60 * 60 * 24));
+	isToday = lastUpdateDays === 0;
+}
+
+const stats = [
+	{
+		icon: "material-symbols:article-outline",
+		label: i18n(I18nKey.siteStatsPostCount),
+		value: posts.length,
+	},
+	{
+		icon: "material-symbols:folder-outline",
+		label: i18n(I18nKey.siteStatsCategoryCount),
+		value: categories.length,
+	},
+	{
+		icon: "material-symbols:label-outline",
+		label: i18n(I18nKey.siteStatsTagCount),
+		value: tags.length,
+	},
+	{
+		icon: "material-symbols:text-ad-outline-rounded",
+		label: i18n(I18nKey.siteStatsTotalWords),
+		value: totalWords,
+		formatted: true,
+	},
+	{
+		icon: "material-symbols:calendar-clock-outline",
+		label: i18n(I18nKey.siteStatsRunningDays),
+		value: runningDays,
+		suffix: i18n(I18nKey.siteStatsDays).replace("{days}", ""),
+	},
+	{
+		icon: "mingcute:heartbeat-line",
+		label: i18n(I18nKey.siteStatsLastUpdate),
+		value: isToday ? 0 : lastUpdateDays,
+		suffix: isToday
+			? i18n(I18nKey.today)
+			: i18n(I18nKey.siteStatsDaysAgo).replace("{days}", ""),
+	},
+];
+---
+
+<div class="home-portal">
+	{/* PROFILE */}
+	<section class="section onload-animation flex flex-col items-center gap-4">
+		<a href={url("/about/")} class="group block relative w-60 h-60 overflow-hidden rounded-full border border-(--line-divider) shrink-0">
+			<ImageWrapper
+				src={profileConfig.avatar || ""}
+				alt="Profile Image of the Author"
+				class="w-full h-full"
+				loading="eager"
+				fetchpriority="high"
+				widths={[400]}
+				sizes="400px"
+			/>
+		</a>
+		<div class="text-center w-full">
+			<TypewriterText text={profileConfig.bio || ""} speed={80} pauseTime={3000} class="text-xl text-(--content-meta)" />
+		</div>
+		<div class="flex items-center justify-center gap-3">
+			{profileConfig.links.map((item) => (
+				<a
+					rel="me"
+					aria-label={item.name}
+					href={item.url}
+					target={item.url.startsWith("http") ? "_blank" : "_self"}
+					class="social-link w-10 h-10 flex items-center justify-center rounded-full border border-(--line-divider) text-(--deep-text) hover:text-(--primary) hover:border-(--primary) transition-colors"
+				>
+				<Icon name={item.icon} class="text-xl" is:inline />
+				</a>
+			))}
+		</div>
+	</section>
+
+
+	{/* STATS */}
+	<div class="onload-animation mt-4">
+		<div class="flex flex-row flex-wrap justify-center gap-x-8 gap-y-4">
+			{stats.map((stat) => (
+				<div class="flex flex-col items-center gap-2">
+					<div class="flex items-center gap-1.5">
+						<Icon name={stat.icon} class="text-base text-neutral-600 dark:text-neutral-300" />
+						<span class="text-xs text-neutral-600 dark:text-neutral-300 font-medium">
+							{stat.label}
+						</span>
+					</div>
+					<NumberTicker
+						value={stat.value}
+						formatted={stat.formatted || false}
+						suffix={stat.suffix || ''}
+						class="text-sm font-bold text-neutral-900 dark:text-neutral-100"
+						client:visible
+					/>
+				</div>
+			))}
+		</div>
+	</div>
+
+	{/* CATEGORIES TITLE */}
+	<div class="section-label text-center">{i18n(I18nKey.categories)}</div>
+
+	{/* CATEGORIES — follows scroll */}
+	<div id="category-sticky-placeholder">
+		<div id="category-sticky-wrapper">
+			<section class="section onload-animation">
+				<div class="flex flex-wrap justify-center gap-2 px-2 max-w-full overflow-x-auto">
+					{categories.map((c) => (
+						<a href={c.url} aria-label={`View all posts in ${c.name.trim()}`} class="cat-square-btn text-sm gap-2 shrink-0">
+							<span>{c.name.trim()}</span>
+							<span class="text-(--content-meta) text-xs">{c.count}</span>
+						</a>
+					))}
+				</div>
+			</section>
+		</div>
+	</div>
+
+	{/* TAGS TITLE */}
+	<div class="section-label text-center">{i18n(I18nKey.tags)}</div>
+
+	{/* TAGS */}
+	<section class="section onload-animation">
+		<div class="flex flex-wrap justify-center gap-2">
+			{tags.map((t) => (
+				<a href={getTagUrl(t.name)} aria-label={`View all posts tagged ${t.name.trim()}`} class="cat-square-btn text-sm">
+					# {t.name.trim()}
+				</a>
+			))}
+		</div>
+	</section>
+</div>
+
+<style>
+	.home-portal {
+		padding-top: 1rem;
+		padding-bottom: 4rem;
+	}
+
+	/* 统一标题边距：分类/标签标题在 section 外，需要与 section 间距一致 */
+	.home-portal > .section-label {
+		margin-top: 3rem;
+		padding-top: 3rem;
+		border-top: 1px solid var(--line-divider);
+	}
+	/* 第一个标题不需要上边框 */
+	.home-portal > .section-label:first-of-type {
+		margin-top: 0;
+		padding-top: 0;
+		border-top: none;
+	}
+
+	:root.dark .social-link {
+		color: oklch(1 0 0) !important;
+		border-color: oklch(0.3 0 0) !important;
+	}
+
+	:root.dark .social-link:hover {
+		color: oklch(0.85 0 0) !important;
+		border-color: oklch(0.5 0 0) !important;
+	}
+
+	/* Category bar — follows header */
+	#category-sticky-placeholder {
+		position: relative;
+	}
+	#category-sticky-wrapper {
+		position: relative;
+		z-index: 40;
+		background: transparent;
+		padding: 0.5rem 0;
+	}
+	#category-sticky-wrapper.is-pinned {
+		position: fixed;
+		top: 68px;
+		left: max(1rem, calc((100vw - 56rem) / 2));
+		right: max(1rem, calc((100vw - 56rem) / 2));
+		max-width: 56rem;
+	}
+
+	.cat-square-btn {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		padding: 0.375rem 1rem;
+		border: 1px solid black;
+		color: black;
+		background: #fff;
+		border-radius: 0;
+		transition: color 150ms, background-color 150ms;
+	}
+	.cat-square-btn:hover {
+		background-color: black;
+		color: white;
+	}
+	:root.dark .cat-square-btn {
+		border-color: white;
+		color: white;
+		background: black;
+	}
+	:root.dark .cat-square-btn:hover {
+		background-color: white;
+		color: black;
+	}
+</style>
+
+<script>
+(function() {
+	const FIXED_TOP = 68;
+	let originalTop = 0;
+	let ticking = false;
+
+	function measure() {
+		const placeholder = document.getElementById('category-sticky-placeholder');
+		if (!placeholder) return;
+		const rect = placeholder.getBoundingClientRect();
+		originalTop = rect.top + window.scrollY;
+	}
+
+	function onScroll() {
+		if (ticking) return;
+		ticking = true;
+		requestAnimationFrame(() => {
+			const wrapper = document.getElementById('category-sticky-wrapper');
+			const placeholder = document.getElementById('category-sticky-placeholder');
+			const mainGrid = document.getElementById('main-grid');
+			if (!wrapper || !placeholder || !mainGrid) { ticking = false; return; }
+
+			const gridRect = mainGrid.getBoundingClientRect();
+			const gridBottom = gridRect.bottom;
+			const shouldPin = window.scrollY >= originalTop - FIXED_TOP && gridBottom > FIXED_TOP + wrapper.offsetHeight;
+
+			if (shouldPin && !wrapper.classList.contains('is-pinned')) {
+				placeholder.style.height = wrapper.offsetHeight + 'px';
+			} else if (!shouldPin && wrapper.classList.contains('is-pinned')) {
+				placeholder.style.height = '';
+			}
+			wrapper.classList.toggle('is-pinned', shouldPin);
+			ticking = false;
+		});
+	}
+
+	function init() {
+		const wrapper = document.getElementById('category-sticky-wrapper');
+		if (!wrapper) return;
+		wrapper.classList.remove('is-pinned');
+		requestAnimationFrame(() => {
+			measure();
+			window.addEventListener('scroll', onScroll, { passive: true });
+			onScroll();
+		});
+	}
+
+	function cleanup() {
+		window.removeEventListener('scroll', onScroll);
+		const wrapper = document.getElementById('category-sticky-wrapper');
+		const placeholder = document.getElementById('category-sticky-placeholder');
+		if (wrapper) wrapper.classList.remove('is-pinned');
+		if (placeholder) placeholder.style.height = '';
+	}
+
+	init();
+	window.addEventListener('resize', () => { measure(); onScroll(); });
+
+	document.addEventListener('swup:page:view', () => { cleanup(); setTimeout(init, 100); });
+	document.addEventListener('astro:page-load', () => { cleanup(); setTimeout(init, 100); });
+})();
+</script>

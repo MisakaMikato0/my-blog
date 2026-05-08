@@ -1,0 +1,307 @@
+---
+import { getEntry } from "astro:content";
+import Comment from "@components/comment/index.astro";
+import FriendCard from "@components/features/FriendCard.astro";
+import FriendRulesModal from "@components/features/FriendRulesModal.astro";
+import { Icon } from "astro-icon/components";
+import {
+	commentConfig,
+	friendsPageConfig,
+	getEnabledFriends,
+	siteConfig,
+} from "@/config";
+import I18nKey from "@/i18n/i18nKey";
+import { i18n } from "@/i18n/translation";
+import MainGridLayout from "@/layouts/MainGridLayout.astro";
+
+// 检查页面是否启用
+if (!siteConfig.pages.friends) {
+	return Astro.redirect("/404/");
+}
+
+const friendsPost = await getEntry("spec", "friends");
+
+if (!friendsPost) {
+	throw new Error("friends page content not found");
+}
+
+// 检查评论系统是否启用
+const isCommentEnabled =
+	commentConfig?.type &&
+	commentConfig.type !== "none" &&
+	friendsPageConfig.showComment !== false;
+
+// 使用配置文件中的友链数据，按权重排序
+const items = getEnabledFriends();
+const allTags = [...new Set(items.flatMap((item) => item.tags || []))].sort();
+
+// 页面标题和描述
+const title = friendsPageConfig.title || i18n(I18nKey.friends);
+const description =
+	friendsPageConfig.description || i18n(I18nKey.friendsDescription);
+---
+
+<MainGridLayout title={title} description={description}>
+  <div
+    class="flex w-full rounded-(--radius-large) relative min-h-32"
+  >
+    <div class="card-base z-10 px-9 py-6 relative w-full">
+      <!-- 页面标题和描述 -->
+      <div class="mb-4">
+        <div class="flex items-center justify-between mb-3">
+          <div class="flex items-center gap-3">
+            <div
+              class="h-8 w-8 rounded-lg bg-(--primary) flex items-center justify-center text-white dark:text-black/70"
+            >
+              <Icon name="material-symbols:group" class="text-[1.5rem]" />
+            </div>
+            <div class="text-3xl font-bold text-neutral-900 dark:text-neutral-100">
+              {title}
+            </div>
+          </div>
+          {
+            friendsPageConfig.applyLink && (
+              <button
+                data-open-friend-rules
+                class="px-4 py-2 rounded-lg border border-neutral-900 dark:border-neutral-100 text-neutral-900 dark:text-neutral-100 hover:bg-neutral-900 hover:text-neutral-100 dark:hover:bg-neutral-100 dark:hover:text-neutral-900 transition-colors duration-200 text-sm font-medium flex items-center gap-2 cursor-pointer"
+              >
+                <Icon name="material-symbols:help-outline-rounded" class="text-base" />
+                如何申请友链
+              </button>
+            )
+          }
+        </div>
+        {
+          description && (
+            <p class="text-base text-neutral-600 dark:text-neutral-400 leading-relaxed mb-4">
+              {description}
+            </p>
+          )
+        }
+      </div>
+
+      <!-- 标签筛选 -->
+      {
+        items.length > 0 && (
+          <friend-filter class="friend-filter-tabs flex flex-wrap gap-1 mb-6 p-1 rounded-xl border border-neutral-900 dark:border-neutral-100" data-tags={["all", ...allTags].join(",")}>
+            <button
+              data-tag="all"
+              class="friend-tab-btn relative z-10 px-4 py-1.5 rounded-lg text-sm font-medium transition-colors duration-200 text-neutral-900 dark:text-neutral-100"
+            >
+              {i18n(I18nKey.all)}
+            </button>
+            {allTags.map((tag) => (
+              <button
+                data-tag={tag}
+                class="friend-tab-btn relative z-10 px-4 py-1.5 rounded-lg text-sm font-medium transition-colors duration-200 text-neutral-900 dark:text-neutral-100"
+              >
+                {tag}
+              </button>
+            ))}
+            <!-- 滑动指示器 -->
+            <div class="friend-tab-indicator absolute top-1 bottom-1 bg-neutral-900 dark:bg-neutral-100 rounded-lg transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] pointer-events-none" style="left: 4px; width: 0px;"></div>
+          </friend-filter>
+        )
+      }
+
+      <div class="friends-grid">
+        {
+          items.map((item) => (
+            <div class="friend-card" data-tags={item.tags?.join(",")}>
+              <FriendCard
+                title={item.title}
+                href={item.siteurl}
+                imgurl={item.imgurl}
+                desc={item.desc}
+                tags={item.tags}
+              />
+            </div>
+          ))
+        }
+      </div>
+    </div>
+  </div>
+
+  <!-- 评论区 -->
+  {isCommentEnabled && (
+    <div class="mt-4">
+      <Comment post={friendsPost} customPath="/friends/" />
+    </div>
+  )}
+
+  <!-- 友链申请指南弹窗 -->
+  <FriendRulesModal applyLink={friendsPageConfig.applyLink} />
+
+  <script slot="head" is:inline>
+    (function() {
+      function initFriendFilter() {
+        const filterEl = document.querySelector("friend-filter");
+        if (!filterEl) return;
+
+        const allBtn = filterEl.querySelector('button[data-tag="all"]');
+        const indicator = filterEl.querySelector(".friend-tab-indicator");
+        if (!allBtn || !indicator) return;
+
+        // 设置"全部"为选中状态
+        allBtn.classList.remove("text-neutral-900", "dark:text-neutral-100");
+        allBtn.classList.add("text-white", "dark:text-neutral-900");
+
+        // 计算并设置指示器位置
+        const parentRect = filterEl.getBoundingClientRect();
+        const btnRect = allBtn.getBoundingClientRect();
+        indicator.style.left = (btnRect.left - parentRect.left) + "px";
+        indicator.style.width = btnRect.width + "px";
+        indicator.style.opacity = "1";
+      }
+
+      // 页面加载完成后初始化
+      if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", initFriendFilter);
+      } else {
+        initFriendFilter();
+      }
+
+      // Astro 页面切换后重新初始化
+      document.addEventListener("astro:page-load", initFriendFilter);
+      document.addEventListener("astro:after-swap", initFriendFilter);
+    })();
+
+    if (!customElements.get("friend-filter")) {
+      class FriendFilter extends HTMLElement {
+        constructor() {
+          super();
+        }
+
+        connectedCallback() {
+          this.addEventListener("click", this.handleClick);
+        }
+
+        disconnectedCallback() {
+          this.removeEventListener("click", this.handleClick);
+        }
+
+        updateIndicator(button) {
+          if (!button) return;
+          const indicator = this.querySelector(".friend-tab-indicator");
+          if (!indicator) return;
+
+          const parentRect = this.getBoundingClientRect();
+          const btnRect = button.getBoundingClientRect();
+
+          indicator.style.left = (btnRect.left - parentRect.left) + "px";
+          indicator.style.width = btnRect.width + "px";
+          indicator.style.opacity = "1";
+        }
+
+        handleClick(e) {
+          const target = e.target;
+          const button = target.closest("button");
+          if (!button) return;
+
+          const selectedTag = button.dataset.tag;
+          const filters = this.querySelectorAll(".friend-tab-btn");
+          const container = this.closest(".card-base");
+          if (!container) return;
+
+          const cards = container.querySelectorAll(".friend-card");
+
+          // 更新滑动指示器位置
+          this.updateIndicator(button);
+
+          // 更新按钮文字颜色：选中白字（暗色下黑字），未选中跟随主题
+          filters.forEach((f) => {
+            if (f === button) {
+              f.classList.remove("text-neutral-900", "dark:text-neutral-100");
+              f.classList.add("text-white", "dark:text-neutral-900");
+            } else {
+              f.classList.remove("text-white", "dark:text-neutral-900");
+              f.classList.add("text-neutral-900", "dark:text-neutral-100");
+            }
+          });
+
+          cards.forEach((card) => {
+            const cardEl = card;
+            const tags = (cardEl.dataset.tags || "").split(",");
+            if (
+              selectedTag === "all" ||
+              (selectedTag && tags.includes(selectedTag))
+            ) {
+              cardEl.style.display = "";
+              cardEl.classList.add("animate-fade-in-up");
+            } else {
+              cardEl.style.display = "none";
+              cardEl.classList.remove("animate-fade-in-up");
+            }
+          });
+        }
+      }
+      customElements.define("friend-filter", FriendFilter);
+    }
+  </script>
+
+  <style is:global>
+    .friends-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.75rem;
+      padding-top: 0.75rem;
+      padding-bottom: 1rem;
+    }
+
+    @media (max-width: 1024px) {
+      .friends-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 640px) {
+      .friends-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .animate-fade-in-up {
+      animation: fadeInUp 0.4s ease-out both;
+    }
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(12px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .friend-filter-tabs {
+      position: relative;
+      display: inline-flex;
+      flex-wrap: wrap;
+    }
+
+    .friend-tab-indicator {
+      box-shadow: 0 1px 3px oklch(0.5 0 0 / 0.15);
+    }
+
+    :root.dark .friend-tab-indicator {
+      box-shadow: 0 1px 3px oklch(0 0 0 / 0.3);
+    }
+
+    .friend-tab-btn {
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .friend-tab-btn:hover {
+      opacity: 0.7;
+    }
+
+    .friend-tab-btn:active {
+      transform: scale(0.95);
+    }
+  </style>
+</MainGridLayout>

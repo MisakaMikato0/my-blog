@@ -22,6 +22,14 @@ export const galleryConfig: GalleryConfig = {
 			tags: ["AI", "祖国人"],
 		},
 		{
+			id: "other-2026",
+			name: "其他",
+			description: "其他相册，欢迎投稿！",
+			location: "all around the world",
+			date: "2026-05-06",
+			tags: ["大杂烩"],
+		},
+		{
 			id: "bl-ll-2026",
 			name: "萝莉",
 			description: "进来先电",

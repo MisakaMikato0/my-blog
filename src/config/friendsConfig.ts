@@ -63,16 +63,7 @@ export const friendsConfig: FriendLink[] = [
 		tags: ["Blog"],
 		weight: 7,
 		enabled: true,
-	},
-	{
-		title: "MmzMing的博客2",
-		imgurl: "https://i.stardots.io/784774835/StarDots-2026042803043780900.png",
-		desc: "带数据库带后台带图库",
-		siteurl: "https://blog.mmzhiku.xyz/",
-		tags: ["Blog"],
-		weight: 10,
-		enabled: true,
-	},
+	}
 ];
 
 // 获取启用的友链并进行排序

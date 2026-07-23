@@ -52,6 +52,23 @@ export default {
 			return handlePosterImage(request);
 		}
 
+		if (url.pathname.startsWith("/admin")) {
+			// Admin SPA: rewrite /admin → /admin/ → /admin/index.html
+			const adminUrl = url.pathname === "/admin" || url.pathname === "/admin/"
+				? new URL(url.origin + "/admin/index.html")
+				: url;
+			const adminReq = new Request(adminUrl, request);
+			if (env.ASSETS) {
+				const response = await env.ASSETS.fetch(adminReq);
+				// If 404, serve index.html for SPA routing
+				if (response.status === 404) {
+					const indexReq = new Request(new URL(url.origin + "/admin/index.html"), request);
+					return withHeaders(await env.ASSETS.fetch(indexReq));
+				}
+				return withHeaders(response);
+			}
+		}
+
 		// Static assets via Pages
 		if (env.ASSETS) {
 			const response = await env.ASSETS.fetch(request);

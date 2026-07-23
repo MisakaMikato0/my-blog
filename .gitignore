@@ -19,6 +19,7 @@ pnpm-debug.log*
 .env.production
 .wrangler/
 .vectorize-manifest.json
+deploy.bat
 # macOS-specific files
 .DS_Store
 

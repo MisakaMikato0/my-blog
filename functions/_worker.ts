@@ -38,25 +38,25 @@ function withHeaders(response: Response): Response {
 	});
 }
 
-export async function onRequest(context: {
-	request: Request;
-	env: Env;
-	ctx: ExecutionContext;
-	next: () => Promise<Response>;
-}): Promise<Response> {
-	const { request, env, ctx, next } = context;
-	const url = new URL(request.url);
+export default {
+	async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
+		const url = new URL(request.url);
 
-	if (url.pathname === "/api/ai-chat") {
-		return handleCloudflareAiSearch(request, env);
-	}
-	if (url.pathname === "/api/github-contributions") {
-		return handleGithubContributions(request, env, ctx);
-	}
-	if (url.pathname === "/api/poster-image") {
-		return handlePosterImage(request);
-	}
+		if (url.pathname === "/api/ai-chat") {
+			return handleCloudflareAiSearch(request, env);
+		}
+		if (url.pathname === "/api/github-contributions") {
+			return handleGithubContributions(request, env, ctx);
+		}
+		if (url.pathname === "/api/poster-image") {
+			return handlePosterImage(request);
+		}
 
-	const response = await next();
-	return withHeaders(response);
-}
+		// Static assets via Pages
+		if (env.ASSETS) {
+			const response = await env.ASSETS.fetch(request);
+			return withHeaders(response);
+		}
+		return new Response("Not Found", { status: 404 });
+	},
+};

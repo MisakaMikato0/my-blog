@@ -6,7 +6,7 @@
 		"dev": "astro dev",
 		"start": "astro dev",
 		"check": "astro check",
-		"build": "cd admin && npm run build && cd .. && cp -r admin/dist public/admin && node scripts/generate-icons.js && astro build && pagefind --site dist",
+		"build": "cd admin && npm run build && cd .. && rm -rf public/admin && cp -r admin/dist public/admin && node scripts/generate-icons.js && astro build && pagefind --site dist",
 		"preview": "astro preview",
 		"astro": "astro",
 		"type-check": "tsc --noEmit",

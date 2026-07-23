@@ -26,6 +26,7 @@ admin/dist/
 admin/node_modules/
 admin/src/**/*.js
 admin/tsconfig.tsbuildinfo
+public/admin/
 
 # macOS-specific files
 .DS_Store

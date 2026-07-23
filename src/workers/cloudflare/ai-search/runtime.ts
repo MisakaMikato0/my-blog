@@ -2,7 +2,7 @@ import { aiSearchConfig } from "@/config/aiSearchConfig";
 import type { AiSearchRuntime } from "@/server/ai-search/contracts";
 import { handleAiSearch } from "@/server/ai-search/handler";
 import { OpenAiCompatibleProvider } from "@/server/ai-search/providers/openai-compatible";
-import { DurableRateLimiter } from "./durable-rate-limiter";
+import { InMemoryRateLimiter } from "./durable-rate-limiter";
 import { cloudflareAiSearchLogger } from "./logger";
 import { VectorizeRetriever } from "./vectorize-retriever";
 import { WorkersAiProvider } from "./workers-ai-provider";
@@ -47,7 +47,7 @@ export function createCloudflareAiSearchRuntime(env: Env): AiSearchRuntime {
 		embeddingProvider: provider,
 		chatProvider: provider,
 		retriever: new VectorizeRetriever(env.VECTORIZE),
-		rateLimiter: new DurableRateLimiter(env.AI_RATE_LIMITER),
+		rateLimiter: new InMemoryRateLimiter(),
 		logger: cloudflareAiSearchLogger,
 	};
 }

@@ -21,13 +21,6 @@ pnpm-debug.log*
 .vectorize-manifest.json
 deploy.bat
 
-# admin build output & artifacts
-admin/dist/
-admin/node_modules/
-admin/src/**/*.js
-admin/tsconfig.tsbuildinfo
-public/admin/
-
 # macOS-specific files
 .DS_Store
 

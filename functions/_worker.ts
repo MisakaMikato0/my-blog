@@ -52,11 +52,7 @@ export default {
 			return handlePosterImage(request);
 		}
 
-		if (url.pathname.startsWith("/admin")) {
-			return withHeaders(await env.ASSETS.fetch(request));
-		}
-
-		// Static assets via Pages
+	// Static assets via Pages
 		if (env.ASSETS) {
 			const response = await env.ASSETS.fetch(request);
 			return withHeaders(response);

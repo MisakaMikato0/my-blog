@@ -149,7 +149,7 @@ export const homeConfig: HomeConfig = {
 				title: '外部站点',
 				english: 'PROJECTS',
 				description: '菲比主站 · 工具导航',
-				image: '/assets/images/home-truncated/1.webp',
+				image: 'https://image.hakugyokurou.fun/file/home/1784904734508_5.png',
 				alt: '外部站点',
 			},
 			{

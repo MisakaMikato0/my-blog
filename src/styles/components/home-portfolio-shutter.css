@@ -83,7 +83,7 @@
 }
 
 .home-portfolio-shutter__interlude-copy-text {
-	font-size: clamp(4.5rem, 13vw, 11rem);
+	font-size: clamp(4.5rem, 13vw, 7rem);
 	font-weight: 950;
 	line-height: 1;
 	letter-spacing: 0.06em;
@@ -109,7 +109,7 @@
 	height: 100vh;
 	object-fit: contain;
 	object-position: center bottom;
-	transform: translateX(-50%);
+	transform: translateX(-40%) !important;
 	user-select: none;
 	-webkit-user-drag: none;
 	opacity: 0;

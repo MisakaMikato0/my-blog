@@ -69,7 +69,7 @@
    DOM 在 line 之后、pillar 之前，自然覆盖 line，被 pillar 覆盖 ===== */
 .home-display-layer__emitter {
 	position: absolute;
-	bottom: 0;
+	bottom: -6%;
 	left: 50%;
 	transform: translateX(-50%);
 	height: clamp(140px, 22vh, 280px);

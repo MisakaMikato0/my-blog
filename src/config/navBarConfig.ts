@@ -18,7 +18,7 @@ const buildNavBarConfig = (): NavBarConfig => {
 	// 1. 构建文章下拉菜单
 	const postsNav: NavBarLink = {
 		...LinkPresets[LinkPreset.NavPosts],
-		children: [LinkPreset.Archive, LinkPreset.Categories, LinkPreset.PostList],
+		children: [LinkPreset.Archive, LinkPreset.Categories, LinkPreset.PostList, LinkPreset.WritePost],
 	};
 
 	// 2. 构建联系我下拉菜单
@@ -64,7 +64,6 @@ const buildNavBarConfig = (): NavBarConfig => {
 		LinkPreset.Feibichi,
 		...(siteConfig.pages.collections ? [LinkPreset.Collections] : []),
 		postsNav,
-			LinkPreset.WritePost,
 		...(contactNav ? [contactNav] : []),
 		myNav,
 	];

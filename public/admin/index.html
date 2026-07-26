@@ -14,6 +14,28 @@
       --color-input-bg: #1a1a1a;
       --color-input-border: #333;
     }
+
+    /* 文章列表卡片玻璃特效 */
+    .nc-entryCard-card {
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+      backdrop-filter: blur(0px) !important;
+      -webkit-backdrop-filter: blur(0px) !important;
+    }
+    .nc-entryCard-card:hover {
+      transform: translateY(-2px) scale(1.01) !important;
+      background: rgba(124, 58, 237, 0.08) !important;
+      backdrop-filter: blur(12px) !important;
+      -webkit-backdrop-filter: blur(12px) !important;
+      box-shadow:
+        0 8px 32px rgba(124, 58, 237, 0.15),
+        0 0 0 1px rgba(124, 58, 237, 0.2) !important;
+    }
+
+    /* 分类下拉选择器 - 显示已有分类但不限制输入 */
+    .nc-select-wrapper input {
+      flex: 1;
+      min-width: 0;
+    }
   </style>
 </head>
 <body>

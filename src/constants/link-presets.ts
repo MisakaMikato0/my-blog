@@ -105,4 +105,9 @@ export const LinkPresets: { [key in LinkPreset]: NavBarLink } = {
 		url: '/music/',
 		icon: 'material-symbols:graphic-eq-rounded',
 	},
+	[LinkPreset.WritePost]: {
+		name: i18n(I18nKey.writePost),
+		url: '/admin/',
+		icon: 'material-symbols:edit-note',
+	},
 };

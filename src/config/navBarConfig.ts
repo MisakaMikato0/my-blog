@@ -64,6 +64,7 @@ const buildNavBarConfig = (): NavBarConfig => {
 		LinkPreset.Feibichi,
 		...(siteConfig.pages.collections ? [LinkPreset.Collections] : []),
 		postsNav,
+			LinkPreset.WritePost,
 		...(contactNav ? [contactNav] : []),
 		myNav,
 	];

@@ -165,7 +165,11 @@ const articleListPosts = await Promise.all(
 			publishedIso: entry.data.published.toISOString(),
 			publishedText: dateFormatter.format(entry.data.published),
 			category,
+<<<<<<< HEAD
 			categoryUrl: getCategoryUrl(rawCategory || null),
+=======
+			categoryUrl: getCategoryUrl(entry.data.category || null),
+>>>>>>> e0fea22 (refactor: ci校验)
 			tags,
 			description:
 				entry.data.description ||

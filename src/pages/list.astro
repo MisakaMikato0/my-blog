@@ -166,10 +166,13 @@ const articleListPosts = await Promise.all(
 			publishedText: dateFormatter.format(entry.data.published),
 			category,
 <<<<<<< HEAD
+<<<<<<< HEAD
 			categoryUrl: getCategoryUrl(rawCategory || null),
 =======
 			categoryUrl: getCategoryUrl(entry.data.category || null),
 >>>>>>> e0fea22 (refactor: ci校验)
+=======
+>>>>>>> 07c6c37 (feat: 优化页面切换性能，启用视口预载和改进 CSS 加载策略)
 			tags,
 			description:
 				entry.data.description ||

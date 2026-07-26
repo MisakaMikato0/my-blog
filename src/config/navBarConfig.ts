@@ -1,10 +1,10 @@
-import { LinkPresets } from "../constants/link-presets";
+import { LinkPresets } from '../constants/link-presets';
 import {
 	LinkPreset,
 	type NavBarConfig,
 	type NavBarLink,
-} from "../types/config";
-import { siteConfig } from "./siteConfig";
+} from '../types/config';
+import { siteConfig } from './siteConfig';
 
 /**
  * 构建导航栏链接配置
@@ -58,7 +58,7 @@ const buildNavBarConfig = (): NavBarConfig => {
 		children: myChildren,
 	};
 
-	// 4. 统一组装导航栏链接（顺序：主页 → 个人主站 → 工具导航 → 文章 → 联系我 → 我的）
+	// 4. 统一组装导航栏链接（顺序：主页 → Touhou → 工具导航 → 文章 → 联系我 → 我的）
 	const links: (NavBarLink | LinkPreset)[] = [
 		LinkPreset.Home,
 		LinkPreset.Feibichi,

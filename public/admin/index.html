@@ -13,6 +13,36 @@
       --color-input-bg: #1a1a1a;
       --color-input-border: #333;
     }
+
+    /* 文章列表条目链接 - Decap CMS 通过 emotion 生成哈希类名 */
+    a[href*="entries/"],
+    a[role="button"][tabindex],
+    [data-testid="entry-card"],
+    [data-testid*="entry"] {
+      transition: all 0.25s ease !important;
+      border-radius: 10px !important;
+    }
+    a[href*="entries/"]:hover,
+    a[role="button"][tabindex]:hover {
+      transform: translateY(-1px) !important;
+      background: rgba(124, 58, 237, 0.08) !important;
+      backdrop-filter: blur(12px) !important;
+      -webkit-backdrop-filter: blur(12px) !important;
+      box-shadow: 0 4px 20px rgba(124, 58, 237, 0.12) !important;
+    }
+
+    /* 网格布局中的卡片容器 */
+    [class*="Grid"] > a,
+    section a[style*="relative"] {
+      transition: all 0.25s ease !important;
+      border-radius: 10px !important;
+    }
+    [class*="Grid"] > a:hover,
+    section a[style*="relative"]:hover {
+      transform: translateY(-1px) !important;
+      background: rgba(124, 58, 237, 0.06) !important;
+      backdrop-filter: blur(10px) !important;
+    }
   </style>
 </head>
 <body>

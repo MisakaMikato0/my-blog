@@ -71,24 +71,84 @@
   <script>
     (function() {
       var CATEGORIES = ['ai', 'projects', 'others', '学习文档', '示例'];
-      // 创建 datalist 元素
-      var datalist = document.createElement('datalist');
-      datalist.id = 'cms-category-list';
-      CATEGORIES.forEach(function(cat) {
-        var opt = document.createElement('option');
-        opt.value = cat;
-        datalist.appendChild(opt);
-      });
-      document.body.appendChild(datalist);
-      // 监听 CMS 渲染的分类输入框，关联 datalist
-      var observer = new MutationObserver(function() {
-        document.querySelectorAll('input[name="category"]').forEach(function(input) {
-          if (!input.hasAttribute('list')) {
-            input.setAttribute('list', 'cms-category-list');
-          }
-        });
-      });
-      observer.observe(document.body, { childList: true, subtree: true });
+
+      CMS.registerWidget('category-select', window.createClass({
+        getInitialState: function() {
+          return { isOpen: false, value: this.props.value || '' };
+        },
+        handleChange: function(e) {
+          var val = e.target.value;
+          this.setState({ value: val });
+          this.props.onChange(val);
+        },
+        toggleOpen: function() {
+          this.setState({ isOpen: !this.state.isOpen });
+        },
+        selectOption: function(opt) {
+          this.setState({ value: opt, isOpen: false });
+          this.props.onChange(opt);
+        },
+        handleBlur: function(e) {
+          var self = this;
+          setTimeout(function() { self.setState({ isOpen: false }); }, 150);
+        },
+        render: function() {
+          var h = window.h;
+          var value = this.state.value;
+          var isOpen = this.state.isOpen;
+          var filtered = CATEGORIES.filter(function(c) {
+            return !value || c.indexOf(value) !== -1;
+          });
+
+          return h('div', { style: { position: 'relative', width: '100%' } },
+            h('div', { style: { display: 'flex', alignItems: 'center' } },
+              h('input', {
+                type: 'text',
+                value: value,
+                onChange: this.handleChange,
+                onFocus: this.toggleOpen,
+                onBlur: this.handleBlur,
+                placeholder: '选择或输入分类',
+                style: {
+                  width: '100%', padding: '8px 12px', fontSize: '14px',
+                  background: '#1a1a1a', color: '#eee', borderRadius: '4px',
+                  border: '1px solid #333', boxSizing: 'border-box', outline: 'none'
+                }
+              }),
+              h('button', {
+                type: 'button',
+                onClick: this.toggleOpen,
+                style: {
+                  position: 'absolute', right: '4px', top: '50%',
+                  transform: 'translateY(-50%)',
+                  background: 'none', border: 'none', color: '#9ca3af',
+                  cursor: 'pointer', padding: '4px 8px', fontSize: '12px'
+                }
+              }, isOpen ? '▲' : '▼')
+            ),
+            isOpen && filtered.length ? h('ul', { style: {
+              position: 'absolute', top: '100%', left: '0', right: '0',
+              margin: '2px 0 0 0', padding: '4px 0',
+              background: '#1a1a1a', border: '1px solid #333',
+              borderRadius: '4px', zIndex: '9999',
+              listStyle: 'none', maxHeight: '200px', overflowY: 'auto'
+            } },
+              filtered.map(function(opt) {
+                var selected = opt === value;
+                return h('li', {
+                  key: opt,
+                  onMouseDown: function() { this.selectOption(opt); }.bind(this),
+                  style: {
+                    padding: '6px 12px', cursor: 'pointer',
+                    background: selected ? 'rgba(124,58,237,0.2)' : 'transparent',
+                    color: selected ? '#a78bfa' : '#eee', fontSize: '14px'
+                  }
+                }, opt);
+              }.bind(this))
+            ) : null
+          );
+        }
+      }));
     })();
   </script>
 </body>

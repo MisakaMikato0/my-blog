@@ -9,8 +9,6 @@ media_folder: public/assets
 public_folder: /assets
 publish_mode: editorial_workflow
 
-local_backend: true
-
 collections:
   - name: posts
     label: 文章

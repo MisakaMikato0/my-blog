@@ -21,9 +21,13 @@ collections:
     meta:
       path:
         widget: hidden
-        label: "路径"
+        label: 路径
         name: path
-        default: ""
+        default: "{{category}}/{{slug}}"
+    slug:
+      encoding: unicode
+      clean_accents: false
+      sanitize_replacement: "-"
     format: yaml-frontmatter
     sortable_fields: [published, title]
     summary: "{{title}}"

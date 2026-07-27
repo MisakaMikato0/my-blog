@@ -70,9 +70,10 @@
 	height: auto;
 	object-fit: contain;
 	border-radius: 10px;
-	border: 2px solid #000000;
-	box-shadow: 0 3px 0 #000000;
 	pointer-events: auto;
+	position: absolute;
+    bottom: clamp(-2.8rem, -3.1vh, -1.65rem);
+    right: clamp(-5.2rem, -5vw, -3.1rem);
 }
 
 /* 打字机光标动画（打字进行中在末尾显示竖线光标） */

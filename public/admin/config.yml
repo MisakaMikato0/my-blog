@@ -16,8 +16,6 @@ collections:
     folder: src/content/posts
     create: true
     delete: true
-    nested:
-      depth: 2
     format: yaml-frontmatter
     sortable_fields: [published, title]
     summary: "{{title}}"

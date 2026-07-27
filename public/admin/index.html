@@ -47,5 +47,28 @@
 </head>
 <body>
   <script src="/admin/decap-cms.js"></script>
+  <script>
+    (function() {
+      var CATEGORIES = ['ai', 'projects', 'others', '学习文档', '示例'];
+      // 创建 datalist 元素
+      var datalist = document.createElement('datalist');
+      datalist.id = 'cms-category-list';
+      CATEGORIES.forEach(function(cat) {
+        var opt = document.createElement('option');
+        opt.value = cat;
+        datalist.appendChild(opt);
+      });
+      document.body.appendChild(datalist);
+      // 监听 CMS 渲染的分类输入框，关联 datalist
+      var observer = new MutationObserver(function() {
+        document.querySelectorAll('input[name="category"]').forEach(function(input) {
+          if (!input.hasAttribute('list')) {
+            input.setAttribute('list', 'cms-category-list');
+          }
+        });
+      });
+      observer.observe(document.body, { childList: true, subtree: true });
+    })();
+  </script>
 </body>
 </html>

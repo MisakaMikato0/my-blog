@@ -16,6 +16,13 @@ collections:
     folder: src/content/posts
     create: true
     delete: true
+    nested:
+      depth: 2
+    meta:
+      path:
+        widget: hidden
+        name: path
+        default: ""
     format: yaml-frontmatter
     sortable_fields: [published, title]
     summary: "{{title}}"

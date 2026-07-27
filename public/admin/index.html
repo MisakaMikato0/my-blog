@@ -21,6 +21,18 @@
     body {
       background: url('https://image.hakugyokurou.fun/file/1784904548543_1.jpg') no-repeat center center fixed;
       background-size: cover;
+      position: relative;
+    }
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background: inherit;
+      background-size: cover;
+      background-attachment: fixed;
+      background-position: center;
+      filter: blur(8px);
+      z-index: -1;
     }
 
     /* 文章列表条目链接 - Decap CMS 通过 emotion 生成哈希类名 */

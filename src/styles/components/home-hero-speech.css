@@ -36,7 +36,7 @@
 	box-shadow:
 		0 3px 0 #000000,
 		0 26px 60px rgba(0, 0, 0, 0.42);
-	color: rgba(255, 255, 255, 0.94);
+	color: rgba(255, 156, 217, 0.7);
 	font-size: clamp(1.05rem, 1.45vw, 1.45rem);
 	font-weight: 700;
 	letter-spacing: 0.04em;
@@ -90,7 +90,7 @@
 	.home-hero__speech {
 		width: min(80%, 34rem);
 		bottom: clamp(2rem, 6vh, 4rem);
-		transform: translate(-50%, -50%);
+		transform: translate(-50%, -50%) !important;
 	}
 
 	.home-hero__speech-text {

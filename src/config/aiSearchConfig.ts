@@ -5,17 +5,17 @@ export const aiSearchConfig = {
 	// ── AI 服务商配置 ──────────────────────────────
 	provider: {
 		// 第三方 API 地址（当前使用魔搭社区 ModelScope）
-		apiUrl: "https://api-inference.modelscope.cn/v1",
+		apiUrl: 'https://api-inference.modelscope.cn/v1',
 		// 第三方对话模型
-		chatModel: "deepseek-ai/DeepSeek-V4-Flash",
+		chatModel: 'deepseek-ai/DeepSeek-V4-Flash',
 		// 第三方 Embedding 模型
-		embeddingModel: "Qwen/Qwen3-Embedding-8B",
+		embeddingModel: 'Qwen/Qwen3-Embedding-8B',
 		// Embedding 向量维度（必须与 Vectorize 索引维度一致）
 		embeddingDimensions: 1024,
 		// Workers AI 回退对话模型
-		workersAiChatModel: "@cf/meta/llama-3-8b-instruct",
+		workersAiChatModel: '@cf/meta/llama-3-8b-instruct',
 		// Workers AI 回退 Embedding 模型
-		workersAiEmbeddingModel: "@cf/baai/bge-large-en-v1.5",
+		workersAiEmbeddingModel: '@cf/baai/bge-large-en-v1.5',
 	},
 	// ── 请求限制 ──────────────────────────────────
 	request: {
@@ -47,7 +47,7 @@ export const aiSearchConfig = {
 	// ── 向量索引 ──────────────────────────────────
 	index: {
 		// Vectorize 索引名称
-		name: "blog-ai-search",
+		name: 'blog-ai-search',
 		// 清单文件 Schema 版本
 		manifestSchemaVersion: 2,
 		// 批量写入索引时的每批条数

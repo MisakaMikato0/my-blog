@@ -81,10 +81,6 @@ const heroRightPanel = homeConfig.hero.rightPanel ?? {
 
 // 将 displayName 拆成逐字 span，用于逐字入场动画与 cqw 缩放
 const nameLetters = Array.from(homeConfig.displayName || "");
-
-const mobileBackground =
-	homeConfig.hero.backgroundImageMobile || homeConfig.hero.backgroundImage;
-
 const rainConfig = {
 	enabled: homeConfig.hero.rain?.enabled ?? true,
 	intensity: homeConfig.hero.rain?.intensity ?? 0.6,
@@ -97,13 +93,8 @@ const rainConfig = {
 	data-avatar-off={avatarOffUrl}
 	data-work-hours={JSON.stringify(workHours)}
 	data-hero-rain={JSON.stringify(rainConfig)}
->
-	<!-- 背景层：移动端 / 桌面端通过 <picture> 服务端切换 -->
-	<picture class="home-hero__video-picture">
-		<source media="(max-width: 768px)" srcset={mobileBackground} />
-		<img class="home-hero__video" src={homeConfig.hero.backgroundImage} alt="" />
-	</picture>
-
+	<!-- 背景层：视频 -->
+	<video class="home-hero__video" autoplay loop muted playsinline src={homeConfig.hero.backgroundImage}></video>
 	<!-- 全屏内容容器 -->
 	<div class="home-hero__canvas-container" id="main-canvas">
 		<!-- 外四角取景框 -->

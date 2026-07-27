@@ -24,10 +24,6 @@ collections:
         label: 路径
         name: path
         default: "{{category}}/{{slug}}"
-    slug:
-      encoding: unicode
-      clean_accents: false
-      sanitize_replacement: "-"
     format: yaml-frontmatter
     sortable_fields: [published, title]
     summary: "{{title}}"

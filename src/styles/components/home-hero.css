@@ -493,7 +493,7 @@ html:has(.home-hero) #top-row {
 .home-hero__name-letter,
 .home-hero__name-badge,
 .home-hero__avatar-group,
-.home-hero__dialogue-box,
+.home-hero__speech,
 .home-hero__right-panel,
 .home-hero__focus-frame,
 .home-hero__viewfinder,
@@ -538,7 +538,7 @@ html:has(.home-hero) #top-row {
 	clip-path: circle(0% at 50% 50%);
 }
 
-.home-hero--motion-pending .home-hero__dialogue-box {
+.home-hero--motion-pending .home-hero__speech {
 	opacity: 0;
 	transform: translateY(34px) scale(0.92);
 	filter: blur(10px);
@@ -567,7 +567,7 @@ html:has(.home-hero) #top-row {
 	transform: scale(1.1);
 }
 
-/* 对话框样式已迁移至 home-hero-dialogue.css（galgame 暗黑对话框） */
+/* 对话框样式已替换为 speech 气泡（home-hero-speech.css） */
 
 /* ---------- 右侧面板 ---------- */
 .home-hero__right-panel {
@@ -829,7 +829,7 @@ html:has(.home-hero) #top-row {
 		margin-bottom: 0.1rem;
 	}
 
-	/* 移动端隐藏相机取景器元素（对话框移动端样式见 home-hero-dialogue.css） */
+	/* 移动端隐藏相机取景器元素（speech 气泡移动端样式见 home-hero-speech.css） */
 	.home-hero__focus-frame,
 	.home-hero__viewfinder,
 	.home-hero__camera-params {

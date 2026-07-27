@@ -1,0 +1,106 @@
+/* ============================================
+   首页 Hero — 底部简介气泡
+   参考 Firefly 主题样式，固定一句台词 + 装饰角色图
+   ============================================ */
+
+.home-hero__speech {
+	position: absolute;
+	left: 50%;
+	bottom: clamp(3.5rem, 8vh, 6.5rem);
+	transform: translateX(-50%);
+	z-index: 32;
+	display: flex;
+	align-items: flex-end;
+	gap: 1rem;
+	width: min(52rem, 92%);
+	pointer-events: none;
+}
+
+.home-hero__speech-wrapper {
+	flex: 1;
+	min-width: 0;
+}
+
+/* 中文台词 */
+.home-hero__speech-text {
+	margin: 0;
+	padding: clamp(1rem, 1.6vw, 1.5rem) clamp(1.4rem, 2vw, 2rem);
+	border: 2px solid #000000;
+	border-radius: 14px;
+	background:
+		linear-gradient(135deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.01)),
+		rgba(10, 12, 16, 0.72);
+	backdrop-filter: blur(22px) saturate(140%);
+	-webkit-backdrop-filter: blur(22px) saturate(140%);
+	box-shadow:
+		0 3px 0 #000000,
+		0 26px 60px rgba(0, 0, 0, 0.42);
+	color: rgba(255, 255, 255, 0.94);
+	font-size: clamp(1.05rem, 1.45vw, 1.45rem);
+	font-weight: 700;
+	letter-spacing: 0.04em;
+	line-height: 1.6;
+}
+
+/* 英文副文本 */
+.home-hero__speech-en {
+	margin: 0.5rem 0 0;
+	padding: clamp(0.6rem, 1vw, 0.9rem) clamp(1rem, 1.6vw, 1.5rem);
+	border: 2px solid #000000;
+	border-radius: 10px;
+	background: rgba(10, 12, 16, 0.6);
+	backdrop-filter: blur(16px) saturate(120%);
+	-webkit-backdrop-filter: blur(16px) saturate(120%);
+	box-shadow: 0 2px 0 #000000;
+	color: rgba(255, 255, 255, 0.7);
+	font-size: clamp(0.82rem, 1vw, 1rem);
+	font-weight: 500;
+	letter-spacing: 0.06em;
+	line-height: 1.4;
+}
+
+.home-hero__speech-en .home-hero__speech-type {
+	font-style: italic;
+}
+
+/* 装饰角色图 */
+.home-hero__speech-accent {
+	flex-shrink: 0;
+	width: clamp(4rem, 6vw, 6.5rem);
+	height: auto;
+	object-fit: contain;
+	border-radius: 10px;
+	border: 2px solid #000000;
+	box-shadow: 0 3px 0 #000000;
+	pointer-events: auto;
+}
+
+/* 打字机光标动画（打字进行中在末尾显示竖线光标） */
+@keyframes speech-caret {
+	0%, 50% { opacity: 1; }
+	50.01%, 100% { opacity: 0; }
+}
+
+/* ============================================
+   移动端适配
+   ============================================ */
+@media (max-width: 768px) {
+	.home-hero__speech {
+		width: min(100%, 34rem);
+		bottom: clamp(2rem, 6vh, 4rem);
+	}
+
+	.home-hero__speech-text {
+		padding: 1rem 1.2rem;
+		font-size: clamp(0.95rem, 3.5vw, 1.1rem);
+	}
+
+	.home-hero__speech-en {
+		padding: 0.6rem 1rem;
+		font-size: clamp(0.75rem, 2.8vw, 0.85rem);
+	}
+
+	.home-hero__speech-accent {
+		width: clamp(3rem, 8vw, 4.5rem);
+	}
+}

@@ -21,6 +21,7 @@ collections:
     meta:
       path:
         widget: hidden
+        label: "路径"
         name: path
         default: ""
     format: yaml-frontmatter

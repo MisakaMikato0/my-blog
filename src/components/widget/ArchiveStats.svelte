@@ -1,37 +1,36 @@
 <script lang="ts">
 import { onMount } from "svelte";
+import { fetchGithubContributionSummary } from "@/api/github-contributions";
 
+type GithubStatus = "idle" | "loading" | "ready" | "error" | "disabled";
 type PostSummary = {
 	category?: string | null;
 	tags: string[];
-	published: number;
 };
 
 export let totalPosts = 0;
 export let currentYearPosts = 0;
-export let currentMonthPosts = 0;
-export let currentMonthNumber = 1;
 export let postSummaries: PostSummary[] = [];
 export let annualPostGoal = 0;
+export let githubEnabled = false;
+export let githubUsername = "";
+export let timezone = "UTC";
 export let totalPostsLabel = "";
-export let monthPostsLabel = "";
-export let writingSpanLabel = "";
+export let githubLabel = "";
 export let categoryPostsLabel = "";
 export let tagPostsLabel = "";
 export let progressLabel = "";
 export let goalLabel = "";
+export let loadingLabel = "";
 export let unavailableLabel = "--";
-export let evaluationAheadTemplate = "";
-export let evaluationOnTrackTemplate = "";
-export let evaluationBehindTemplate = "";
-export let evaluationCompleteTemplate = "";
 
 let displayedScopePosts = totalPosts;
-let displayedMonthPosts = currentMonthPosts;
 let scopePostsLabel = totalPostsLabel;
 let writingSpanDays: number | null = null;
 let displayedWritingSpanDays: number | null = null;
 let displayedProgress: number | null = null;
+let displayedGithub: number | null = null;
+let githubStatus: GithubStatus = "idle";
 let progressTarget: number | null = null;
 let animationFrames: number[] = [];
 
@@ -48,13 +47,9 @@ function normalizeFilterValue(value: string | null | undefined): string {
 	return (value ?? "").trim();
 }
 
-function getScopeSummary(): {
-	label: string;
-	count: number;
-	spanDays: number | null;
-} {
+function getScopeSummary(): { label: string; count: number } {
 	if (postSummaries.length === 0) {
-		return { label: totalPostsLabel, count: totalPosts, spanDays: null };
+		return { label: totalPostsLabel, count: totalPosts };
 	}
 
 	const params = new URLSearchParams(window.location.search);
@@ -88,38 +83,15 @@ function getScopeSummary(): {
 			: categories.length > 0 || hasUncategorized
 				? categoryPostsLabel
 				: totalPostsLabel;
-	const timestamps = filtered.map((post) => post.published);
-	const spanDays =
-		timestamps.length > 1
-			? Math.max(
-					0,
-					Math.round(
-						(Math.max(...timestamps) - Math.min(...timestamps)) / 86_400_000,
-					),
-				)
-			: null;
-	return { label, count: filtered.length, spanDays };
+	return { label, count: filtered.length };
 }
 
-function getEvaluation(): string {
-	if (annualPostGoal <= 0) return "";
-	if (currentYearPosts >= annualPostGoal) return evaluationCompleteTemplate;
-
-	const remainingPosts = annualPostGoal - currentYearPosts;
-	const remainingMonths = Math.max(1, 12 - currentMonthNumber);
-	const requiredMonthlyPace = Math.ceil(remainingPosts / remainingMonths);
-	const expectedProgress = (currentMonthNumber / 12) * 100;
-	const actualProgress = progressTarget ?? 0;
-	const template =
-		actualProgress >= expectedProgress + 10
-			? evaluationAheadTemplate
-			: actualProgress >= expectedProgress - 10
-				? evaluationOnTrackTemplate
-				: evaluationBehindTemplate;
-	return template
-		.replace("{remaining}", formatNumber(remainingPosts))
-		.replace("{months}", formatNumber(remainingMonths))
-		.replace("{pace}", formatNumber(requiredMonthlyPace));
+function getRuntimeYear(): number {
+	const year = new Intl.DateTimeFormat("en-US", {
+		timeZone: timezone,
+		year: "numeric",
+	}).format(Date.now());
+	return Number(year);
 }
 
 function animateNumber(
@@ -159,6 +131,7 @@ function cancelAnimations(): void {
 }
 
 onMount(() => {
+	const controller = new AbortController();
 	const reducedMotion = window.matchMedia(
 		"(prefers-reduced-motion: reduce)",
 	).matches;
@@ -199,17 +172,56 @@ onMount(() => {
 		);
 	}
 
-	return cancelAnimations;
+	const cleanup = () => {
+		controller.abort();
+		cancelAnimations();
+	};
+
+	if (!githubEnabled || !githubUsername) {
+		githubStatus = "disabled";
+		return cleanup;
+	}
+
+	githubStatus = "loading";
+	const year = getRuntimeYear();
+	void fetchGithubContributionSummary(githubUsername, year, controller.signal)
+		.then((summary) => {
+			if (controller.signal.aborted) return;
+			githubStatus = "ready";
+			animateNumber(
+				summary.totalContributions,
+				(value) => (displayedGithub = value),
+				reducedMotion,
+			);
+		})
+		.catch(() => {
+			if (controller.signal.aborted) return;
+			githubStatus = "error";
+			displayedGithub = null;
+		});
+
+	return cleanup;
 });
 
+$: githubValue =
+	displayedGithub === null ? unavailableLabel : formatNumber(displayedGithub);
 $: progressValue =
 	displayedProgress === null
 		? unavailableLabel
 		: `${formatNumber(displayedProgress)}%`;
-$: evaluationText = getEvaluation();
+$: githubStatusText =
+	githubStatus === "loading"
+		? loadingLabel
+		: githubStatus === "error"
+			? unavailableLabel
+			: "";
 </script>
 
-<section class="archive-stats">
+<section
+	class="archive-stats"
+	class:archive-stats--loading={githubStatus === "loading"}
+	aria-busy={githubStatus === "loading"}
+>
 	<div class="archive-stats__grid">
 		<div
 			class="archive-stats__metric"
@@ -248,8 +260,17 @@ $: evaluationText = getEvaluation();
 				<span class="archive-stats__goal">{goalLabel} {annualPostGoal}</span>
 			{/if}
 		</div>
+		<div
+			class="archive-stats__metric"
+			role="group"
+			aria-label={`${githubLabel}: ${githubValue}`}
+		>
+			<span class="archive-stats__value" aria-hidden="true">{githubValue}</span>
+			<span class="archive-stats__label">{githubLabel}</span>
+		</div>
 	</div>
-	{#if evaluationText}
-		<p class="archive-stats__evaluation">{evaluationText}</p>
+
+	{#if githubStatusText}
+		<span class="archive-stats__status sr-only" role="status">{githubStatusText}</span>
 	{/if}
 </section>

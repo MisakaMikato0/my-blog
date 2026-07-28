@@ -26,6 +26,11 @@ export let unavailableLabel = "--";
 
 let displayedScopePosts = totalPosts;
 let scopePostsLabel = totalPostsLabel;
+<<<<<<< HEAD
+=======
+let writingSpanDays: number | null = null;
+let displayedWritingSpanDays: number | null = null;
+>>>>>>> ad2d674 (feat: 优化导航栏图标动画，添加动态移动效果与样式调整)
 let displayedProgress: number | null = null;
 let displayedGithub: number | null = null;
 let githubStatus: GithubStatus = "idle";
@@ -135,15 +140,31 @@ onMount(() => {
 	).matches;
 	const scopeSummary = getScopeSummary();
 	scopePostsLabel = scopeSummary.label;
+	writingSpanDays = scopeSummary.spanDays;
+	displayedWritingSpanDays = writingSpanDays;
 
 	if (!reducedMotion) {
 		displayedScopePosts = 0;
+		displayedWritingSpanDays = writingSpanDays === null ? null : 0;
+		displayedMonthPosts = 0;
 		displayedProgress = progressTarget === null ? null : 0;
 	}
 
 	animateNumber(
 		scopeSummary.count,
 		(value) => (displayedScopePosts = value),
+		reducedMotion,
+	);
+	if (writingSpanDays !== null) {
+		animateNumber(
+			writingSpanDays,
+			(value) => (displayedWritingSpanDays = value),
+			reducedMotion,
+		);
+	}
+	animateNumber(
+		currentMonthPosts,
+		(value) => (displayedMonthPosts = value),
 		reducedMotion,
 	);
 	if (progressTarget !== null) {
@@ -212,6 +233,24 @@ $: githubStatusText =
 		>
 			<span class="archive-stats__value" aria-hidden="true">{formatNumber(displayedScopePosts)}</span>
 			<span class="archive-stats__label">{scopePostsLabel}</span>
+		</div>
+		{#if displayedWritingSpanDays !== null}
+			<div
+				class="archive-stats__metric"
+				role="group"
+				aria-label={`${writingSpanLabel}: ${formatNumber(displayedWritingSpanDays)}`}
+			>
+				<span class="archive-stats__value" aria-hidden="true">{formatNumber(displayedWritingSpanDays)}</span>
+				<span class="archive-stats__label">{writingSpanLabel}</span>
+			</div>
+		{/if}
+		<div
+			class="archive-stats__metric"
+			role="group"
+			aria-label={`${monthPostsLabel}: ${formatNumber(displayedMonthPosts)}`}
+		>
+			<span class="archive-stats__value" aria-hidden="true">{formatNumber(displayedMonthPosts)}</span>
+			<span class="archive-stats__label">{monthPostsLabel}</span>
 		</div>
 		<div
 			class="archive-stats__metric"

@@ -227,9 +227,6 @@ export const ja: Translation = {
 	[Key.postEncrypted]: "この記事は暗号化されています",
 
 	// 投稿リストレイアウト
-	[Key.postListLayout]: "投稿リストレイアウト",
-	[Key.postListLayoutList]: "リスト",
-	[Key.postListLayoutGrid]: "グリッド",
 
 	// スポンサーページ
 	[Key.sponsor]: "スポンサー",

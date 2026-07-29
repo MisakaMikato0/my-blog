@@ -10,6 +10,7 @@ type PostSummary = {
 
 export let totalPosts = 0;
 export let currentYearPosts = 0;
+export let currentMonthPosts = 0;
 export let postSummaries: PostSummary[] = [];
 export let annualPostGoal = 0;
 export let githubEnabled = false;
@@ -22,10 +23,12 @@ export let tagPostsLabel = "";
 export let progressLabel = "";
 export let goalLabel = "";
 export let monthPostsLabel = "";
+export let writingSpanLabel = "";
 export let loadingLabel = "";
 export let unavailableLabel = "--";
 
 let displayedScopePosts = totalPosts;
+let displayedMonthPosts = currentMonthPosts;
 let scopePostsLabel = totalPostsLabel;
 let writingSpanDays: number | null = null;
 let displayedWritingSpanDays: number | null = null;

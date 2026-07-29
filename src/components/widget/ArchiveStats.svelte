@@ -21,6 +21,7 @@ export let categoryPostsLabel = "";
 export let tagPostsLabel = "";
 export let progressLabel = "";
 export let goalLabel = "";
+export let monthPostsLabel = "";
 export let loadingLabel = "";
 export let unavailableLabel = "--";
 

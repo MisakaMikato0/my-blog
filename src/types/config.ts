@@ -310,7 +310,7 @@ export type HomeConfig = {
 		backgroundImageMobile?: string;
 		characterImage?: string;
 		speechAccentImage: string;
-	speech?: {
+		speech?: {
 			text: string;
 			english?: string;
 		};

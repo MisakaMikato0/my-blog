@@ -43,9 +43,12 @@ const articleListPosts = await Promise.all(
 			publishedTimestamp: entry.data.published.getTime(),
 			publishedText: dateFormatter.format(entry.data.published),
 			category,
-			categoryUrl: getCategoryUrl(rawCategory || null),   // 或另一个，但必须唯一
+			categoryUrl: getCategoryUrl(rawCategory || null), // 或另一个，但必须唯一
 			tags,
-			description: entry.data.description || remarkPluginFrontmatter.excerpt || "暂无文章简介，点击查看完整内容。",
+			description:
+				entry.data.description ||
+				remarkPluginFrontmatter.excerpt ||
+				"暂无文章简介，点击查看完整内容。",
 			pinned: !!entry.data.pinned,
 			password: !!entry.data.password,
 		};

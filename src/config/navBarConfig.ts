@@ -1,10 +1,10 @@
-import { LinkPresets } from '../constants/link-presets';
+import { LinkPresets } from "../constants/link-presets";
 import {
 	LinkPreset,
 	type NavBarConfig,
 	type NavBarLink,
-} from '../types/config';
-import { siteConfig } from './siteConfig';
+} from "../types/config";
+import { siteConfig } from "./siteConfig";
 
 /**
  * 构建导航栏链接配置
@@ -18,7 +18,12 @@ const buildNavBarConfig = (): NavBarConfig => {
 	// 1. 构建文章下拉菜单
 	const postsNav: NavBarLink = {
 		...LinkPresets[LinkPreset.NavPosts],
-		children: [LinkPreset.Archive, LinkPreset.Categories, LinkPreset.PostList, LinkPreset.WritePost],
+		children: [
+			LinkPreset.Archive,
+			LinkPreset.Categories,
+			LinkPreset.PostList,
+			LinkPreset.WritePost,
+		],
 	};
 
 	// 2. 构建联系我下拉菜单

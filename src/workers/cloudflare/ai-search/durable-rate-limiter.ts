@@ -1,8 +1,8 @@
+import { aiSearchConfig } from "@/config/aiSearchConfig";
 import type {
 	RateLimiter as RateLimiterContract,
 	RateLimitResult,
 } from "@/server/ai-search/contracts";
-import { aiSearchConfig } from "@/config/aiSearchConfig";
 
 function getClientIp(request: Request): string {
 	return request.headers.get("CF-Connecting-IP") || "development";

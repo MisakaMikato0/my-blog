@@ -124,12 +124,7 @@ pnpm build-index -- --force
 | 评论服务 | 若启用评论，需自行部署对应后端（Waline / Twikoo / Artalk 等） |
 | 留言板 | 留言板固定使用 Waline `/guestbook/` 频道；启用前需在 `src/config/commentConfig.ts` 中配置 Waline，无需 Cloudflare KV 或项目 Worker 路由 |
 | 统计服务 | 站点访问统计通过 Umami 获取（`siteConfig.ts` 中配置 `analytics.umamiAnalytics`，Worker 中配置 `UMAMI_TOKEN` Secret） |
-<<<<<<< HEAD
-| GitHub 贡献数据 | 归档页的 GitHub 贡献数据由 Worker 动态请求 GitHub GraphQL API，部署时需配置 `GITHUB_TOKEN` Secret |
-| AI 搜索 | 需 Cloudflare Vectorize 索引；构建索引需 `CLOUDFLARE_API_TOKEN` + `CLOUDFLARE_ACCOUNT_ID`；LLM/Embedding 默认走 Workers AI，也可在 `aiSearchConfig.ts` 中配置第三方 API（如魔搭社区）并设置 `AI_API_KEY` |
-=======
 | AI 搜索（可选） | 仅在 `aiSearchConfig.ts` 开启后配置：需 Cloudflare Vectorize 索引；构建索引需 `CLOUDFLARE_API_TOKEN` + `CLOUDFLARE_ACCOUNT_ID`；LLM/Embedding 默认走 Workers AI，也可配置第三方 API 并设置 `AI_API_KEY` |
->>>>>>> 45be58c (docs: 更新项目文档与说明)
 | 图片上传（可选） | 留言板默认将不超过 128 KB 的图片内嵌到 Waline 留言；如需上传不超过 5 MB 的图片，可在 `commentConfig.waline.imageUploadURL` 中配置兼容的自建上传接口。文章图片仍建议使用独立图床 |
 
 ## Cloudflare Pages 部署方案

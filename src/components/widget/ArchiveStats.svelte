@@ -26,11 +26,8 @@ export let unavailableLabel = "--";
 
 let displayedScopePosts = totalPosts;
 let scopePostsLabel = totalPostsLabel;
-<<<<<<< HEAD
-=======
 let writingSpanDays: number | null = null;
 let displayedWritingSpanDays: number | null = null;
->>>>>>> ad2d674 (feat: 优化导航栏图标动画，添加动态移动效果与样式调整)
 let displayedProgress: number | null = null;
 let displayedGithub: number | null = null;
 let githubStatus: GithubStatus = "idle";

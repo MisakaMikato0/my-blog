@@ -1,4 +1,6 @@
 import { handleCloudflareAiSearch } from "./workers/cloudflare/ai-search/runtime";
+import { handleGithubContributions } from "./workers/cloudflare/github-contributions/handler";
+import { handlePosterImage } from "./workers/cloudflare/poster-image/handler";
 
 const STATIC_SECURITY_HEADERS = {
 	"Content-Security-Policy-Report-Only": [

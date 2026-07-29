@@ -358,6 +358,7 @@ export const ja: Translation = {
 	[Key.qqGroup]: "QQグループ",
 	[Key.navPosts]: "記事",
 	[Key.navMy]: "マイ",
+	[Key.writePost]: "投稿する",
 	[Key.calendarDescription]: "祝日・誕生日・予定・記事更新の総合カレンダー",
 	[Key.calendarToday]: "今日",
 	[Key.calendarTomorrow]: "明日",

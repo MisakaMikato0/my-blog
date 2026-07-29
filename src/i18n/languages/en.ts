@@ -359,6 +359,7 @@ export const en: Translation = {
 	[Key.qqGroup]: "QQ Group",
 	[Key.navPosts]: "Posts",
 	[Key.navMy]: "My",
+	[Key.writePost]: "Write Post",
 	[Key.calendarDescription]:
 		"Holidays, birthdays, schedules and post updates at a glance",
 	[Key.calendarToday]: "Today",

@@ -78,6 +78,19 @@ export type SiteConfig = {
 	// 分类导航栏开关
 	categoryBar?: boolean;
 
+	// 文章列表布局配置
+	postListLayout?: {
+		defaultMode: "list" | "grid";
+		mobileDefaultMode?: "list" | "grid";
+		showTags: boolean;
+		descriptionLines: number;
+		allowSwitch: boolean;
+		grid: {
+			masonry: boolean;
+			columnWidth: number;
+		};
+	};
+
 	// 分页配置
 	pagination: {
 		postsPerPage: number; // 每页显示的文章数量

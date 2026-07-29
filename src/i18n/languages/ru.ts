@@ -360,6 +360,7 @@ export const ru: Translation = {
 	[Key.qqGroup]: "QQ Группа",
 	[Key.navPosts]: "Статьи",
 	[Key.navMy]: "Моё",
+	[Key.writePost]: "Написать пост",
 	[Key.calendarDescription]:
 		"Праздники, дни рождения, события и публикации в одном месте",
 	[Key.calendarToday]: "Сегодня",

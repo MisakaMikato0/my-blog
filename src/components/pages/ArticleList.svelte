@@ -159,7 +159,7 @@ function handleImageLoad(e: Event, postId: string) {
 
 function handleImageError(e: Event, apiUrls: string[]) {
 	const img = e.target as HTMLImageElement;
-	const currentIndex = Number.parseInt(img.dataset.apiIndex || "0");
+	const currentIndex = Number.parseInt(img.dataset.apiIndex || "0", 10);
 	const nextIndex = currentIndex + 1;
 
 	if (nextIndex < apiUrls.length) {

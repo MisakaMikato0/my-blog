@@ -7,8 +7,8 @@ import I18nKey from "@/i18n/i18nKey";
 import { i18n } from "@/i18n/translation";
 import MainGridLayout from "@/layouts/MainGridLayout.astro";
 import { getSortedPosts } from "@/utils/content-utils";
+import { getApiUrlList, processCoverImageSync } from "@/utils/image-utils";
 import { getCategoryUrl, getPostUrlBySlug, getTagUrl } from "@/utils/url-utils";
-import { processCoverImageSync, getApiUrlList } from "@/utils/image-utils";
 
 const title = "文章列表";
 const description = "按整页滚动浏览所有文章。";

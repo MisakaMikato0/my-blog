@@ -28,6 +28,8 @@ export type ArticleListPost = {
 	description: string;
 	pinned: boolean;
 	password: boolean;
+	coverImage: string;
+	coverApiUrls: string[];
 };
 
 type UmamiPageviewConfig = {
@@ -211,6 +213,11 @@ onMount(() => {
 {#snippet articleCard(post: ArticleListPost, variant: "pinned" | "regular")}
 	<article class={`article-list-card article-list-card--${variant}`}>
 		<div class="article-list-card__body">
+			{#if layoutMode === "grid" && post.coverImage}
+				<div class="article-list-card__cover">
+					<img src={post.coverImage} alt="" class="article-list-card__cover-img" loading="lazy" decoding="async" />
+				</div>
+			{/if}
 			{#if variant === "pinned"}
 				<div class="article-list-card__pinned">
 					<Icon icon="material-symbols:pinboard" size="sm" />

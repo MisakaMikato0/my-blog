@@ -364,6 +364,60 @@
 	border-color: var(--deep-text);
 }
 
+/* 网格模式封面图 */
+.layout-mode-grid .article-list-card__cover {
+	width: 100%;
+	padding-top: 56.25%;
+	position: relative;
+	overflow: hidden;
+	background: color-mix(in oklch, var(--deep-text) 6%, transparent);
+	border-radius: var(--radius-small) var(--radius-small) 0 0;
+}
+
+.layout-mode-grid .article-list-card__cover-img {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+}
+
+.layout-mode-grid .article-list-card--regular .article-list-card__body {
+	padding: 0;
+}
+
+.layout-mode-grid .article-list-card__cover + .article-list-card__pinned,
+.layout-mode-grid .article-list-card__cover + * + .article-list-card__pinned {
+	padding: var(--space-3) var(--space-4) 0;
+}
+
+.layout-mode-grid .article-list-card__cover + .article-list-card__pinned + .article-list-card__title,
+.layout-mode-grid .article-list-card__cover + .article-list-card__title,
+.layout-mode-grid .article-list-card__cover + * + .article-list-card__title {
+	padding: 0 var(--space-4);
+}
+
+.layout-mode-grid .article-list-card__cover ~ .article-list-card__description {
+	padding: 0 var(--space-4);
+}
+
+.layout-mode-grid .article-list-card__cover ~ .article-list-card__meta {
+	padding: 0 var(--space-4) var(--space-3);
+}
+
+.layout-mode-grid .article-list-card--regular .article-list-card__title {
+	font-size: clamp(0.95rem, 1.5vw, 1.1rem);
+}
+
+.layout-mode-grid .article-list-card--regular .article-list-card__description {
+	-webkit-line-clamp: 3;
+}
+
+.layout-mode-grid .article-list-card__cover ~ .article-list-card__rule {
+	margin: var(--space-3) var(--space-4);
+}
+
 /* ========================================================================== 
    分页与空状态
    ========================================================================== */

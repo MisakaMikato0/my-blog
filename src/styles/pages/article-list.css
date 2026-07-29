@@ -31,6 +31,12 @@
 	flex-direction: column;
 }
 
+.article-list-regular__collection.is-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(min(100%, 320px), 1fr));
+	gap: var(--space-4);
+}
+
 .article-list-pinned__collection {
 	gap: var(--space-4);
 }
@@ -344,6 +350,17 @@
 
 .article-list-card--regular:hover,
 .article-list-card--regular:focus-within {
+	border-color: var(--deep-text);
+}
+
+/* 网格模式各卡片使用背景 */
+.layout-mode-grid .article-list-card--regular {
+	background: color-mix(in oklch, var(--deep-text) 5%, transparent);
+	border-color: transparent;
+}
+
+.layout-mode-grid .article-list-card--regular:hover,
+.layout-mode-grid .article-list-card--regular:focus-within {
 	border-color: var(--deep-text);
 }
 

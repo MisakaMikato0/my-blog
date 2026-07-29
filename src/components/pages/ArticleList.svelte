@@ -1,6 +1,7 @@
 <script lang="ts">
 import { onMount } from "svelte";
 import Icon from "@/components/common/Icon.svelte";
+import AnimatedTabs from "@/components/controls/AnimatedTabs.svelte";
 import {
 	createEmptyUmamiPageviewLookup,
 	getUmamiPageviewLookup,
@@ -46,7 +47,19 @@ let { posts, postsPerPage = 15, umamiPageviews }: Props = $props();
 let containerRef = $state<HTMLElement | null>(null);
 let sortMode = $state<ArticleSort>("latest");
 let currentPage = $state(1);
+let layoutMode = $state<"list" | "grid">("list");
 let pageviewLookup = $state<Map<string, number> | null>(null);
+
+function initLayoutMode() {
+	try {
+		const saved = localStorage.getItem("postListLayout");
+		if (saved === "list" || saved === "grid") layoutMode = saved;
+	} catch {}
+}
+
+function handleLayoutChange(e: Event) {
+	layoutMode = (e as CustomEvent).detail.layout;
+}
 
 const pinnedPosts = $derived(
 	posts
@@ -132,6 +145,8 @@ function generatePageNumbers(
 const pageNumbers = $derived(generatePageNumbers(currentPage, totalPages));
 
 onMount(() => {
+	initLayoutMode();
+	window.addEventListener("layoutChange", handleLayoutChange);
 	if (
 		umamiPageviews?.enabled &&
 		umamiPageviews.apiBase &&
@@ -145,6 +160,10 @@ onMount(() => {
 				pageviewLookup = createEmptyUmamiPageviewLookup();
 			});
 	}
+
+	return () => {
+		window.removeEventListener("layoutChange", handleLayoutChange);
+	};
 });
 </script>
 
@@ -260,16 +279,17 @@ onMount(() => {
 				最早
 			</button>
 		</div>
-	</header>
+			<AnimatedTabs bind:activeTab={layoutMode} />
+		</header>
 
 	<p class="sr-only" aria-live="polite">
 		当前按{sortMode === "latest" ? "最新" : "最早"}排序，第 {currentPage} 页，共 {totalPages} 页
 	</p>
 
-	<section class="article-list-regular" aria-labelledby="article-list-regular-title">
+	<section class="article-list-regular" aria-labelledby="article-list-regular-title" class:layout-mode-grid={layoutMode === "grid"}>
 		<h2 id="article-list-regular-title" class="sr-only">普通文章</h2>
 		{#if paginatedPosts.length > 0}
-			<div class="article-list-regular__collection">
+			<div class="article-list-regular__collection" class:is-grid={layoutMode === "grid"}>
 				{#each paginatedPosts as post (post.id)}
 					{@render articleCard(post, "regular")}
 				{/each}

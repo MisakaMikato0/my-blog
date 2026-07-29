@@ -51,6 +51,7 @@ let sortMode = $state<ArticleSort>("latest");
 let currentPage = $state(1);
 let layoutMode = $state<"list" | "grid">("list");
 let pageviewLookup = $state<Map<string, number> | null>(null);
+let loadedImageIds = $state<Set<string>>(new Set());
 
 function initLayoutMode() {
 	try {
@@ -146,6 +147,30 @@ function generatePageNumbers(
 
 const pageNumbers = $derived(generatePageNumbers(currentPage, totalPages));
 
+function handleImageLoad(e: Event, postId: string) {
+	const img = e.target as HTMLImageElement;
+	if (!img.classList.contains("is-loaded")) {
+		img.classList.add("is-loaded");
+	}
+	if (postId && !loadedImageIds.has(postId)) {
+		loadedImageIds = new Set(loadedImageIds).add(postId);
+	}
+}
+
+function handleImageError(e: Event, apiUrls: string[]) {
+	const img = e.target as HTMLImageElement;
+	const currentIndex = Number.parseInt(img.dataset.apiIndex || "0");
+	const nextIndex = currentIndex + 1;
+
+	if (nextIndex < apiUrls.length) {
+		img.dataset.apiIndex = String(nextIndex);
+		img.src = apiUrls[nextIndex];
+	} else {
+		const media = img.closest(".article-list-card__media");
+		if (media) media.classList.add("is-hidden");
+	}
+}
+
 onMount(() => {
 	initLayoutMode();
 	window.addEventListener("layoutChange", handleLayoutChange);
@@ -171,83 +196,52 @@ onMount(() => {
 
 {#snippet articleMeta(post: ArticleListPost)}
 	<div class="article-list-card__meta">
-		<a
-			href={post.categoryUrl}
-			class="article-list-card__category article-list-card__meta-link"
-			style={`--article-category-hue: ${getCategoryHue(post.category)}`}
-			aria-label={`查看分类归档：${post.category}`}
-		>
-			{post.category}
-		</a>
-		<span class="article-list-card__meta-divider" aria-hidden="true">/</span>
-		<span class="article-list-card__meta-item">
-			<Icon icon="material-symbols:calendar-month-rounded" size="sm" />
-			<span class="sr-only">发布日期：</span>
-			<time datetime={post.publishedIso}>{post.publishedText}</time>
-		</span>
-		<span class="article-list-card__meta-divider" aria-hidden="true">/</span>
-		<span class="article-list-card__meta-item" title="访问量">
-			<Icon icon="material-symbols:visibility-outline-rounded" size="sm" />
-			<span class="sr-only">访问量：</span>
-			<span>{getPageviews(post)}</span>
-		</span>
-		{#each post.tags.slice(0, 3) as tag (tag.name)}
-			<span class="article-list-card__meta-divider" aria-hidden="true">/</span>
-			<a
-				href={tag.url}
-				class="article-list-card__tag article-list-card__meta-link"
-				aria-label={`查看标签归档：${tag.name}`}
-			>
-				{tag.name}
-			</a>
-		{/each}
-		{#if post.tags.length > 3}
-			<span class="article-list-card__meta-divider" aria-hidden="true">/</span>
-			<span class="article-list-card__tag-more">
-				<span class="sr-only">另有</span>+{post.tags.length - 3}
+		{#if layoutMode === "grid"}
+			<span class="article-list-card__category">#{post.category}</span>
+			<span class="article-list-card__divider" aria-hidden="true">/</span>
+			<span class="article-list-card__meta-item">
+				<Icon icon="material-symbols:calendar-month-rounded" size="sm" />
+				<time datetime={post.publishedIso}>{post.publishedText}</time>
 			</span>
+		{:else}
+			<a
+				href={post.categoryUrl}
+				class="article-list-card__category article-list-card__meta-link"
+				style={`--article-category-hue: ${getCategoryHue(post.category)}`}
+				aria-label={`查看分类归档：${post.category}`}
+			>
+				{post.category}
+			</a>
+			<span class="article-list-card__meta-divider" aria-hidden="true">/</span>
+			<span class="article-list-card__meta-item">
+				<Icon icon="material-symbols:calendar-month-rounded" size="sm" />
+				<span class="sr-only">发布日期：</span>
+				<time datetime={post.publishedIso}>{post.publishedText}</time>
+			</span>
+			<span class="article-list-card__meta-divider" aria-hidden="true">/</span>
+			<span class="article-list-card__meta-item" title="访问量">
+				<Icon icon="material-symbols:visibility-outline-rounded" size="sm" />
+				<span class="sr-only">访问量：</span>
+				<span>{getPageviews(post)}</span>
+			</span>
+			{#each post.tags.slice(0, 3) as tag (tag.name)}
+				<span class="article-list-card__meta-divider" aria-hidden="true">/</span>
+				<a
+					href={tag.url}
+					class="article-list-card__tag article-list-card__meta-link"
+					aria-label={`查看标签归档：${tag.name}`}
+				>
+					{tag.name}
+				</a>
+			{/each}
+			{#if post.tags.length > 3}
+				<span class="article-list-card__meta-divider" aria-hidden="true">/</span>
+				<span class="article-list-card__tag-more">
+					<span class="sr-only">另有</span>+{post.tags.length - 3}
+				</span>
+			{/if}
 		{/if}
 	</div>
-{/snippet}
-
-{#snippet articleCard(post: ArticleListPost, variant: "pinned" | "regular")}
-	<article class={`article-list-card article-list-card--${variant}`}>
-		<div class="article-list-card__body">
-			{#if layoutMode === "grid" && post.coverImage}
-				<div class="article-list-card__cover">
-					<img src={post.coverImage} alt="" class="article-list-card__cover-img" loading="lazy" decoding="async" />
-				</div>
-			{/if}
-			{#if variant === "pinned"}
-				<div class="article-list-card__pinned">
-					<Icon icon="material-symbols:pinboard" size="sm" />
-					<span>置顶</span>
-				</div>
-			{/if}
-
-			<h3 class="article-list-card__title">
-				<a
-					href={post.url}
-					class="article-list-card__article-link"
-					aria-label={`查看文章：${post.title}`}
-				>
-					{post.title}
-					{#if post.password}
-						<span class="article-list-card__lock" aria-hidden="true">
-							<Icon icon="material-symbols:lock-outline" size="sm" />
-						</span>
-						<span class="sr-only">加密文章</span>
-					{/if}
-				</a>
-			</h3>
-
-			<p class="article-list-card__description">{post.description}</p>
-			{#if variant === "pinned"}
-				<div class="article-list-card__rule" aria-hidden="true"></div>
-			{/if}
-			{@render articleMeta(post)}
-		</div>
-	</article>
 {/snippet}
 
 <div class="article-list" bind:this={containerRef}>
@@ -256,7 +250,48 @@ onMount(() => {
 			<h2 id="article-list-pinned-title" class="sr-only">置顶文章</h2>
 			<div class="article-list-pinned__collection">
 				{#each pinnedPosts as post (post.id)}
-					{@render articleCard(post, "pinned")}
+					<article class="article-list-card article-list-card--pinned" class:has-image={!!post.coverImage}>
+						<a href={post.url} class="article-list-card__link" aria-label={`查看文章：${post.title}`}>
+							{#if layoutMode === "grid" && post.coverImage}
+								<div class="article-list-card__media" class:skeleton-shimmer={!loadedImageIds.has(post.id)} aria-hidden="true">
+									<picture>
+										<img
+											class="article-list-card__image"
+											src={post.coverImage}
+											alt=""
+											width="640"
+											height="360"
+											loading="lazy"
+											decoding="async"
+											data-post-id={post.id}
+											onload={(e) => handleImageLoad(e, post.id)}
+											onerror={(e) => handleImageError(e, post.coverApiUrls)}
+										/>
+									</picture>
+									<div class="article-list-card__media-overlay"></div>
+								</div>
+							{/if}
+							<div class="article-list-card__content">
+								{#if post.pinned}
+									<div class="article-list-card__pinned">
+										<Icon icon="material-symbols:pinboard" size="sm" />
+										<span>置顶</span>
+									</div>
+								{/if}
+								<h2 class="article-list-card__title">
+									{post.title}
+									{#if post.password}
+										<span class="article-list-card__lock" aria-hidden="true">
+											<Icon icon="material-symbols:lock-outline" size="sm" />
+										</span>
+										<span class="sr-only">加密文章</span>
+									{/if}
+								</h2>
+								<p class="article-list-card__description">{post.description}</p>
+								{@render articleMeta(post)}
+							</div>
+						</a>
+					</article>
 				{/each}
 			</div>
 		</section>
@@ -286,19 +321,76 @@ onMount(() => {
 				最早
 			</button>
 		</div>
-			<AnimatedTabs bind:activeTab={layoutMode} />
-		</header>
+		<AnimatedTabs bind:activeTab={layoutMode} />
+	</header>
 
 	<p class="sr-only" aria-live="polite">
 		当前按{sortMode === "latest" ? "最新" : "最早"}排序，第 {currentPage} 页，共 {totalPages} 页
 	</p>
 
-	<section class="article-list-regular" aria-labelledby="article-list-regular-title" class:layout-mode-grid={layoutMode === "grid"}>
+	<section class="article-list-regular" aria-labelledby="article-list-regular-title">
 		<h2 id="article-list-regular-title" class="sr-only">普通文章</h2>
 		{#if paginatedPosts.length > 0}
-			<div class="article-list-regular__collection" class:is-grid={layoutMode === "grid"}>
-				{#each paginatedPosts as post (post.id)}
-					{@render articleCard(post, "regular")}
+			<div class="article-list-regular__collection" data-view={layoutMode}>
+				{#each paginatedPosts as post, index (post.id)}
+					<article
+						class="article-list-card article-list-card--regular"
+						class:has-image={!!post.coverImage}
+						class:is-pinned={post.pinned}
+						data-post-id={post.id}
+					>
+						<a
+							href={post.url}
+							class="article-list-card__link"
+							aria-label={`查看文章：${post.title}`}
+						>
+							{#if post.coverImage}
+								<div
+									class="article-list-card__media"
+									class:skeleton-shimmer={layoutMode === "grid" && !loadedImageIds.has(post.id)}
+									class:is-hidden={layoutMode === "list" && loadedImageIds.has(post.id)}
+									aria-hidden="true"
+								>
+									<picture>
+										<img
+											class="article-list-card__image"
+											src={post.coverImage}
+											alt=""
+											width="640"
+											height="360"
+											loading={index < 3 ? "eager" : "lazy"}
+											fetchpriority={index === 0 ? "high" : "auto"}
+											decoding="async"
+											data-api-index="0"
+											data-post-id={post.id}
+											onload={(e) => handleImageLoad(e, post.id)}
+											onerror={(e) => handleImageError(e, post.coverApiUrls)}
+										/>
+									</picture>
+									<div class="article-list-card__media-overlay"></div>
+								</div>
+							{/if}
+							<div class="article-list-card__content">
+								{#if post.pinned}
+									<div class="article-list-card__pinned">
+										<Icon icon="material-symbols:pinboard" size="sm" />
+										<span>置顶</span>
+									</div>
+								{/if}
+								<h2 class="article-list-card__title">
+									{post.title}
+									{#if post.password}
+										<span class="article-list-card__lock" aria-hidden="true">
+											<Icon icon="material-symbols:lock-outline" size="sm" />
+										</span>
+										<span class="sr-only">加密文章</span>
+									{/if}
+								</h2>
+								<p class="article-list-card__description">{post.description}</p>
+								{@render articleMeta(post)}
+							</div>
+						</a>
+					</article>
 				{/each}
 			</div>
 		{:else}

@@ -521,7 +521,7 @@
 	min-width: 0;
 	flex: 1;
 	flex-direction: column;
-	gap: 0.625rem;
+	/* gap: 0.625rem; */
 	padding: 1rem 1.125rem 1.125rem;
 	z-index: 2;
 }
@@ -580,7 +580,7 @@
 .article-list-regular__collection {
 	display: grid;
 	width: 100%;
-	gap: var(--space-5);
+	/* gap: var(--space-5); */
 }
 
 [data-view="grid"] {

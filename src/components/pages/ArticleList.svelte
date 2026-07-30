@@ -288,6 +288,9 @@ onMount(() => {
 									{/if}
 								</h2>
 								<p class="article-list-card__description">{post.description}</p>
+								{#if variant === "pinned"}
+									<div class="article-list-card__rule" aria-hidden="true"></div>
+								{/if}
 								{@render articleMeta(post)}
 							</div>
 						</a>

@@ -660,7 +660,6 @@
 [data-view="list"] .article-list-card__content {
 	min-height: 9.5rem;
 	justify-content: center;
-	max-width: 42%;
 	padding: 1.125rem 1rem;
 	position: relative;
 	z-index: 2;

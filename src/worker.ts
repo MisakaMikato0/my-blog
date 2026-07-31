@@ -1,6 +1,5 @@
 import { handleCloudflareAiSearch } from "./workers/cloudflare/ai-search/runtime";
 import { handleGithubContributions } from "./workers/cloudflare/github-contributions/handler";
-import { handlePosterImage } from "./workers/cloudflare/poster-image/handler";
 
 const STATIC_SECURITY_HEADERS = {
 	"Content-Security-Policy-Report-Only": [
@@ -40,7 +39,7 @@ function withStaticSecurityHeaders(response: Response): Response {
 
 function plainNotFound(): Response {
 	return new Response(
-		`<!DOCTYPE html>
+		<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
 	<meta charset="UTF-8" />
@@ -61,7 +60,7 @@ function plainNotFound(): Response {
 		<a href="/">返回首页</a>
 	</main>
 </body>
-</html>`,
+</html>,
 		{
 			status: 404,
 			headers: {
@@ -81,10 +80,6 @@ export default {
 		if (url.pathname === "/api/github-contributions") {
 			return handleGithubContributions(request, env, ctx);
 		}
-		if (url.pathname === "/api/poster-image") {
-			return handlePosterImage(request);
-		}
-
 		if (env.ASSETS) {
 			return withStaticSecurityHeaders(await env.ASSETS.fetch(request));
 		}

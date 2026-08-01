@@ -1,4 +1,4 @@
-/* ============================================
+﻿/* ============================================
    首页 Hero 全屏层 — 来自 HomeHero.astro
    全屏背景 + 双栏布局（左 87% / 右 13%）+ 磨砂玻璃对话框
    ============================================ */
@@ -525,6 +525,10 @@ html:has(.home-hero) #top-row {
 .home-hero--motion-pending .home-hero__occupation {
 	opacity: 0;
 	transform: translateY(48px);
+}
+
+.home-hero--motion-pending .home-hero__name {
+	opacity: 0;
 }
 
 .home-hero--motion-pending .home-hero__name-badge {

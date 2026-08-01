@@ -150,27 +150,29 @@ const rainConfig = {
 			</div>
 		</section>
 
-		<!-- 底部简介气泡 -->
+		<!-- 底部简介气泡：固定在右下角 -->
 		<section class="home-hero__speech" aria-label="Character message">
-			<div class="home-hero__speech-wrapper">
-				<p class="home-hero__speech-text">
-					<span class="home-hero__speech-type" aria-label={speechConfig.text}>{speechConfig.text}</span>
-				</p>
-				{speechConfig.english && (
-					<p class="home-hero__speech-en">
-						<span class="home-hero__speech-type" aria-label={speechConfig.english}>{speechConfig.english}</span>
-					</p>
+			<div class="home-hero__speech-inner">
+				{homeConfig.hero.speechAccentImage && (
+					<img
+						src={homeConfig.hero.speechAccentImage}
+						alt=""
+						class="home-hero__speech-accent"
+						loading="eager"
+						aria-hidden="true"
+					/>
 				)}
+				<div class="home-hero__speech-bubble">
+					<p class="home-hero__speech-text">
+						<span class="home-hero__speech-type" aria-label={speechConfig.text}>{speechConfig.text}</span>
+					</p>
+					{speechConfig.english && (
+						<p class="home-hero__speech-en">
+							<span class="home-hero__speech-type" aria-label={speechConfig.english}>{speechConfig.english}</span>
+						</p>
+					)}
+				</div>
 			</div>
-			{homeConfig.hero.speechAccentImage && (
-				<img
-					src={homeConfig.hero.speechAccentImage}
-					alt=""
-					class="home-hero__speech-accent"
-					loading="eager"
-					aria-hidden="true"
-				/>
-			)}
 		</section>
 
 		<!-- 右侧面板（比例与样式保持不变） -->

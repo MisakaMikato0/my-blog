@@ -1,4 +1,4 @@
-/* Decap CMS 自定义预览样式 —— 匹配博客文章样式 */
+﻿/* Decap CMS 自定义预览样式 —— 匹配博客文章样式 */
 .cms-preview-post {
   max-width: 720px;
   margin: 0 auto;
@@ -188,4 +188,15 @@
 [class*="PreviewPane"],
 [class*="preview-pane"] {
   background: transparent !important;
+}
+
+/* .custom-md 容器（与 renderMarkdown 输出匹配） */
+.custom-md {
+  overflow-wrap: break-word;
+}
+.custom-md p {
+  margin: 0 0 1rem;
+}
+.custom-md p:last-child {
+  margin-bottom: 0;
 }

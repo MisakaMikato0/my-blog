@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Decap CMS 自定义预览模板
  * 将 Markdown 编辑器内容渲染为博客文章样式
  */
@@ -11,49 +11,136 @@
   function renderMarkdown(md) {
     if (!md) return '';
 
+    // 先对 & < > 做 HTML 转义
     var html = md
       .replace(/&/g, '&amp;')
       .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      // 代码块
-      .replace(/```([a-zA-Z0-9]*)\n([\s\S]*?)```/g, function (_, lang, code) {
-        return '<pre class="expressive-code"><code class="language-' + (lang || 'text') + '">' + code.trim() + '</code></pre>';
-      })
-      // 行内代码
-      .replace(/`([^`]+)`/g, '<code>$1</code>')
-      // 标题
-      .replace(/^###### (.*)$/gm, '<h6>$1</h6>')
-      .replace(/^##### (.*)$/gm, '<h5>$1</h5>')
-      .replace(/^#### (.*)$/gm, '<h4>$1</h4>')
-      .replace(/^### (.*)$/gm, '<h3>$1</h3>')
-      .replace(/^## (.*)$/gm, '<h2>$1</h2>')
-      .replace(/^# (.*)$/gm, '<h1>$1</h1>')
-      // 引用
-      .replace(/^\> (.*)$/gm, '<blockquote>$1</blockquote>')
-      // 图片
-      .replace(/!\[([^\]]*)\]\(([^)]+)\)/g, '<img src="$2" alt="$1" loading="lazy" />')
-      // 链接
-      .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>')
-      // 粗体/斜体
-      .replace(/\*\*\*(.+?)\*\*\*/g, '<strong><em>$1</em></strong>')
-      .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
-      .replace(/\*(.+?)\*/g, '<em>$1</em>')
-      // 删除线
-      .replace(/~~(.+?)~~/g, '<del>$1</del>')
-      // 无序列表
-      .replace(/^[-*+] (.*)$/gm, '<li>$1</li>')
-      // 有序列表
-      .replace(/^\d+\. (.*)$/gm, '<li>$1</li>')
-      // 水平线
-      .replace(/^---$/gm, '<hr />')
-      // 段落与换行
-      .replace(/\n\n/g, '</p><p>')
-      .replace(/\n/g, '<br />');
+      .replace(/>/g, '&gt;');
 
-    // 包裹列表
-    html = html.replace(/(<li>.*<\/li>)/g, function (match) {
-      if (match.indexOf('<ol>') === -1) return '<ul>' + match + '</ul>';
-      return match;
+    // 保护代码块 —— 先用占位符替换，避免被后续正则破坏
+    var codeBlocks = [];
+    html = html.replace(/```([a-zA-Z0-9+#]*)\n?([\s\S]*?)```/g, function (_, lang, code) {
+      var idx = codeBlocks.length;
+      codeBlocks.push(
+        '<pre class="expressive-code"><code class="language-' + (lang || 'text') + '">' +
+        code.replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>') +
+        '</code></pre>'
+      );
+      return '\x00CODEBLOCK' + idx + '\x00';
+    });
+
+    // 保护行内代码（避免被后续的 *、` 等规则破坏）
+    var inlineCodes = [];
+    html = html.replace(/`([^`]+)`/g, function (_, code) {
+      var idx = inlineCodes.length;
+      inlineCodes.push('<code>' + code + '</code>');
+      return '\x00INLINECODE' + idx + '\x00';
+    });
+
+    // 逐行解析 Markdown
+    var lines = html.split('\n');
+    var result = [];
+    var inList = false;
+    var listType = null; // 'ul' or 'ol'
+
+    function closeList() {
+      if (inList) {
+        result.push('</' + listType + '>');
+        inList = false;
+        listType = null;
+      }
+    }
+
+    for (var i = 0; i < lines.length; i++) {
+      var line = lines[i];
+      var trimmed = line.trim();
+
+      // 空行 → 关闭列表
+      if (trimmed === '') {
+        closeList();
+        continue;
+      }
+
+      // 水平线
+      if (/^---$/.test(trimmed)) {
+        closeList();
+        result.push('<hr />');
+        continue;
+      }
+
+      // 标题
+      var headerMatch = trimmed.match(/^(#{1,6})\s+(.*)$/);
+      if (headerMatch) {
+        closeList();
+        var level = headerMatch[1].length;
+        result.push('<h' + level + '>' + headerMatch[2] + '</h' + level + '>');
+        continue;
+      }
+
+      // 引用
+      var bqMatch = trimmed.match(/^>\s?(.*)$/);
+      if (bqMatch) {
+        closeList();
+        result.push('<blockquote>' + bqMatch[1] + '</blockquote>');
+        continue;
+      }
+
+      // 无序列表
+      var ulMatch = trimmed.match(/^[-*+]\s+(.*)$/);
+      if (ulMatch) {
+        if (!inList || listType !== 'ul') {
+          closeList();
+          result.push('<ul>');
+          inList = true;
+          listType = 'ul';
+        }
+        result.push('<li>' + ulMatch[1] + '</li>');
+        continue;
+      }
+
+      // 有序列表
+      var olMatch = trimmed.match(/^\d+\.\s+(.*)$/);
+      if (olMatch) {
+        if (!inList || listType !== 'ol') {
+          closeList();
+          result.push('<ol>');
+          inList = true;
+          listType = 'ol';
+        }
+        result.push('<li>' + olMatch[1] + '</li>');
+        continue;
+      }
+
+      // 普通段落
+      closeList();
+      // 处理行内粗体/斜体/删除线/图片/链接
+      line = line
+        .replace(/\*\*\*(.+?)\*\*\*/g, '<strong><em>$1</em></strong>')
+        .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+        .replace(/\*(.+?)\*/g, '<em>$1</em>')
+        .replace(/~~(.+?)~~/g, '<del>$1</del>')
+        .replace(/!\[([^\]]*)\]\(([^)]+)\)/g, '<img src="$2" alt="$1" loading="lazy" />')
+        .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>');
+      result.push('<p>' + line + '</p>');
+    }
+
+    closeList();
+
+    html = result.join('\n');
+
+    // 恢复行内代码占位符
+    html = html.replace(/\x00INLINECODE(\d+)\x00/g, function (_, idx) {
+      return inlineCodes[parseInt(idx)];
+    });
+
+    // 恢复代码块占位符
+    html = html.replace(/\x00CODEBLOCK(\d+)\x00/g, function (_, idx) {
+      return codeBlocks[parseInt(idx)];
+    });
+
+    // 处理段落内的换行（单个 \n 转为 <br />）
+    html = html.replace(/<p>(.*?)<\/p>/g, function (_, content) {
+      return '<p>' + content.replace(/\n/g, '<br />') + '</p>';
     });
 
     return '<div class="custom-md">' + html + '</div>';

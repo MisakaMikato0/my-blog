@@ -1,92 +1,245 @@
-<!DOCTYPE html>
-<html>
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>博客管理</title>
+  <meta name="robots" content="noindex, nofollow" />
+  <title>博客管理 | Hakugyokurou</title>
+  <link rel="preconnect" href="https://image.hakugyokurou.fun" />
+  <link rel="dns-prefetch" href="https://image.hakugyokurou.fun" />
   <style>
     :root {
-      --color-background: #0b0b0b;
-      --color-text: #eee;
-      --color-primary: #7c3aed;
-      --color-text-light: #9ca3af;
-      --color-input-bg: #1a1a1a;
-      --color-input-border: #333;
+      --bg: #0b0b0b;
+      --surface: rgba(20, 20, 23, 0.82);
+      --surface-solid: #141417;
+      --text: #f2f2f2;
+      --muted: #9ca3af;
+      --primary: #7c3aed;
+      --primary-light: #a78bfa;
+      --border: rgba(255, 255, 255, 0.08);
+      --shadow: rgba(0, 0, 0, 0.45);
     }
+
+    @media (prefers-color-scheme: light) {
+      :root {
+        --bg: #f7f7f8;
+        --surface: rgba(255, 255, 255, 0.86);
+        --surface-solid: #ffffff;
+        --text: #111113;
+        --muted: #6b7280;
+        --primary: #7c3aed;
+        --primary-light: #8b5cf6;
+        --border: rgba(0, 0, 0, 0.08);
+        --shadow: rgba(0, 0, 0, 0.15);
+      }
+    }
+
+    * { box-sizing: border-box; }
 
     html, body {
       height: 100%;
       margin: 0;
-    }
-    body {
-      margin: 0;
-      min-height: 100vh;
-      background: url('https://image.hakugyokurou.fun/file/1784904548543_1.jpg') no-repeat center center fixed;
-      background-size: cover;
-      position: relative;
-    }
-    body::before {
-      content: '';
-      position: fixed;
-      inset: 0;
-      background: url('https://image.hakugyokurou.fun/file/1784904548543_1.jpg') no-repeat center center fixed;
-      background-size: cover;
-      filter: blur(8px);
-      z-index: -1;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans SC", sans-serif;
+      background: var(--bg);
+      color: var(--text);
     }
 
-    /* 文章列表条目链接 - Decap CMS 通过 emotion 生成哈希类名 */
+    body {
+      min-height: 100vh;
+      position: relative;
+    }
+
+    /* 背景图片 + 毛玻璃遮罩 */
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background:
+        url("https://image.hakugyokurou.fun/file/1784904548543_1.jpg") no-repeat center center fixed,
+        linear-gradient(rgba(0,0,0,0.35), rgba(0,0,0,0.45));
+      background-size: cover;
+      filter: blur(10px) saturate(0.85);
+      transform: scale(1.05);
+      z-index: -1;
+      pointer-events: none;
+    }
+
+    @media (prefers-color-scheme: light) {
+      body::before {
+        filter: blur(10px) saturate(1.1);
+      }
+    }
+
+    /* 加载遮罩 */
+    #cms-loader {
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 1.5rem;
+      background: rgba(0, 0, 0, 0.55);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      transition: opacity 0.35s ease, visibility 0.35s ease;
+    }
+
+    #cms-loader.hidden {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    #cms-loader .loader-ring {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      border: 4px solid rgba(124, 58, 237, 0.25);
+      border-top-color: var(--primary-light);
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    #cms-loader .loader-title {
+      font-size: 1.25rem;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+    }
+
+    #cms-loader .loader-subtitle {
+      font-size: 0.85rem;
+      color: var(--muted);
+      max-width: 320px;
+      text-align: center;
+      line-height: 1.5;
+    }
+
+    #cms-loader .loader-error {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.75rem;
+      margin-top: 0.5rem;
+    }
+
+    #cms-loader.has-error .loader-ring,
+    #cms-loader.has-error .loader-subtitle {
+      display: none;
+    }
+
+    #cms-loader.has-error .loader-error {
+      display: flex;
+    }
+
+    /* Decap 挂载后整体玻璃化 */
+    #nc-root {
+      position: relative;
+      z-index: 1;
+    }
+
+    /* 卡片/按钮过渡增强 */
     a[href*="entries/"],
-    a[role="button"][tabindex],
     [data-testid="entry-card"],
-    [data-testid*="entry"] {
-      transition: all 0.25s ease !important;
+    [class*="Grid"] > a,
+    section a[style*="relative"] {
+      transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease !important;
       border-radius: 10px !important;
     }
+
     a[href*="entries/"]:hover,
-    a[role="button"][tabindex]:hover {
-      transform: translateY(-1px) !important;
+    [data-testid="entry-card"]:hover,
+    [class*="Grid"] > a:hover,
+    section a[style*="relative"]:hover {
+      transform: translateY(-2px) !important;
       background: rgba(124, 58, 237, 0.08) !important;
       backdrop-filter: blur(12px) !important;
       -webkit-backdrop-filter: blur(12px) !important;
-      box-shadow: 0 4px 20px rgba(124, 58, 237, 0.12) !important;
-    }
-
-    /* 网格布局中的卡片容器 */
-    [class*="Grid"] > a,
-    section a[style*="relative"] {
-      transition: all 0.25s ease !important;
-      border-radius: 10px !important;
-    }
-    [class*="Grid"] > a:hover,
-    section a[style*="relative"]:hover {
-      transform: translateY(-1px) !important;
-      background: rgba(124, 58, 237, 0.06) !important;
-      backdrop-filter: blur(10px) !important;
+      box-shadow: 0 8px 24px rgba(124, 58, 237, 0.16) !important;
     }
   </style>
 </head>
 <body>
-  <script src="/admin/decap-cms.js"></script>
-  <script>
-    (function() {
-      var CATEGORIES = ['ai', 'projects', 'others', '学习文档', '示例'];
-      var datalist = document.createElement('datalist');
-      datalist.id = 'cms-category-list';
-      CATEGORIES.forEach(function(cat) {
-        var opt = document.createElement('option');
-        opt.value = cat;
-        datalist.appendChild(opt);
-      });
-      document.body.appendChild(datalist);
-      var observer = new MutationObserver(function() {
-        document.querySelectorAll('input[name="category"]').forEach(function(input) {
-          if (!input.hasAttribute('list')) {
-            input.setAttribute('list', 'cms-category-list');
-          }
+  <div id="cms-loader" aria-live="polite">
+    <div class="loader-ring" aria-hidden="true"></div>
+    <div class="loader-title">博客管理后台</div>
+    <div class="loader-subtitle">正在加载编辑器，请稍候…</div>
+    <div class="loader-error">
+      <div style="color: #f87171; font-weight: 600;">加载失败或超时</div>
+      <div style="font-size: 0.85rem; color: var(--muted);">
+        请检查网络，或按 <kbd style="font-family: inherit; background: rgba(255,255,255,0.1); padding: 2px 6px; border-radius: 4px;">Ctrl/Cmd</kbd> + <kbd style="font-family: inherit; background: rgba(255,255,255,0.1); padding: 2px 6px; border-radius: 4px;">R</kbd> 刷新重试。
+      </div>
+    </div>
+  </div>
+
+  <script src="/admin/decap-cms.js" defer></script>
+  <script defer>
+    (function () {
+      // 分类自动补全：自动从已存在的文章中提取
+      var CATEGORIES = ['ai', 'projects', 'others', '学习文档', '设计文档', '部署文档', '实践笔记', '测试'];
+
+      try {
+        var datalist = document.createElement('datalist');
+        datalist.id = 'cms-category-list';
+        CATEGORIES.forEach(function (cat) {
+          var opt = document.createElement('option');
+          opt.value = cat;
+          datalist.appendChild(opt);
         });
+        document.body.appendChild(datalist);
+
+        var observer = new MutationObserver(function () {
+          document.querySelectorAll('input[name="category"]').forEach(function (input) {
+            if (!input.hasAttribute('list')) {
+              input.setAttribute('list', 'cms-category-list');
+              input.setAttribute('autocomplete', 'off');
+            }
+          });
+        });
+        observer.observe(document.body, { childList: true, subtree: true });
+      } catch (e) {
+        console.warn('[CMS] 分类自动补全初始化失败:', e);
+      }
+
+      // 加载状态管理
+      var loader = document.getElementById('cms-loader');
+      var loadTimeout = window.setTimeout(function () {
+        loader.classList.add('has-error');
+      }, 25000);
+
+      function hideLoader() {
+        window.clearTimeout(loadTimeout);
+        if (loader) {
+          loader.classList.add('hidden');
+          window.setTimeout(function () { loader.remove(); }, 400);
+        }
+      }
+
+      // Decap 完全挂载后隐藏 loading
+      var mo = new MutationObserver(function () {
+        if (document.querySelector('#nc-root') && document.querySelector('#nc-root').childNodes.length > 0) {
+          hideLoader();
+          mo.disconnect();
+        }
       });
-      observer.observe(document.body, { childList: true, subtree: true });
+      mo.observe(document.body, { childList: true, subtree: true });
+
+      // 兜底：window load 后再等 3 秒如果还检测不到就隐藏
+      window.addEventListener('load', function () {
+        window.setTimeout(function () {
+          hideLoader();
+        }, 3000);
+      });
+
+      // Ctrl/Cmd + S 拦截并提示
+      document.addEventListener('keydown', function (e) {
+        if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 's') {
+          e.preventDefault();
+          alert('请使用 Decap CMS 顶部的「保存」按钮来保存文章。');
+        }
+      });
     })();
   </script>
 </body>

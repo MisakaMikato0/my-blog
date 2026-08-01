@@ -5,14 +5,25 @@ backend:
   base_url: https://my-blog-decap-oauth.ltznb666.workers.dev
   auth_endpoint: auth
 
+locale: zh_Hans
+
 media_folder: public/assets
 public_folder: /assets
+
 publish_mode: editorial_workflow
+
+show_preview_links: true
+
+slug:
+  encoding: unicode
+  clean_accents: false
+  sanitize_replacement: "-"
 
 collections:
   - name: posts
     label: 文章
     label_singular: 文章
+    description: 博客文章，支持 Markdown、分类、标签、封面与置顶。
     folder: src/content/posts
     create: true
     delete: true
@@ -25,14 +36,87 @@ collections:
         name: path
         default: "{{category}}/{{slug}}"
     format: yaml-frontmatter
-    sortable_fields: [published, title]
-    summary: "{{title}}"
+    sortable_fields: [published, title, category]
+    view_filters:
+      - label: 已发布
+        field: draft
+        pattern: false
+      - label: 草稿
+        field: draft
+        pattern: true
+      - label: 置顶
+        field: pinned
+        pattern: true
+    view_groups:
+      - label: 分类
+        field: category
+      - label: 年份
+        field: published
+        pattern: "\\d{4}"
+    summary: "{{title}} {{#pinned}}📌{{/pinned}} | {{category}} | {{published}}"
     fields:
-      - { label: 标题, name: title, widget: string }
-      - { label: 发布日期, name: published, widget: datetime, format: YYYY-MM-DD, picker_utc: false }
-      - { label: 描述, name: description, widget: text, required: false }
-      - { label: 标签, name: tags, widget: list, required: false }
-      - { label: 分类, name: category, widget: string, required: false }
-      - { label: 草稿, name: draft, widget: boolean, default: false, required: false }
-      - { label: 封面图, name: image, widget: image, required: false }
-      - { label: 正文, name: body, widget: markdown }
+      - label: 标题
+        name: title
+        widget: string
+        required: true
+        hint: 文章标题，会显示在列表和浏览器标签页。
+
+      - label: 发布日期
+        name: published
+        widget: datetime
+        format: YYYY-MM-DD
+        date_format: YYYY-MM-DD
+        time_format: false
+        picker_utc: false
+        required: true
+        default: ""
+        hint: 仅日期，不包含时间。
+
+      - label: 描述
+        name: description
+        widget: text
+        required: false
+        hint: 文章摘要，用于 SEO 和列表展示。
+
+      - label: 分类
+        name: category
+        widget: string
+        required: true
+        default: 学习文档
+        hint: 输入已有分类或新增分类；常用分类会自动提示。
+
+      - label: 标签
+        name: tags
+        widget: list
+        required: false
+        hint: 回车添加多个标签，建议 1~5 个。
+        field: { label: 标签, name: tag, widget: string }
+
+      - label: 封面图
+        name: image
+        widget: image
+        required: false
+        hint: 建议 1200×630 以上的横图。
+        media_library:
+          config:
+            multiple: false
+
+      - label: 置顶
+        name: pinned
+        widget: boolean
+        default: false
+        required: false
+        hint: 置顶文章会排在列表最前。
+
+      - label: 草稿
+        name: draft
+        widget: boolean
+        default: true
+        required: false
+        hint: 草稿不会出现在博客前台，可后续发布。
+
+      - label: 正文
+        name: body
+        widget: markdown
+        required: true
+        hint: 支持标准 Markdown，可插入图片、代码块等。

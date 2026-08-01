@@ -39,7 +39,7 @@ function withStaticSecurityHeaders(response: Response): Response {
 
 function plainNotFound(): Response {
 	return new Response(
-		<!DOCTYPE html>
+		`<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
 	<meta charset="UTF-8" />
@@ -60,7 +60,7 @@ function plainNotFound(): Response {
 		<a href="/">返回首页</a>
 	</main>
 </body>
-</html>,
+</html>`,
 		{
 			status: 404,
 			headers: {

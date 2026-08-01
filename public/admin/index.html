@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
   <meta charset="utf-8" />
@@ -7,6 +7,8 @@
   <title>博客管理 | Hakugyokurou</title>
   <link rel="preconnect" href="https://image.hakugyokurou.fun" />
   <link rel="dns-prefetch" href="https://image.hakugyokurou.fun" />
+  <link rel="preconnect" href="https://unpkg.com" />
+  <link rel="dns-prefetch" href="https://unpkg.com" />
   <style>
     :root {
       --bg: #0b0b0b;
@@ -174,10 +176,9 @@
     </div>
   </div>
 
-  <script src="/admin/decap-cms.js" defer></script>
-  <script defer>
+  <script>
     (function () {
-      // 分类自动补全：自动从已存在的文章中提取
+      // 分类自动补全
       var CATEGORIES = ['ai', 'projects', 'others', '学习文档', '设计文档', '部署文档', '实践笔记', '测试'];
 
       try {
@@ -239,6 +240,54 @@
           e.preventDefault();
           alert('请使用 Decap CMS 顶部的「保存」按钮来保存文章。');
         }
+      });
+
+      // 加载自定义预览模板（在 CMS 初始化之前注册会被队列，初始化之后立即执行）
+      function loadPreviewTemplate() {
+        return new Promise(function (resolve, reject) {
+          var script = document.createElement('script');
+          script.src = '/admin/templates/preview.js';
+          script.async = true;
+          script.onload = function () { resolve(); };
+          script.onerror = function () { reject(new Error('preview.js load failed')); };
+          document.body.appendChild(script);
+        });
+      }
+
+      // CDN 加载失败时自动降级到本地副本
+      var CDN_SCRIPT = 'https://unpkg.com/decap-cms@3.15.1/dist/decap-cms.js';
+      var FALLBACK_SCRIPT = '/admin/decap-cms.js';
+
+      function loadScript(src, onError) {
+        return new Promise(function (resolve, reject) {
+          var script = document.createElement('script');
+          script.src = src;
+          script.async = true;
+          script.onload = function () { resolve(); };
+          script.onerror = function () { reject(new Error('Failed to load ' + src)); };
+          document.body.appendChild(script);
+        });
+      }
+
+      loadScript(CDN_SCRIPT).then(function () {
+        // Decap 初始化完成后注册预览模板
+        if (window.CMS) {
+          loadPreviewTemplate().catch(function (err) {
+            console.warn('[CMS] 预览模板加载失败:', err);
+          });
+        }
+      }).catch(function () {
+        console.warn('[CMS] CDN 加载失败，尝试使用本地副本');
+        return loadScript(FALLBACK_SCRIPT).then(function () {
+          if (window.CMS) {
+            loadPreviewTemplate().catch(function (err) {
+              console.warn('[CMS] 预览模板加载失败:', err);
+            });
+          }
+        });
+      }).catch(function (err) {
+        console.error('[CMS] 无法加载 Decap CMS:', err);
+        loader.classList.add('has-error');
       });
     })();
   </script>

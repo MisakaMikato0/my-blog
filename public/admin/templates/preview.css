@@ -1,0 +1,191 @@
+/* Decap CMS 自定义预览样式 —— 匹配博客文章样式 */
+.cms-preview-post {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 2rem;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans SC", sans-serif;
+  line-height: 1.75;
+  color: #e8e8e8;
+  background: rgba(10, 10, 12, 0.72);
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.cms-preview-header {
+  margin-bottom: 1.5rem;
+}
+
+.cms-preview-category {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  color: #a78bfa;
+  background: rgba(124, 58, 237, 0.12);
+  border: 1px solid rgba(124, 58, 237, 0.25);
+  border-radius: 9999px;
+  margin-bottom: 0.75rem;
+}
+
+.cms-preview-title {
+  font-size: 1.75rem;
+  font-weight: 800;
+  line-height: 1.3;
+  margin: 0 0 0.75rem;
+  color: #ffffff;
+}
+
+.cms-preview-desc {
+  font-size: 1rem;
+  color: #b0b0b0;
+  margin: 0 0 1rem;
+  line-height: 1.6;
+}
+
+.cms-preview-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 0.8rem;
+  color: #888;
+}
+
+.cms-preview-meta time {
+  color: #a0a0a0;
+}
+
+.cms-preview-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.cms-preview-tag {
+  padding: 0.15rem 0.5rem;
+  font-size: 0.7rem;
+  color: #c4b5fd;
+  background: rgba(167, 139, 250, 0.1);
+  border: 1px solid rgba(167, 139, 250, 0.2);
+  border-radius: 9999px;
+}
+
+.cms-preview-cover {
+  margin: 0 0 1.5rem;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.cms-preview-cover img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.cms-preview-body {
+  overflow-wrap: break-word;
+}
+
+.cms-preview-body h1,
+.cms-preview-body h2,
+.cms-preview-body h3,
+.cms-preview-body h4,
+.cms-preview-body h5,
+.cms-preview-body h6 {
+  margin: 1.75rem 0 0.75rem;
+  line-height: 1.35;
+  color: #ffffff;
+  font-weight: 700;
+}
+
+.cms-preview-body h1 { font-size: 1.5rem; }
+.cms-preview-body h2 { font-size: 1.35rem; }
+.cms-preview-body h3 { font-size: 1.15rem; }
+.cms-preview-body h4 { font-size: 1rem; }
+.cms-preview-body h5 { font-size: 0.9rem; }
+.cms-preview-body h6 { font-size: 0.85rem; }
+
+.cms-preview-body p {
+  margin: 0 0 1rem;
+}
+
+.cms-preview-body a {
+  color: #a78bfa;
+  text-decoration: underline;
+  text-decoration-style: dashed;
+  text-underline-offset: 4px;
+  transition: color 0.2s ease;
+}
+
+.cms-preview-body a:hover {
+  color: #c4b5fd;
+}
+
+.cms-preview-body code {
+  font-family: "JetBrains Mono Variable", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  background: rgba(255, 255, 255, 0.08);
+  color: #f2f2f2;
+  padding: 0.15rem 0.35rem;
+  border-radius: 6px;
+  font-size: 0.875em;
+}
+
+.cms-preview-body pre {
+  background: rgba(0, 0, 0, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  padding: 1rem;
+  overflow-x: auto;
+  margin: 1rem 0;
+}
+
+.cms-preview-body pre code {
+  background: transparent;
+  padding: 0;
+  color: #e0e0e0;
+}
+
+.cms-preview-body blockquote {
+  margin: 1rem 0;
+  padding: 0.75rem 1rem;
+  border-left: 4px solid #7c3aed;
+  background: rgba(124, 58, 237, 0.08);
+  color: #d0d0d0;
+  border-radius: 0 8px 8px 0;
+}
+
+.cms-preview-body ul,
+.cms-preview-body ol {
+  margin: 0.75rem 0;
+  padding-left: 1.25rem;
+}
+
+.cms-preview-body li {
+  margin: 0.35rem 0;
+}
+
+.cms-preview-body img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
+  margin: 1rem 0;
+}
+
+.cms-preview-body hr {
+  border: none;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  margin: 1.5rem 0;
+}
+
+.cms-preview-body strong { color: #ffffff; }
+.cms-preview-body em { color: #c0c0c0; }
+.cms-preview-body del { color: #888; }
+
+/* 适配 Decap CMS 预览面板白色背景 */
+[class*="PreviewPane"],
+[class*="preview-pane"] {
+  background: transparent !important;
+}

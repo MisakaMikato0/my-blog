@@ -154,21 +154,23 @@ const rainConfig = {
 		<section class="home-hero__speech" aria-label="Character message">
 			<div class="home-hero__speech-wrapper">
 				<p class="home-hero__speech-text">
-					<span class="home-hero__speech-type">{speechConfig.text}</span>
+					<span class="home-hero__speech-type" aria-label={speechConfig.text}>{speechConfig.text}</span>
 				</p>
 				{speechConfig.english && (
 					<p class="home-hero__speech-en">
-						<span class="home-hero__speech-type">{speechConfig.english}</span>
+						<span class="home-hero__speech-type" aria-label={speechConfig.english}>{speechConfig.english}</span>
 					</p>
 				)}
 			</div>
-			<img
-				src={homeConfig.hero.speechAccentImage || ""}
-				alt=""
-				class="home-hero__speech-accent"
-				loading="eager"
-				aria-hidden="true"
-			/>
+			{homeConfig.hero.speechAccentImage && (
+				<img
+					src={homeConfig.hero.speechAccentImage}
+					alt=""
+					class="home-hero__speech-accent"
+					loading="eager"
+					aria-hidden="true"
+				/>
+			)}
 		</section>
 
 		<!-- 右侧面板（比例与样式保持不变） -->
@@ -668,7 +670,7 @@ const rainConfig = {
 				filter: "blur(0px)",
 				duration: 0.92,
 				ease: "expo.out",
-				clearProps: "filter",
+				clearProps: "filter,transform,opacity,translate,rotate,scale,visibility",
 			}, 2.12);
 
 		hero.classList.remove("home-hero--motion-pending");

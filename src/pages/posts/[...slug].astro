@@ -28,6 +28,7 @@ import { homeConfig } from "@/config/homeConfig";
 import { siteConfig } from "@/config/siteConfig";
 import { formatDateI18n, formatDateToYYYYMMDD } from "@/utils/date-utils";
 import { processCoverImageSync } from "@/utils/image-utils";
+import type { ImageMetadata } from "astro";
 import { url } from "@/utils/url-utils";
 
 export async function getStaticPaths() {

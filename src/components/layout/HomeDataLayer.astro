@@ -1,6 +1,7 @@
 ---
 import Icon from "@components/common/Icon.astro";
 import DataMetricCard from "@components/features/DataMetricCard.astro";
+import WeatherWidget from "@components/widget/WeatherWidget.astro";
 import I18nKey from "@i18n/i18nKey";
 import { i18n } from "@i18n/translation";
 import { homeConfig, siteConfig } from "@/config";
@@ -152,6 +153,8 @@ const statsShareId = umamiConfig?.shareId ?? "";
 				</div>
 			</section>
 		</div>
+
+		<WeatherWidget />
 	</div>
 </section>
 

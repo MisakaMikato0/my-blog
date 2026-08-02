@@ -21,7 +21,7 @@ export const coverImageConfig: CoverImageConfig = {
 
 	randomCoverImage: {
 		// 随机封面图功能开关
-		enable: false,
+		enable: true,
 		// 封面图API列表
 		apis: [
 			"https://www.loliapi.com/acg/pc/",

@@ -30,6 +30,7 @@ export type ArticleListPost = {
 	password: boolean;
 	coverImage: string;
 	coverApiUrls: string[];
+	coverReferrerPolicy: string;
 };
 
 type UmamiPageviewConfig = {
@@ -42,9 +43,15 @@ interface Props {
 	posts: ArticleListPost[];
 	postsPerPage?: number;
 	umamiPageviews?: UmamiPageviewConfig;
+	fallbackCoverImage?: string;
 }
 
-let { posts, postsPerPage = 15, umamiPageviews }: Props = $props();
+let {
+	posts,
+	postsPerPage = 15,
+	umamiPageviews,
+	fallbackCoverImage = "",
+}: Props = $props();
 
 let containerRef = $state<HTMLElement | null>(null);
 let sortMode = $state<ArticleSort>("latest");
@@ -157,7 +164,7 @@ function handleImageLoad(e: Event, postId: string) {
 	}
 }
 
-function handleImageError(e: Event, apiUrls: string[]) {
+function handleImageError(e: Event, apiUrls: string[], fallback = "") {
 	const img = e.target as HTMLImageElement;
 	const currentIndex = Number.parseInt(img.dataset.apiIndex || "0", 10);
 	const nextIndex = currentIndex + 1;
@@ -165,9 +172,13 @@ function handleImageError(e: Event, apiUrls: string[]) {
 	if (nextIndex < apiUrls.length) {
 		img.dataset.apiIndex = String(nextIndex);
 		img.src = apiUrls[nextIndex];
+	} else if (fallback && !img.dataset.usedFallback) {
+		img.dataset.usedFallback = "1";
+		img.src = fallback;
 	} else {
 		const media = img.closest(".article-list-card__media");
-		if (media) media.classList.add("is-hidden");
+		media?.classList.add("is-hidden");
+		media?.closest(".article-list-card")?.classList.remove("has-image");
 	}
 }
 
@@ -252,8 +263,8 @@ onMount(() => {
 				{#each pinnedPosts as post (post.id)}
 					<article class="article-list-card article-list-card--pinned" class:has-image={!!post.coverImage}>
 						<a href={post.url} class="article-list-card__link" aria-label={`查看文章：${post.title}`}>
-							{#if layoutMode === "grid" && post.coverImage}
-								<div class="article-list-card__media" class:skeleton-shimmer={!loadedImageIds.has(post.id)} aria-hidden="true">
+							{#if post.coverImage}
+								<div class="article-list-card__media" class:skeleton-shimmer={layoutMode === "grid" && !loadedImageIds.has(post.id)} aria-hidden="true">
 									<picture>
 										<img
 											class="article-list-card__image"
@@ -263,9 +274,11 @@ onMount(() => {
 											height="360"
 											loading="lazy"
 											decoding="async"
+											data-api-index="0"
 											data-post-id={post.id}
+											referrerpolicy={post.coverReferrerPolicy || undefined}
 											onload={(e) => handleImageLoad(e, post.id)}
-											onerror={(e) => handleImageError(e, post.coverApiUrls)}
+											onerror={(e) => handleImageError(e, post.coverApiUrls, fallbackCoverImage)}
 										/>
 									</picture>
 									<div class="article-list-card__media-overlay"></div>
@@ -351,7 +364,6 @@ onMount(() => {
 								<div
 									class="article-list-card__media"
 									class:skeleton-shimmer={layoutMode === "grid" && !loadedImageIds.has(post.id)}
-									class:is-hidden={layoutMode === "list" && loadedImageIds.has(post.id)}
 									aria-hidden="true"
 								>
 									<picture>
@@ -366,8 +378,9 @@ onMount(() => {
 											decoding="async"
 											data-api-index="0"
 											data-post-id={post.id}
+											referrerpolicy={post.coverReferrerPolicy || undefined}
 											onload={(e) => handleImageLoad(e, post.id)}
-											onerror={(e) => handleImageError(e, post.coverApiUrls)}
+											onerror={(e) => handleImageError(e, post.coverApiUrls, fallbackCoverImage)}
 										/>
 									</picture>
 									<div class="article-list-card__media-overlay"></div>

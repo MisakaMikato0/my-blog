@@ -4,7 +4,7 @@ published: 2026-06-03
 description: OpenSpec 规范驱动开发与 Superpowers 工程化工作流的协同实践，建立"规范驱动规划 + 流程驱动执行"的 AI 编程闭环。
 tags: [AI, Skill, 工作流]
 category: 学习文档
-image: ./cover/cover1.webp
+image: "api"
 draft: false
 ---
 

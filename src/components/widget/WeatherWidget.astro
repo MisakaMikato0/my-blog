@@ -417,6 +417,37 @@ import Icon from "@components/common/Icon.astro";
 </style>
 
 <script>
+	interface ForecastDay {
+		sunrise?: string;
+		sunset?: string;
+		pop?: number | string;
+	}
+
+	interface WeatherData {
+		city?: string;
+		district?: string;
+		temperature?: number | string;
+		weather?: string;
+		wind_direction?: string;
+		wind_power?: string;
+		humidity?: number | string;
+		report_time?: string;
+		temp_max?: number | string;
+		temp_min?: number | string;
+		weather_icon?: string;
+		feels_like?: number | string;
+		visibility?: number | string;
+		pressure?: number | string;
+		uv?: number | string;
+		precipitation?: number | string;
+		cloud?: number | string;
+		forecast?: ForecastDay[];
+		aqi?: number | string;
+		aqi_category?: string;
+		aqi_level?: number;
+		air_pollutants?: Record<string, number | string | undefined>;
+	}
+
 	const city = undefined;
 	const adcode = undefined;
 	const CACHE_KEY = "weather_data_cache";
@@ -445,11 +476,11 @@ import Icon from "@components/common/Icon.astro";
 		"210": "thunderstorm",
 	};
 
-	function getWeatherIcon(weatherIcon) {
+	function getWeatherIcon(weatherIcon: string) {
 		return weatherIcons[weatherIcon] || "wb-sunny";
 	}
 
-	function readCache(key) {
+	function readCache(key: string): WeatherData | null {
 		try {
 			const raw = localStorage.getItem(key);
 			if (!raw) return null;
@@ -463,7 +494,7 @@ import Icon from "@components/common/Icon.astro";
 	}
 
 	// 获取天气数据 - 支持 IP 自动定位
-	async function fetchWeather() {
+	async function fetchWeather(): Promise<WeatherData> {
 		const params = new URLSearchParams();
 		if (adcode) {
 			params.set("adcode", adcode);
@@ -492,7 +523,7 @@ import Icon from "@components/common/Icon.astro";
 			throw new Error(`请求失败: ${response.status}`);
 		}
 
-		const data = await response.json();
+		const data = (await response.json()) as WeatherData;
 
 		if (cacheKey) {
 			try {
@@ -509,26 +540,26 @@ import Icon from "@components/common/Icon.astro";
 	}
 
 	// 图标组件为构建期内联 SVG，无法运行时改 name，改为按代码切换显示
-	function setWeatherIcon(container, weatherIcon) {
+	function setWeatherIcon(container: HTMLElement, weatherIcon: string) {
 		const iconName = getWeatherIcon(weatherIcon);
-		container.querySelectorAll("[data-weather-icon]").forEach((el) => {
+		container.querySelectorAll<HTMLElement>("[data-weather-icon]").forEach((el) => {
 			el.classList.toggle("weather-hidden", el.dataset.icon !== iconName);
 		});
 	}
 
 	// 更新 UI
-	function updateUI(container, data, error = null) {
+	function updateUI(container: HTMLElement, data: WeatherData | null, error: string | null = null) {
 		const loading = container.querySelector("[data-weather-loading]");
 		const errorEl = container.querySelector("[data-weather-error]");
 		const content = container.querySelector("[data-weather-content]");
 		const errorMsg = container.querySelector("[data-error-message]");
 
 		// 隐藏加载状态
-		loading.classList.add("weather-hidden");
+		loading?.classList.add("weather-hidden");
 
 		if (error) {
 			// 如果有错误，显示错误信息，但不隐藏已有的内容
-			errorEl.classList.remove("weather-hidden");
+			errorEl?.classList.remove("weather-hidden");
 			if (errorMsg) errorMsg.textContent = error;
 			// 保留服务端渲染的内容（如果有的话）
 			return;
@@ -540,12 +571,12 @@ import Icon from "@components/common/Icon.astro";
 		}
 
 		// 隐藏错误状态
-		errorEl.classList.add("weather-hidden");
+		errorEl?.classList.add("weather-hidden");
 
 		// 更新数据
-		const setData = (selector, value) => {
+		const setData = (selector: string, value: unknown) => {
 			const el = container.querySelector(selector);
-			if (el) el.textContent = value || "--";
+			if (el) el.textContent = value == null || value === "" ? "--" : String(value);
 		};
 
 		setData("[data-city]", data.city);
@@ -561,7 +592,7 @@ import Icon from "@components/common/Icon.astro";
 		setData("[data-temp-min]", data.temp_min != null ? String(data.temp_min) : "--");
 
 		// 更新天气图标
-		setWeatherIcon(container, data.weather_icon);
+		setWeatherIcon(container, data.weather_icon ?? "");
 
 		// 更新扩展数据
 		const extendedSection = container.querySelector("[data-weather-extended]");
@@ -591,7 +622,7 @@ import Icon from "@components/common/Icon.astro";
 					aqiCategoryEl.className = "aqi-tag";
 					if (data.aqi_level === 1) aqiCategoryEl.classList.add("aqi-good");
 					else if (data.aqi_level === 2) aqiCategoryEl.classList.add("aqi-moderate");
-					else if (data.aqi_level >= 3) aqiCategoryEl.classList.add("aqi-bad");
+					else if ((data.aqi_level ?? 0) >= 3) aqiCategoryEl.classList.add("aqi-bad");
 				}
 			} else {
 				if (aqiEl) aqiEl.textContent = "--";
@@ -609,11 +640,11 @@ import Icon from "@components/common/Icon.astro";
 		}
 
 		// 显示内容
-		content.classList.remove("weather-hidden");
+		content?.classList.remove("weather-hidden");
 	}
 
 	// 初始化组件
-	function initWidget(container) {
+	function initWidget(container: HTMLElement): (() => void) | undefined {
 		if (container.dataset.weatherReady === "true") return;
 		container.dataset.weatherReady = "true";
 
@@ -624,9 +655,9 @@ import Icon from "@components/common/Icon.astro";
 
 		async function loadWeather() {
 			// 显示加载状态，隐藏其他状态
-			loading.classList.remove("weather-hidden");
-			errorEl.classList.add("weather-hidden");
-			content.classList.add("weather-hidden");
+			loading?.classList.remove("weather-hidden");
+			errorEl?.classList.add("weather-hidden");
+			content?.classList.add("weather-hidden");
 
 			try {
 				const data = await fetchWeather();
@@ -653,9 +684,9 @@ import Icon from "@components/common/Icon.astro";
 	}
 
 	// SWUP 无刷新切换页面时的初始化与清理
-	const cleanups = [];
+	const cleanups: Array<() => void> = [];
 	function initWeatherWidgets() {
-		document.querySelectorAll("[data-weather-init]").forEach((container) => {
+		document.querySelectorAll<HTMLElement>("[data-weather-init]").forEach((container) => {
 			const cleanup = initWidget(container);
 			if (cleanup) cleanups.push(cleanup);
 		});

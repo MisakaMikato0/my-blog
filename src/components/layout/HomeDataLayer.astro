@@ -195,7 +195,7 @@ const statsShareId = umamiConfig?.shareId ?? "";
 
 	function getGuideOpeningBlocks(layer: HTMLElement): GuideOpeningBlock[] {
 		const cards = Array.from(layer.querySelectorAll<HTMLElement>(
-			".home-data-layer__top-grid > .data-card, .home-guide-grid > .guide-card",
+			".home-data-layer__top-grid > .data-card, .home-guide-grid > .guide-card, .weather-widget",
 		));
 		if (cards.length === 0) return [];
 
@@ -210,6 +210,20 @@ const statsShareId = umamiConfig?.shareId ?? "";
 
 		return cards.map((element, index) => {
 			const rect = element.getBoundingClientRect();
+
+			// 天气组件为全宽横条，从舞台下方滑入并轻微上移聚集，
+			// 避免像卡片那样从中心外围飞入（那会越过舞台中心出现怪异路径）
+			if (element.classList.contains("weather-widget")) {
+				return {
+					element,
+					collapseX: 0,
+					collapseY: -Math.min(rect.height * 0.2, 60),
+					entryX: 0,
+					entryY: rect.height + 80,
+					rotation: 0,
+				};
+			}
+
 			const cardCenterX = (rect.left + rect.right) / 2;
 			const cardCenterY = (rect.top + rect.bottom) / 2;
 			const deltaX = cardCenterX - stageCenterX;

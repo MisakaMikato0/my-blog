@@ -1,5 +1,9 @@
 ---
 import Icon from "@components/common/Icon.astro";
+import { getApiUrlList } from "@/utils/image-utils";
+
+// 文章封面 API：随机图做背景，客户端按顺序重试，全部失败隐藏背景
+const coverApis = getApiUrlList("api", "weather-widget");
 ---
 
 <!--
@@ -8,6 +12,21 @@ import Icon from "@components/common/Icon.astro";
 	图标使用 lucide（轻量线性图标库），构建期内联 SVG，运行时按 weather_icon 切换显示。
 -->
 <section class="weather-widget" data-weather-init aria-label="天气预报">
+	<!-- 背景图：文章封面 API（与 guide-card 视觉一致，低透明度 + hover 放大） -->
+	{coverApis.length > 0 && (
+		<div class="weather-widget__visual" aria-hidden="true">
+			<img
+				src={coverApis[0]}
+				data-weather-cover
+				data-api-urls={JSON.stringify(coverApis)}
+				alt=""
+				loading="lazy"
+				decoding="async"
+				referrerpolicy="no-referrer"
+			/>
+		</div>
+	)}
+
 	<!-- 加载状态 -->
 	<div class="weather-widget__status weather-widget__status--loading" data-weather-loading>
 		<div class="weather-widget__spinner" aria-hidden="true"></div>
@@ -178,10 +197,41 @@ import Icon from "@components/common/Icon.astro";
 		color: var(--weather-fg);
 		padding: clamp(1rem, 1.8vw, 1.6rem);
 		overflow: hidden;
+		isolation: isolate;
 	}
 
 	.weather-hidden {
 		display: none !important;
+	}
+
+	/* ===== 背景图：文章封面 API（与 guide-card__visual 一致） ===== */
+	.weather-widget__visual {
+		position: absolute;
+		inset: 0;
+		z-index: -2;
+		opacity: 0.16;
+		pointer-events: none;
+		overflow: hidden;
+	}
+
+	.weather-widget__visual img {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+		object-position: center;
+		transition: transform 240ms ease, opacity 240ms ease;
+	}
+
+	.weather-widget:hover .weather-widget__visual img,
+	.weather-widget:focus-within .weather-widget__visual img {
+		transform: scale(1.06) translateX(1.5%);
+		opacity: 0.55;
+	}
+
+	.weather-widget__status,
+	.weather-widget__content {
+		position: relative;
+		z-index: 1;
 	}
 
 	/* ===== 状态：加载 / 错误 ===== */
@@ -663,6 +713,36 @@ import Icon from "@components/common/Icon.astro";
 		});
 	}
 
+	// 封面背景图：按顺序重试 API，全部失败则隐藏背景层（天气数据不受影响）
+	function initWeatherCover(container: HTMLElement) {
+		const img = container.querySelector<HTMLImageElement>("[data-weather-cover]");
+		if (!img) return;
+
+		let urls: string[] = [];
+		try {
+			urls = JSON.parse(img.dataset.apiUrls || "[]");
+		} catch {
+			urls = [];
+		}
+
+		let index = 1; // 0 号已由服务端设为 src
+		const onError = () => {
+			if (index < urls.length) {
+				img.addEventListener("error", onError, { once: true });
+				img.src = urls[index];
+				index += 1;
+			} else {
+				img.closest(".weather-widget__visual")?.classList.add("weather-hidden");
+			}
+		};
+
+		if (img.complete) {
+			if (img.naturalWidth === 0) onError();
+		} else {
+			img.addEventListener("error", onError, { once: true });
+		}
+	}
+
 	// 更新 UI
 	function updateUI(container: HTMLElement, data: WeatherData | null, error: string | null = null) {
 		const loading = container.querySelector("[data-weather-loading]");
@@ -763,6 +843,8 @@ import Icon from "@components/common/Icon.astro";
 	function initWidget(container: HTMLElement): (() => void) | undefined {
 		if (container.dataset.weatherReady === "true") return;
 		container.dataset.weatherReady = "true";
+
+		initWeatherCover(container);
 
 		const retryBtns = Array.from(container.querySelectorAll("[data-retry-btn]"));
 		const content = container.querySelector("[data-weather-content]");

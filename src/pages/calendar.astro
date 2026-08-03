@@ -8,8 +8,8 @@ import I18nKey from "@/i18n/i18nKey";
 import { i18n } from "@/i18n/translation";
 import MainGridLayout from "@/layouts/MainGridLayout.astro";
 import "@/styles/pages/calendar.css";
-import type { HolidayEntry } from "@/pages/api/holidays.json";
-import type { PostMeta } from "@/utils/calendar-events";
+import { getHolidayEntries } from "@/utils/holiday-data";
+import { getAllPostMeta } from "@/utils/post-meta";
 
 if (!siteConfig.pages.calendar) {
 	return Astro.redirect("/404/");
@@ -28,15 +28,9 @@ const now = new Date();
 const years = [now.getFullYear() - 1, now.getFullYear(), now.getFullYear() + 1];
 
 // SSR 拉取节日数据 & 文章数据
-const [holidaysRes, postsRes] = await Promise.all([
-	fetch(new URL("/api/holidays.json", Astro.url)),
-	fetch(new URL("/api/allPostMeta.json", Astro.url)),
-]);
-
-const holidays = (
-	holidaysRes.ok ? await holidaysRes.json() : []
-) as HolidayEntry[];
-const posts = (postsRes.ok ? await postsRes.json() : []) as PostMeta[];
+// 直接调用共享数据函数（零网络依赖），构建时不再请求线上站点或外部 API
+const holidays = getHolidayEntries();
+const posts = await getAllPostMeta();
 
 const overviewProps = {
 	holidays,

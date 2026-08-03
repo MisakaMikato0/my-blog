@@ -1,7 +1,7 @@
 import type { CalendarConfig } from "../types/config";
 
 // 日历页面配置
-// 节日数据来源：timor.tech API（构建时拉取）+ builtinHolidays 内置补充
+// 节日数据来源：timor.tech 静态缓存（src/data/holiday-api.json）+ builtinHolidays 内置补充（构建零网络依赖）
 // 生日 / 安排支持公历或农历（农历需 type: "lunar"，会自动换算为当年公历日期）
 export const calendarConfig: CalendarConfig = {
 	// 页面标题，留空使用 i18n 翻译
@@ -9,15 +9,15 @@ export const calendarConfig: CalendarConfig = {
 	// 页面描述，留空使用 i18n 翻译
 	description: "",
 
-	// 节日 API（构建时拉取并缓存，运行时无网络依赖）
+	// 节日 API 缓存（构建时零网络依赖，数据已提交为 src/data/holiday-api.json 静态缓存）
 	holidayApi: {
-		// 是否启用 API 拉取
+		// 是否在构建时合并 API 缓存数据
 		enable: true,
-		// timor.tech 中国法定节假日 API（含调休、补班）
+		// timor.tech 中国法定节假日 API（仅 scripts/update-holiday-cache.ts 刷新缓存时使用）
 		url: "https://timor.tech/api/holiday/year/",
-		// 拉取失败时是否仅用 builtinHolidays 兜底
+		// 拉取为空时是否保留已有缓存（仅刷新脚本使用）
 		fallbackOnError: true,
-		// 编译期拉取哪些年（按需扩展）
+		// 缓存覆盖的年份（需与 src/data/holiday-api.json 一致；新增年份时运行 update-holiday-cache.ts 刷新）
 		years: [2026, 2027],
 	},
 

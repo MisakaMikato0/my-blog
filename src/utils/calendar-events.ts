@@ -1,5 +1,5 @@
-import type { HolidayEntry } from "@/pages/api/holidays.json";
 import type { BirthdayItem, ScheduleItem } from "@/types/config";
+import type { HolidayEntry } from "@/utils/holiday-data";
 import {
 	getLunarMonthDayChinese,
 	resolveYearlyDate,

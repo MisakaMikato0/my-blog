@@ -1,0 +1,14 @@
+---
+import DynamicAlbumViewer from "@/components/pages/gallery/DynamicAlbumViewer.svelte";
+import MainGridLayout from "@/layouts/MainGridLayout.astro";
+import "@/styles/pages/gallery.css";
+import "@/styles/pages/gallery-admin.css";
+
+// 动态相册的客户端渲染壳：
+// _worker.ts 会把构建时不存在的 /gallery/{id}/ 请求转发到本页面，
+// URL 保持不变，本组件从路径中解析相册 ID 并从又拍云索引渲染。
+---
+
+<MainGridLayout title="Album">
+	<DynamicAlbumViewer client:only="svelte" />
+</MainGridLayout>

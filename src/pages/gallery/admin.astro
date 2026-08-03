@@ -1,0 +1,17 @@
+---
+import GalleryAdmin from "@/components/pages/gallery/admin/GalleryAdmin.svelte";
+import I18nKey from "@/i18n/i18nKey";
+import { i18n } from "@/i18n/translation";
+import MainGridLayout from "@/layouts/MainGridLayout.astro";
+import "@/styles/pages/gallery-admin.css";
+
+const title = i18n(I18nKey.galleryAdmin);
+---
+
+<MainGridLayout title={title} description={title}>
+	<div class="w-full rounded-(--radius-large) overflow-hidden relative">
+		<div class="card-base z-10 px-6 py-6 relative w-full">
+			<GalleryAdmin client:only="svelte" />
+		</div>
+	</div>
+</MainGridLayout>

@@ -1,0 +1,616 @@
+/* ============================================
+   相册管理页 /gallery/admin/ — 与博客同风格（黑白简约 + 玻璃卡片 + 暗色自适应）
+   ============================================ */
+
+.admin-app {
+	width: 100%;
+}
+
+/* ---- 顶部栏 ---- */
+.admin-header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 1rem;
+	flex-wrap: wrap;
+	padding-bottom: 1.25rem;
+	margin-bottom: 1.25rem;
+	border-bottom: 1px solid var(--line-divider, oklch(0.85 0 0));
+}
+
+.admin-header__left {
+	display: flex;
+	align-items: center;
+	gap: 0.75rem;
+	min-width: 0;
+}
+
+.admin-header__title {
+	font-size: 1.35rem;
+	font-weight: 700;
+	color: var(--deep-text, oklch(0.1 0 0));
+	margin: 0;
+}
+
+.admin-header__actions {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+}
+
+/* ---- 通用按钮 ---- */
+.admin-btn {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.4rem;
+	padding: 0.5rem 1rem;
+	border-radius: var(--radius-medium, 0.5rem);
+	border: 1px solid var(--line-divider, oklch(0.85 0 0));
+	background: transparent;
+	color: var(--btn-content, oklch(0.25 0 0));
+	font-size: 0.875rem;
+	font-weight: 500;
+	cursor: pointer;
+	white-space: nowrap;
+	transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease, transform 0.15s ease;
+}
+
+.admin-btn:hover:not(:disabled) {
+	background: var(--btn-regular-bg-hover, oklch(0.94 0 0));
+}
+
+.admin-btn:active:not(:disabled) {
+	transform: translateY(0.5px);
+}
+
+.admin-btn:disabled {
+	opacity: 0.55;
+	cursor: not-allowed;
+}
+
+.admin-btn--primary {
+	border-color: var(--deep-text, oklch(0.1 0 0));
+	background: var(--deep-text, oklch(0.1 0 0));
+	color: #fff;
+}
+
+.admin-btn--primary:hover:not(:disabled) {
+	background: var(--title-active, oklch(0.3 0 0));
+	border-color: var(--title-active, oklch(0.3 0 0));
+}
+
+:root.dark .admin-btn--primary {
+	border-color: #fff;
+	background: #fff;
+	color: #111;
+}
+
+:root.dark .admin-btn--primary:hover:not(:disabled) {
+	background: #e5e5e5;
+	border-color: #e5e5e5;
+}
+
+.admin-btn--danger {
+	border-color: rgba(239, 68, 68, 0.6);
+	color: #ef4444;
+}
+
+.admin-btn--danger:hover:not(:disabled) {
+	background: rgba(239, 68, 68, 0.1);
+}
+
+/* ---- 布局 ---- */
+.admin-body {
+	display: grid;
+	grid-template-columns: 260px minmax(0, 1fr);
+	gap: 1.25rem;
+	align-items: start;
+}
+
+@media (max-width: 768px) {
+	.admin-body {
+		grid-template-columns: 1fr;
+	}
+}
+
+.admin-sidebar,
+.admin-main {
+	display: flex;
+	flex-direction: column;
+	gap: 1rem;
+}
+
+.admin-panel {
+	padding: 1rem;
+	border: 1px solid var(--line-divider, oklch(0.85 0 0));
+	border-radius: var(--radius-large, 0.75rem);
+	background: var(--card-bg, transparent);
+}
+
+/* ---- 相册选择 ---- */
+.admin-select {
+	appearance: none;
+	width: 100%;
+	padding: 0.55rem 2rem 0.55rem 0.75rem;
+	border-radius: var(--radius-medium, 0.5rem);
+	border: 1px solid var(--line-divider, oklch(0.85 0 0));
+	background: transparent;
+	color: var(--btn-content, oklch(0.25 0 0));
+	font-size: 0.875rem;
+	font-weight: 500;
+	cursor: pointer;
+}
+
+.admin-select:focus {
+	outline: none;
+	border-color: var(--deep-text, oklch(0.1 0 0));
+}
+
+.admin-sidebar__stats {
+	font-size: 0.8125rem;
+	color: var(--content-meta, oklch(0.45 0 0));
+	line-height: 1.7;
+}
+
+.admin-sidebar__tags {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.35rem;
+	margin-top: 0.35rem;
+}
+
+.admin-sidebar__tag {
+	font-size: 0.6875rem;
+	padding: 0.15rem 0.5rem;
+	border-radius: 9999px;
+	border: 1px solid var(--line-divider, oklch(0.85 0 0));
+	color: var(--content-meta, oklch(0.45 0 0));
+}
+
+.admin-sidebar__hint {
+	font-size: 0.75rem;
+	color: var(--content-meta, oklch(0.45 0 0));
+	line-height: 1.6;
+}
+
+/* ---- 上传区 ---- */
+.admin-uploadzone {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	gap: 0.6rem;
+	padding: 2.25rem 1rem;
+	border: 1.5px dashed var(--line-divider, oklch(0.85 0 0));
+	border-radius: var(--radius-large, 0.75rem);
+	text-align: center;
+	cursor: pointer;
+	transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+.admin-uploadzone:hover:not(.admin-uploadzone--disabled) {
+	border-color: var(--deep-text, oklch(0.1 0 0));
+}
+
+.admin-uploadzone--dragover {
+	border-color: var(--deep-text, oklch(0.1 0 0));
+	background: var(--btn-regular-bg-hover, oklch(0.94 0 0));
+}
+
+.admin-uploadzone--disabled {
+	opacity: 0.55;
+	cursor: not-allowed;
+}
+
+.admin-uploadzone__icon {
+	font-size: 2rem;
+	opacity: 0.45;
+}
+
+.admin-uploadzone__title {
+	font-size: 1rem;
+	font-weight: 600;
+	margin: 0;
+}
+
+.admin-uploadzone__hint {
+	font-size: 0.8125rem;
+	color: var(--content-meta, oklch(0.45 0 0));
+	margin: 0;
+}
+
+/* ---- 上传队列 ---- */
+.upload-list {
+	display: flex;
+	flex-direction: column;
+	gap: 0.5rem;
+}
+
+.upload-item {
+	display: grid;
+	grid-template-columns: minmax(0, 1fr) 120px;
+	gap: 0.75rem;
+	align-items: center;
+	padding: 0.6rem 0.75rem;
+	border: 1px solid var(--line-divider, oklch(0.85 0 0));
+	border-radius: var(--radius-medium, 0.5rem);
+	font-size: 0.8125rem;
+}
+
+.upload-item__name {
+	overflow: hidden;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+}
+
+.upload-item__track {
+	height: 5px;
+	border-radius: 9999px;
+	background: var(--line-divider, oklch(0.85 0 0));
+	overflow: hidden;
+	margin-top: 0.3rem;
+}
+
+.upload-item__bar {
+	height: 100%;
+	border-radius: 9999px;
+	background: var(--deep-text, oklch(0.1 0 0));
+	transition: width 0.2s ease;
+}
+
+:root.dark .upload-item__bar {
+	background: #fff;
+}
+
+.upload-item__status {
+	display: inline-flex;
+	align-items: center;
+	justify-content: flex-end;
+	gap: 0.35rem;
+	font-size: 0.75rem;
+	white-space: nowrap;
+}
+
+.upload-item__status--success {
+	color: #16a34a;
+}
+
+.upload-item__status--error {
+	color: #ef4444;
+}
+
+.upload-item__status--uploading {
+	color: var(--content-meta, oklch(0.45 0 0));
+}
+
+/* ---- 图片网格 ---- */
+.photo-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+	gap: 0.9rem;
+}
+
+.photo-item {
+	position: relative;
+	border-radius: var(--radius-medium, 0.5rem);
+	overflow: hidden;
+	border: 1px solid var(--line-divider, oklch(0.85 0 0));
+	background: var(--btn-regular-bg-hover, oklch(0.94 0 0));
+}
+
+.photo-item__thumb {
+	position: relative;
+	display: block;
+	aspect-ratio: 4 / 3;
+	overflow: hidden;
+	cursor: zoom-in;
+}
+
+.photo-item__thumb img {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+	transition: transform 0.3s ease;
+}
+
+.photo-item:hover .photo-item__thumb img {
+	transform: scale(1.05);
+}
+
+.photo-item__cover-badge {
+	position: absolute;
+	top: 8px;
+	left: 8px;
+	padding: 2px 8px;
+	border-radius: 9999px;
+	font-size: 0.625rem;
+	font-weight: 600;
+	background: rgba(0, 0, 0, 0.55);
+	color: #fff;
+	backdrop-filter: blur(4px);
+}
+
+.photo-item__actions {
+	position: absolute;
+	inset: auto 0 0 0;
+	display: flex;
+	align-items: center;
+	justify-content: flex-end;
+	gap: 0.25rem;
+	padding: 0.4rem;
+	background: linear-gradient(to top, rgba(0, 0, 0, 0.55), transparent);
+	opacity: 0;
+	transform: translateY(6px);
+	transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.photo-item:hover .photo-item__actions {
+	opacity: 1;
+	transform: translateY(0);
+}
+
+.photo-item__actions button {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 30px;
+	height: 30px;
+	border-radius: 8px;
+	border: none;
+	background: rgba(255, 255, 255, 0.92);
+	color: #111;
+	cursor: pointer;
+	transition: background 0.15s ease, color 0.15s ease;
+}
+
+.photo-item__actions button:hover {
+	background: #fff;
+}
+
+.photo-item__actions button.danger:hover {
+	background: #ef4444;
+	color: #fff;
+}
+
+.photo-empty {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	gap: 0.5rem;
+	padding: 3rem 1rem;
+	color: var(--content-meta, oklch(0.45 0 0));
+	font-size: 0.875rem;
+}
+
+.photo-empty svg {
+	font-size: 2.5rem;
+	opacity: 0.4;
+}
+
+/* ---- 新建相册表单 ---- */
+.album-form {
+	display: flex;
+	flex-direction: column;
+	gap: 0.85rem;
+	padding: 1rem;
+	border: 1px solid var(--line-divider, oklch(0.85 0 0));
+	border-radius: var(--radius-large, 0.75rem);
+}
+
+.album-form__row {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 0.75rem;
+}
+
+@media (max-width: 640px) {
+	.album-form__row {
+		grid-template-columns: 1fr;
+	}
+}
+
+.album-form label {
+	display: flex;
+	flex-direction: column;
+	gap: 0.35rem;
+	font-size: 0.8125rem;
+	font-weight: 500;
+	color: var(--btn-content, oklch(0.25 0 0));
+}
+
+.album-form input,
+.album-form textarea {
+	padding: 0.5rem 0.75rem;
+	border-radius: var(--radius-medium, 0.5rem);
+	border: 1px solid var(--line-divider, oklch(0.85 0 0));
+	background: transparent;
+	color: var(--btn-content, oklch(0.25 0 0));
+	font-size: 0.875rem;
+	resize: vertical;
+}
+
+.album-form input:focus,
+.album-form textarea:focus {
+	outline: none;
+	border-color: var(--deep-text, oklch(0.1 0 0));
+}
+
+.album-form__actions {
+	display: flex;
+	justify-content: flex-end;
+	gap: 0.5rem;
+}
+
+.album-form__error {
+	font-size: 0.8125rem;
+	color: #ef4444;
+}
+
+/* ---- 登录卡片 ---- */
+.admin-login {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 0.75rem;
+	max-width: 340px;
+	margin: 3rem auto;
+	padding: 2rem;
+	text-align: center;
+}
+
+.admin-login__icon {
+	font-size: 2.75rem;
+	opacity: 0.4;
+}
+
+.admin-login h2 {
+	margin: 0;
+	font-size: 1.25rem;
+}
+
+.admin-login p {
+	margin: 0;
+	font-size: 0.8125rem;
+	color: var(--content-meta, oklch(0.45 0 0));
+}
+
+.admin-login input {
+	width: 100%;
+	padding: 0.55rem 0.85rem;
+	border-radius: var(--radius-medium, 0.5rem);
+	border: 1px solid var(--line-divider, oklch(0.85 0 0));
+	background: transparent;
+	color: var(--btn-content, oklch(0.25 0 0));
+	font-size: 0.875rem;
+}
+
+.admin-login input:focus {
+	outline: none;
+	border-color: var(--deep-text, oklch(0.1 0 0));
+}
+
+.admin-login .admin-btn {
+	width: 100%;
+	justify-content: center;
+}
+
+.admin-login__error {
+	color: #ef4444 !important;
+}
+
+/* ---- 确认弹窗 ---- */
+.dialog-overlay {
+	position: fixed;
+	inset: 0;
+	z-index: 1000;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 1rem;
+	background: rgba(0, 0, 0, 0.45);
+	backdrop-filter: blur(4px);
+}
+
+.dialog {
+	max-width: 380px;
+	width: 100%;
+	padding: 1.5rem;
+	border: 1px solid var(--line-divider, oklch(0.85 0 0));
+	border-radius: var(--radius-large, 0.75rem);
+	background: var(--page-bg, #fff);
+	box-shadow: 0 12px 40px rgba(0, 0, 0, 0.18);
+}
+
+:root.dark .dialog {
+	background: #111;
+}
+
+.dialog h3 {
+	margin: 0 0 0.5rem;
+	font-size: 1.05rem;
+}
+
+.dialog p {
+	margin: 0 0 1.25rem;
+	font-size: 0.875rem;
+	color: var(--content-meta, oklch(0.45 0 0));
+	line-height: 1.6;
+}
+
+.dialog__actions {
+	display: flex;
+	justify-content: flex-end;
+	gap: 0.5rem;
+}
+
+/* ---- Toast ---- */
+.toast-container {
+	position: fixed;
+	right: 1.25rem;
+	bottom: 1.25rem;
+	z-index: 1100;
+	display: flex;
+	flex-direction: column;
+	gap: 0.5rem;
+	max-width: 320px;
+}
+
+.toast {
+	padding: 0.7rem 1rem;
+	border-radius: var(--radius-medium, 0.5rem);
+	border: 1px solid var(--line-divider, oklch(0.85 0 0));
+	background: var(--page-bg, #fff);
+	color: var(--btn-content, oklch(0.25 0 0));
+	font-size: 0.8125rem;
+	box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+	animation: toastIn 0.25s ease-out both;
+}
+
+:root.dark .toast {
+	background: #111;
+}
+
+.toast--success {
+	border-left: 3px solid #16a34a;
+}
+
+.toast--error {
+	border-left: 3px solid #ef4444;
+}
+
+@keyframes toastIn {
+	from {
+		opacity: 0;
+		transform: translateY(8px);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
+}
+
+/* ---- 加载态 ---- */
+.admin-loading {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 0.5rem;
+	padding: 4rem 1rem;
+	color: var(--content-meta, oklch(0.45 0 0));
+	font-size: 0.875rem;
+}
+
+/* ---- 动态相册查看器（/gallery/_dynamic/）---- */
+.dynamic-viewer {
+	width: 100%;
+}
+
+.dynamic-viewer__notfound {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 0.75rem;
+	padding: 4rem 1rem;
+	color: var(--content-meta, oklch(0.45 0 0));
+}

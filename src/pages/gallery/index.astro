@@ -2,6 +2,7 @@
 import Icon from "@components/common/Icon.astro";
 import PageTitle from "@/components/common/PageTitle.astro";
 import AlbumCard from "@/components/pages/gallery/AlbumCard.astro";
+import DynamicAlbums from "@/components/pages/gallery/DynamicAlbums.svelte";
 import NetworkAlbum from "@/components/pages/gallery/NetworkAlbum.svelte";
 import { galleryConfig, siteConfig } from "@/config";
 import I18nKey from "@/i18n/i18nKey";
@@ -94,27 +95,33 @@ const tabs = [
           </div>
         )}
 
-        {albums.length > 0 ? (
-          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 my-6">
-            {albums.map((album) => (
-              <AlbumCard
-                id={album.id}
-                name={album.name}
-                cover={album.cover}
-                description={album.description}
-                date={album.date}
-                location={album.location}
-                tags={album.tags}
-                photoCount={album.photoCount}
-              />
-            ))}
-          </div>
-        ) : (
-          <div class="flex flex-col items-center justify-center py-16 text-neutral-400 dark:text-neutral-500">
-            <Icon name="material-symbols:photo-library" class="text-6xl mb-4 opacity-50" />
-            <p class="text-lg">{i18n(I18nKey.galleryNoAlbums)}</p>
-          </div>
-        )}
+        <div
+          class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 my-6"
+          data-album-grid
+          data-static-count={albums.length}
+        >
+          {albums.map((album) => (
+            <AlbumCard
+              id={album.id}
+              name={album.name}
+              cover={album.cover}
+              description={album.description}
+              date={album.date}
+              location={album.location}
+              tags={album.tags}
+              photoCount={album.photoCount}
+            />
+          ))}
+          <DynamicAlbums client:visible />
+        </div>
+        <div
+          class="flex flex-col items-center justify-center py-16 text-neutral-400 dark:text-neutral-500"
+          style={`display:${albums.length === 0 ? "flex" : "none"}`}
+          data-album-empty
+        >
+          <Icon name="material-symbols:photo-library" class="text-6xl mb-4 opacity-50" />
+          <p class="text-lg">{i18n(I18nKey.galleryNoAlbums)}</p>
+        </div>
       </div>
 
       <div data-gallery-section="network" class="hidden">

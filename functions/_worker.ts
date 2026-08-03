@@ -1,5 +1,6 @@
 import { handleCloudflareAiSearch } from "../src/workers/cloudflare/ai-search/runtime";
 import { handleGithubContributions } from "../src/workers/cloudflare/github-contributions/handler";
+import { handleGallery } from "../src/workers/cloudflare/gallery/handler";
 import { handlePosterImage } from "../src/workers/cloudflare/poster-image/handler";
 
 const STATIC_SECURITY_HEADERS: Record<string, string> = {
@@ -50,6 +51,23 @@ export default {
 		}
 		if (url.pathname === "/api/poster-image") {
 			return handlePosterImage(request);
+		}
+		if (url.pathname.startsWith("/api/gallery/")) {
+			return handleGallery(request, env);
+		}
+
+		// 动态相册兜底：/gallery/{id}/ 在静态构建中不存在时，
+		// 交给客户端渲染壳 /gallery/_dynamic/ 处理（URL 保持不变）。
+		const galleryAlbumMatch = url.pathname.match(/^\/gallery\/([^/]+)\/$/);
+		if (galleryAlbumMatch && env.ASSETS) {
+			const assetResponse = await env.ASSETS.fetch(request);
+			if (assetResponse.status === 404) {
+				const shellUrl = new URL("/gallery/_dynamic/", request.url);
+				const shellRequest = new Request(shellUrl.toString(), request);
+				const shellResponse = await env.ASSETS.fetch(shellRequest);
+				return withHeaders(shellResponse);
+			}
+			return withHeaders(assetResponse);
 		}
 
 		// Static assets via Pages

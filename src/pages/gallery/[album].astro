@@ -1,5 +1,6 @@
 ---
 import Icon from "@components/common/Icon.astro";
+import DynamicPhotos from "@/components/pages/gallery/DynamicPhotos.svelte";
 import PhotoCard from "@/components/pages/gallery/PhotoCard.svelte";
 import { galleryConfig, siteConfig } from "@/config";
 import I18nKey from "@/i18n/i18nKey";
@@ -132,6 +133,7 @@ const columnWidth = galleryConfig.columnWidth || 240;
           {photos.map((photo) => (
             <PhotoCard src={photo} albumId={albumMeta.id} client:visible />
           ))}
+          <DynamicPhotos albumId={albumMeta.id} client:visible />
         </div>
       ) : (
         <div class="flex flex-col items-center justify-center py-16 text-neutral-400 dark:text-neutral-500">

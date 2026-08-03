@@ -91,6 +91,7 @@
 		"@biomejs/biome": "2.4.15",
 		"@cloudflare/vitest-pool-workers": "0.18.4",
 		"@cloudflare/workers-types": "5.20260715.1",
+		"@iconify-json/lucide": "^1.2.121",
 		"@iconify-json/mdi": "^1.2.3",
 		"@iconify-json/svg-spinners": "^1.2.4",
 		"@iconify/types": "^2.0.0",

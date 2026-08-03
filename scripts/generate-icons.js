@@ -18,6 +18,7 @@ const OUTPUT_FILE = join(SRC_DIR, "constants", "icons.ts");
 // 支持的图标集及其包名
 const ICON_SETS = {
 	"material-symbols": "@iconify-json/material-symbols",
+	lucide: "@iconify-json/lucide",
 	"fa7-solid": "@iconify-json/fa7-solid",
 	"fa7-brands": "@iconify-json/fa7-brands",
 	"fa7-regular": "@iconify-json/fa7-regular",

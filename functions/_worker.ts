@@ -1,7 +1,6 @@
 import { handleCloudflareAiSearch } from "../src/workers/cloudflare/ai-search/runtime";
 import { handleGithubContributions } from "../src/workers/cloudflare/github-contributions/handler";
 import { handleGallery } from "../src/workers/cloudflare/gallery/handler";
-import { handlePosterImage } from "../src/workers/cloudflare/poster-image/handler";
 
 const STATIC_SECURITY_HEADERS: Record<string, string> = {
 	"Content-Security-Policy-Report-Only": [
@@ -49,9 +48,6 @@ export default {
 		if (url.pathname === "/api/github-contributions") {
 			return handleGithubContributions(request, env, ctx);
 		}
-		if (url.pathname === "/api/poster-image") {
-			return handlePosterImage(request);
-		}
 		if (url.pathname.startsWith("/api/gallery/")) {
 			return handleGallery(request, env);
 		}
@@ -62,7 +58,7 @@ export default {
 		if (galleryAlbumMatch && env.ASSETS) {
 			const assetResponse = await env.ASSETS.fetch(request);
 			if (assetResponse.status === 404) {
-				const shellUrl = new URL("/gallery/_dynamic/", request.url);
+				const shellUrl = new URL("/gallery/dynamic-album/", request.url);
 				const shellRequest = new Request(shellUrl.toString(), request);
 				const shellResponse = await env.ASSETS.fetch(shellRequest);
 				return withHeaders(shellResponse);

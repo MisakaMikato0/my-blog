@@ -1,0 +1,5 @@
+﻿{
+  "name": "my-blog-pages-worker",
+  "main": "functions/_worker.ts",
+  "compatibility_date": "2026-08-04"
+}

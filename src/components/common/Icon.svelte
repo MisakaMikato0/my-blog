@@ -11,7 +11,10 @@
 import { getIconSvg, hasIcon } from "@/constants/icons";
 
 interface Props {
-	icon: string;
+	/** 图标名，如 "material-symbols:search"（name 优先，兼容旧用法 icon） */
+	name?: string;
+	/** 图标名旧写法，与 name 等价 */
+	icon?: string;
 	class?: string;
 	style?: string;
 	size?: "xs" | "sm" | "md" | "lg" | "xl" | "2xl";
@@ -19,12 +22,15 @@ interface Props {
 }
 
 let {
+	name,
 	icon,
 	class: className = "",
 	style = "",
 	size = "md",
 	color,
 }: Props = $props();
+
+const iconName = $derived(name ?? icon ?? "");
 
 // 尺寸映射
 const sizeClasses: Record<string, string> = {
@@ -42,8 +48,8 @@ const combinedStyle = $derived(`${colorStyle}${style}`);
 const combinedClass = $derived(`${sizeClass} ${className}`.trim());
 
 // 获取内联 SVG
-const svgContent = $derived(getIconSvg(icon));
-const iconExists = $derived(hasIcon(icon));
+const svgContent = $derived(getIconSvg(iconName));
+const iconExists = $derived(hasIcon(iconName));
 </script>
 
 {#if iconExists && svgContent}
@@ -61,7 +67,7 @@ const iconExists = $derived(hasIcon(icon));
     class="inline-icon inline-flex items-center justify-center {combinedClass}"
     style={combinedStyle}
     aria-hidden="true"
-    title="Icon not found: {icon}"
+    title="Icon not found: {iconName}"
   >
     <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24">
       <circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="2" opacity="0.3"/>

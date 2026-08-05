@@ -54,8 +54,19 @@ export function getUpyunConfig(env: UpyunEnv): UpyunConfig {
 		operator: UPYUN_OPERATOR,
 		password: UPYUN_OPERATOR_PASSWORD,
 		formSecret: UPYUN_FORM_API_SECRET,
-		cdnHost: UPYUN_CDN_HOST.replace(/\/+$/, ""),
+		cdnHost: normalizeCdnHost(UPYUN_CDN_HOST),
 	};
+}
+
+/**
+ * 规范化 CDN 主机：补全协议头，避免前端用相对路径拼接出
+ * 形如 `https://site/gallery/admin/img.host/gallery/...` 的错误 URL。
+ * 环境变量写成 `img.example.com` 或 `https://img.example.com/` 均可。
+ */
+function normalizeCdnHost(host: string): string {
+	const normalized = host.trim().replace(/\/+$/, "");
+	if (/^[a-z][a-z0-9+.-]*:\/\//i.test(normalized)) return normalized;
+	return `https://${normalized}`;
 }
 
 function b64encodeUtf8(str: string): string {

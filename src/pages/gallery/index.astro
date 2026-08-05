@@ -312,4 +312,91 @@ const tabs = [
       document.addEventListener("astro:page-load", updateAdminEntryVisibility);
     })();
   </script>
+
+  <!-- 相册卡片入场动效（gsap）：模糊散去 + 淡入上浮 + 错开 -->
+  <script>
+    import gsap from "gsap";
+
+    const prefersReducedMotion = () =>
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const isMobile = () => window.matchMedia("(max-width: 768px)").matches;
+
+    // 已入场卡片集合（Swup 导航后新 DOM 是新元素，自然重新触发）
+    const entered = new WeakSet<Element>();
+    let localObserver: MutationObserver | null = null;
+    let networkObserver: MutationObserver | null = null;
+
+    function shouldAnimate(): boolean {
+      return !prefersReducedMotion() && !isMobile();
+    }
+
+    function animateCards(container: HTMLElement, selector: string): void {
+      if (!shouldAnimate()) return;
+      const targets = Array.from(
+        container.querySelectorAll<HTMLElement>(selector),
+      ).filter((el) => !entered.has(el));
+      if (targets.length === 0) return;
+      targets.forEach((el) => entered.add(el));
+
+      gsap.fromTo(
+        targets,
+        { opacity: 0, y: 30, filter: "blur(10px)" },
+        {
+          opacity: 1,
+          y: 0,
+          filter: "blur(0px)",
+          duration: 0.6,
+          // 错开页面容器 fade-in-up（400ms），避免两层动画叠加闪动
+          delay: 0.15,
+          stagger: 0.12,
+          ease: "power2.out",
+          overwrite: true,
+          onComplete() {
+            // 清除 inline 样式，避免覆盖 .album-card 子元素 hover 效果
+            gsap.set(targets, { clearProps: "transform,opacity,filter" });
+          },
+        },
+      );
+    }
+
+    function initGalleryEntrance(): void {
+      localObserver?.disconnect();
+      networkObserver?.disconnect();
+
+      const localSection = document.querySelector<HTMLElement>(
+        '[data-gallery-section="local"]',
+      );
+      const networkSection = document.querySelector<HTMLElement>(
+        '[data-gallery-section="network"]',
+      );
+
+      if (localSection) {
+        animateCards(localSection, ".album-card");
+        localObserver = new MutationObserver(() =>
+          animateCards(localSection, ".album-card"),
+        );
+        localObserver.observe(localSection, {
+          childList: true,
+          subtree: true,
+        });
+      }
+
+      if (networkSection) {
+        networkObserver = new MutationObserver(() => {
+          if (networkSection.classList.contains("hidden")) return;
+          animateCards(networkSection, ".image-item");
+        });
+        networkObserver.observe(networkSection, {
+          childList: true,
+          subtree: true,
+        });
+      }
+    }
+
+    if (!window.__galleryEntranceReady) {
+      window.__galleryEntranceReady = true;
+      document.addEventListener("astro:page-load", initGalleryEntrance);
+    }
+    initGalleryEntrance();
+  </script>
 </MainGridLayout>

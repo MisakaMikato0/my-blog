@@ -9,6 +9,7 @@ import I18nKey from "@/i18n/i18nKey";
 import { i18n } from "@/i18n/translation";
 import MainGridLayout from "@/layouts/MainGridLayout.astro";
 import { getAlbumCover, scanAlbumPhotos } from "@/utils/gallery-utils";
+import { url } from "@/utils/url-utils";
 import "@/styles/pages/gallery.css";
 
 if (!siteConfig.pages.gallery) {
@@ -43,9 +44,18 @@ const tabs = [
 <MainGridLayout title={title} description={description}>
   <div class="flex w-full rounded-(--radius-large) overflow-hidden relative min-h-32">
     <div class="card-base z-10 px-9 py-6 relative w-full">
-      <div class="mb-4">
+      <div class="mb-4 flex items-center justify-between gap-4">
         <PageTitle title={title} variant="stacked" />
-
+        <a
+          href={url("/gallery/admin/")}
+          class="gallery-admin-entry inline-flex shrink-0 items-center justify-center rounded-lg w-9 h-9 text-neutral-500 hover:text-(--primary) dark:text-neutral-400 dark:hover:text-(--primary) transition-colors"
+          title={i18n(I18nKey.galleryAdmin)}
+          aria-label={i18n(I18nKey.galleryAdmin)}
+          data-gallery-admin-entry
+          style="display:none"
+        >
+          <Icon name="material-symbols:manage-accounts-rounded" class="text-xl" />
+        </a>
       </div>
 
       <div class="border-b border-(--line-divider) mb-3 relative">
@@ -284,6 +294,22 @@ const tabs = [
 
       initFilterIndicator();
       document.addEventListener("astro:page-load", initFilterIndicator);
+
+      /* ---- 管理入口显隐（当前会话已登录管理员才显示） ---- */
+      function updateAdminEntryVisibility() {
+        var entry = document.querySelector("[data-gallery-admin-entry]");
+        if (!entry) return;
+        var hasToken = false;
+        try {
+          hasToken = !!sessionStorage.getItem("gallery-admin-token");
+        } catch (e) {
+          hasToken = false;
+        }
+        entry.style.display = hasToken ? "" : "none";
+      }
+
+      updateAdminEntryVisibility();
+      document.addEventListener("astro:page-load", updateAdminEntryVisibility);
     })();
   </script>
 </MainGridLayout>

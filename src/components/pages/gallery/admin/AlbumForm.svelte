@@ -4,18 +4,22 @@ import { i18n } from "@i18n/translation";
 import type { AlbumDraft } from "./types";
 
 interface Props {
-	onCreate: (data: AlbumDraft) => Promise<void>;
+	/** 编辑模式：传入相册现有数据时预填表单并隐藏 ID 输入 */
+	initial?: AlbumDraft | null;
+	onSubmit: (data: AlbumDraft) => Promise<void>;
 	onCancel: () => void;
 }
 
-let { onCreate, onCancel }: Props = $props();
+let { initial = null, onSubmit, onCancel }: Props = $props();
 
-let name = $state("");
-let id = $state("");
-let description = $state("");
-let date = $state("");
-let location = $state("");
-let tags = $state("");
+const editing = $derived(!!initial);
+
+let name = $state(initial?.name ?? "");
+let id = $state(initial?.id ?? "");
+let description = $state(initial?.description ?? "");
+let date = $state(initial?.date ?? "");
+let location = $state(initial?.location ?? "");
+let tags = $state((initial?.tags ?? []).join(", "));
 let busy = $state(false);
 let error = $state("");
 
@@ -33,8 +37,8 @@ async function submit() {
 	busy = true;
 	error = "";
 	try {
-		await onCreate({
-			id: id.trim() || slugify(name) || `album-${Date.now()}`,
+		await onSubmit({
+			id: (initial?.id ?? id.trim()) || slugify(name) || `album-${Date.now()}`,
 			name: name.trim(),
 			description: description.trim() || undefined,
 			date: date.trim() || undefined,
@@ -63,15 +67,17 @@ async function submit() {
 			<input type="date" bind:value={date} />
 		</label>
 	</div>
-	<label>
-		ID (URL)
-		<input
-			type="text"
-			bind:value={id}
-			placeholder="auto: {slugify(name) || 'album-id'}"
-			pattern="[a-z0-9][a-z0-9-]{0,46}[a-z0-9]"
-		/>
-	</label>
+	{#if !editing}
+		<label>
+			ID (URL)
+			<input
+				type="text"
+				bind:value={id}
+				placeholder="auto: {slugify(name) || 'album-id'}"
+				pattern="[a-z0-9][a-z0-9-]{0,46}[a-z0-9]"
+			/>
+		</label>
+	{/if}
 	<label>
 		{i18n(I18nKey.galleryAdminAlbumDescription)}
 		<textarea rows="2" bind:value={description}></textarea>
@@ -92,7 +98,7 @@ async function submit() {
 	<div class="album-form__actions">
 		<button type="button" class="admin-btn" onclick={onCancel}>{i18n(I18nKey.galleryAdminCancel)}</button>
 		<button type="submit" class="admin-btn admin-btn--primary" disabled={busy || !name.trim()}>
-			{i18n(I18nKey.galleryAdminCreate)}
+			{editing ? i18n(I18nKey.galleryAdminSave) : i18n(I18nKey.galleryAdminCreate)}
 		</button>
 	</div>
 </form>

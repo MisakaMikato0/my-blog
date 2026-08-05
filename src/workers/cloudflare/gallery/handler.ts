@@ -248,6 +248,42 @@ async function handleCreateAlbum(
 	return jsonResponse({ ok: true, album }, 200);
 }
 
+async function handleRenameAlbum(
+	request: Request,
+	env: GalleryEnv,
+): Promise<Response> {
+	const body = await readJsonBody(request);
+	const id = asString(body.id).toLowerCase();
+	const name = asString(body.name);
+	if (!validateAlbumId(id)) {
+		return errorResponse("invalid_album_id", 400);
+	}
+	if (!name || name.length > 60) {
+		return errorResponse("invalid_album_name", 400);
+	}
+	const description = asString(body.description).slice(0, 300) || undefined;
+	const date = asString(body.date).slice(0, 20) || undefined;
+	const location = asString(body.location).slice(0, 60) || undefined;
+	const tags = asStringArray(body.tags);
+
+	await updateIndex(env, (index) => {
+		const album = index.albums.find((a) => a.id === id);
+		if (!album) {
+			throw new Error("album_not_found");
+		}
+		// 静态相册元数据由 galleryConfig.ts 管理，只允许改动态相册
+		if (!album.dynamic) {
+			throw new Error("album_not_editable");
+		}
+		album.name = name;
+		album.description = description;
+		album.date = date;
+		album.location = location;
+		album.tags = tags.length > 0 ? tags : undefined;
+	});
+	return jsonResponse({ ok: true }, 200);
+}
+
 async function handleDeleteAlbum(
 	request: Request,
 	env: GalleryEnv,
@@ -333,6 +369,9 @@ export async function handleGallery(
 		if (method === "POST" && path === "/api/gallery/album") {
 			return await handleCreateAlbum(request, env);
 		}
+		if (method === "POST" && path === "/api/gallery/album/rename") {
+			return await handleRenameAlbum(request, env);
+		}
 		if (method === "DELETE" && path === "/api/gallery/album") {
 			return await handleDeleteAlbum(request, env);
 		}
@@ -351,6 +390,9 @@ export async function handleGallery(
 		}
 		if (message === "album_not_found") {
 			return errorResponse("album_not_found", 404);
+		}
+		if (message === "album_not_editable") {
+			return errorResponse("album_not_editable", 400);
 		}
 		if (message === "photo_not_found") {
 			return errorResponse("photo_not_found", 404);

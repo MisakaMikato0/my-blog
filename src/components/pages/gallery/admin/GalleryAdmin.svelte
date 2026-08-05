@@ -66,6 +66,7 @@ let cdnBase = $state("");
 let dynamicAlbums = $state<AdminAlbum[]>([]);
 let selectedAlbumId = $state("");
 let createOpen = $state(false);
+let editingAlbum = $state<AdminAlbum | null>(null);
 let toasts = $state<Array<{ id: number; kind: ToastKind; text: string }>>([]);
 let confirmState = $state<ConfirmState | null>(null);
 let uploads = $state<UploadItem[]>([]);
@@ -313,6 +314,20 @@ async function handleCreateAlbum(draft: AlbumDraft) {
 	}
 }
 
+async function handleUpdateAlbum(draft: AlbumDraft) {
+	try {
+		await api("/api/gallery/album/rename", {
+			method: "POST",
+			body: JSON.stringify(draft),
+		});
+		editingAlbum = null;
+		await loadIndex();
+		toast("success", i18n(I18nKey.galleryAdminSaveSuccess));
+	} catch (e) {
+		throw e;
+	}
+}
+
 function requestDeletePhoto(photo: AdminPhoto) {
 	const albumId = selectedAlbumId;
 	confirmState = {
@@ -463,6 +478,10 @@ async function copyLink(photo: AdminPhoto) {
 				</button>
 
 				{#if selectedAlbum?.dynamic}
+					<button class="admin-btn" onclick={() => { createOpen = false; editingAlbum = selectedAlbum; }}>
+						<Icon name="material-symbols:edit-square-outline" size="sm" />
+						{i18n(I18nKey.galleryAdminEditAlbum)}
+					</button>
 					<button class="admin-btn admin-btn--danger" onclick={requestDeleteAlbum}>
 						<Icon name="material-symbols:delete-rounded" size="sm" />
 						{i18n(I18nKey.galleryAdminDeleteAlbum)}
@@ -472,7 +491,20 @@ async function copyLink(photo: AdminPhoto) {
 
 			<main class="admin-main">
 				{#if createOpen}
-					<AlbumForm onCreate={handleCreateAlbum} onCancel={() => (createOpen = false)} />
+					<AlbumForm onSubmit={handleCreateAlbum} onCancel={() => (createOpen = false)} />
+				{:else if editingAlbum}
+					<AlbumForm
+						initial={{
+							id: editingAlbum.id,
+							name: editingAlbum.name,
+							description: editingAlbum.description,
+							date: editingAlbum.date,
+							location: editingAlbum.location,
+							tags: editingAlbum.tags,
+						}}
+						onSubmit={handleUpdateAlbum}
+						onCancel={() => (editingAlbum = null)}
+					/>
 				{/if}
 
 				<UploadZone

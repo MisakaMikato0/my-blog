@@ -315,17 +315,13 @@ async function handleCreateAlbum(draft: AlbumDraft) {
 }
 
 async function handleUpdateAlbum(draft: AlbumDraft) {
-	try {
-		await api("/api/gallery/album/rename", {
-			method: "POST",
-			body: JSON.stringify(draft),
-		});
-		editingAlbum = null;
-		await loadIndex();
-		toast("success", i18n(I18nKey.galleryAdminSaveSuccess));
-	} catch (e) {
-		throw e;
-	}
+	await api("/api/gallery/album/rename", {
+		method: "POST",
+		body: JSON.stringify(draft),
+	});
+	editingAlbum = null;
+	await loadIndex();
+	toast("success", i18n(I18nKey.galleryAdminSaveSuccess));
 }
 
 function requestDeletePhoto(photo: AdminPhoto) {

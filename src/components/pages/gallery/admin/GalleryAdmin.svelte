@@ -3,6 +3,7 @@ import I18nKey from "@i18n/i18nKey";
 import { i18n } from "@i18n/translation";
 import Icon from "@/components/common/Icon.svelte";
 import { galleryConfig } from "@/config/galleryConfig";
+import { normalizeImageOrientation } from "@/utils/image-orientation";
 import { url } from "@/utils/url-utils";
 import type { GalleryIndexDto, UploadTokenDto } from "../types";
 import AlbumForm from "./AlbumForm.svelte";
@@ -254,10 +255,12 @@ async function handleFiles(files: File[]) {
 	uploads = [...uploads, ...items];
 
 	for (let i = 0; i < files.length; i++) {
-		const file = files[i];
+		let file = files[i];
 		const item = items[i];
 		updateUpload(item.id, { status: "uploading", progress: 0 });
 		try {
+			// 上传前按 EXIF 方向转正，避免 CDN 转码丢方向导致图片横过来
+			file = await normalizeImageOrientation(file);
 			const tok = await api<UploadTokenDto>("/api/gallery/upload-token", {
 				method: "POST",
 				body: JSON.stringify({ albumId, filename: file.name }),

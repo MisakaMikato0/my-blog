@@ -370,6 +370,9 @@ export const ja: Translation = {
 	[Key.galleryCloudAlbum]: "クラウドアルバム",
 	[Key.galleryAlbumNotFound]: "アルバムが見つかりません",
 	[Key.galleryLoadError]: "読み込みに失敗しました、後でもう一度お試しください",
+	[Key.gallerySearch]: "アルバムを検索",
+	[Key.gallerySearchPlaceholder]: "アルバム名、説明、場所、写真の説明文で検索…",
+	[Key.gallerySearchNoResults]: "該当するアルバムはありません",
 
 	// 收藏APIページ
 	[Key.collections]: "コレクション",

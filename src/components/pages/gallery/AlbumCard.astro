@@ -1,4 +1,4 @@
----
+﻿---
 import I18nKey from "@/i18n/i18nKey";
 import { i18n } from "@/i18n/translation";
 import { url } from "@/utils/url-utils";
@@ -7,6 +7,7 @@ interface Props {
 	id: string;
 	name: string;
 	cover: string;
+	photos: string[]; // 前3张照片，用于堆叠展示
 	description?: string;
 	date?: string;
 	location?: string;
@@ -14,15 +15,25 @@ interface Props {
 	photoCount: number;
 }
 
-const { id, name, cover, date, location, tags, photoCount } = Astro.props;
+const {
+	id,
+	name,
+	cover,
+	photos,
+	date,
+	location,
+	tags,
+	photoCount,
+} = Astro.props;
 
-function truncateLocation(loc: string | undefined, maxChars = 4): string {
-	if (!loc) return "";
-	if (loc.length <= maxChars) return loc;
-	return `${loc.slice(0, maxChars)}...`;
+const displayPhotos = photos.slice(0, 3);
+// 补齐到3张（不足时用cover补）
+while (displayPhotos.length < 3) {
+	displayPhotos.push(cover || "");
 }
 
-const displayLocation = truncateLocation(location);
+const rotations = [-3, 5, -2]; // 三张照片的旋转角度
+const offsets = [0, 4, 8]; // 每张照片的偏移量（px）
 ---
 
 <a
@@ -30,54 +41,56 @@ const displayLocation = truncateLocation(location);
   data-tags={tags?.join(",") || ""}
   class="album-card group"
 >
-  <!-- Image wrapper -->
-  <div class="album-card-imgbox">
-    {cover ? (
-      <img
-        src={cover}
-        alt={name}
-        class="album-card-img"
-        loading="lazy"
-        decoding="async"
-        width="400"
-        height="300"
-      />
-    ) : (
-      <div class="w-full h-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
-        <div class="text-gray-400 text-5xl">&#x1f4f7;</div>
+  <!-- 堆叠照片区域 -->
+  <div class="polaroid-stack">
+    {displayPhotos.map((src, i) => (
+      <div
+        class="polaroid-photo"
+        style={`--polaroid-rotate: ${rotations[i]}deg; --polaroid-offset: ${offsets[i]}px; z-index: ${3 - i};`}
+      >
+        {src ? (
+          <img
+            src={src}
+            alt={i === 0 ? name : `${name} ${i + 1}`}
+            class="polaroid-img"
+            loading="lazy"
+            decoding="async"
+            width="400"
+            height="300"
+          />
+        ) : (
+          <div class="w-full h-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
+            <span class="text-gray-400 text-3xl">📷</span>
+          </div>
+        )}
       </div>
-    )}
-
-    <!-- Photo count badge (常驻，悬停时消失) -->
-    <div class="album-card-badge">
-      {photoCount} {i18n(I18nKey.galleryPhotos)}
-    </div>
-
-    <!-- Tags overlay (图片内左下角，悬停时消失，最多4个) -->
-    {tags && tags.length > 0 && (
-      <div class="album-card-tags-overlay">
-        {tags.slice(0, 4).map((tag) => (
-          <span class="album-card-tag-overlay">{tag}</span>
-        ))}
-      </div>
-    )}
+    ))}
   </div>
 
-  <!-- Details (悬停时露出) -->
-  <div class="album-card-details">
-    <h3 class="album-card-title">{name}</h3>
+  <!-- 照片数角标 -->
+  <div class="album-card-badge">
+    {photoCount} {i18n(I18nKey.galleryPhotos)}
+  </div>
 
-    <div class="album-card-meta">
+  <!-- 信息区域（悬停展开） -->
+  <div class="polaroid-details">
+    <h3 class="polaroid-title">{name}</h3>
+    <div class="polaroid-meta">
       {date && <span>{date}</span>}
-      {displayLocation && (
-        <span class="album-card-location">
+      {location && (
+        <span class="polaroid-location">
           <svg class="w-3 h-3" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5a2.5 2.5 0 010-5 2.5 2.5 0 010 5z"/></svg>
-          {displayLocation}
+          {location}
         </span>
       )}
     </div>
-
-
+    {tags && tags.length > 0 && (
+      <div class="polaroid-tags">
+        {tags.slice(0, 4).map((tag) => (
+          <span class="polaroid-tag">{tag}</span>
+        ))}
+      </div>
+    )}
   </div>
 </a>
 

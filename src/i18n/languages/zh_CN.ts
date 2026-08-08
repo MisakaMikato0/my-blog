@@ -362,6 +362,9 @@ export const zh_CN: Translation = {
 	[Key.galleryCloudAlbum]: "云端相册",
 	[Key.galleryAlbumNotFound]: "相册不存在",
 	[Key.galleryLoadError]: "加载失败，请稍后重试",
+	[Key.gallerySearch]: "搜索相册",
+	[Key.gallerySearchPlaceholder]: "搜索相册名称、描述、地点或照片说明…",
+	[Key.gallerySearchNoResults]: "没有找到匹配的相册",
 
 	// 收藏API页面
 	[Key.collections]: "工具导航",

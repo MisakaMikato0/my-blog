@@ -363,6 +363,9 @@ export const zh_TW: Translation = {
 	[Key.galleryCloudAlbum]: "雲端相簿",
 	[Key.galleryAlbumNotFound]: "相簿不存在",
 	[Key.galleryLoadError]: "載入失敗，請稍後重試",
+	[Key.gallerySearch]: "搜尋相簿",
+	[Key.gallerySearchPlaceholder]: "搜尋相簿名稱、描述、地點或照片說明…",
+	[Key.gallerySearchNoResults]: "沒有找到符合的相簿",
 
 	// 收藏API頁面
 	[Key.collections]: "工具導航",

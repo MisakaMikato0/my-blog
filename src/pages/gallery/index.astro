@@ -1,4 +1,4 @@
----
+﻿---
 import Icon from "@components/common/Icon.astro";
 import PageTitle from "@/components/common/PageTitle.astro";
 import AlbumCard from "@/components/pages/gallery/AlbumCard.astro";
@@ -8,7 +8,7 @@ import { galleryConfig, siteConfig } from "@/config";
 import I18nKey from "@/i18n/i18nKey";
 import { i18n } from "@/i18n/translation";
 import MainGridLayout from "@/layouts/MainGridLayout.astro";
-import { getAlbumCover, scanAlbumPhotos } from "@/utils/gallery-utils";
+import { getAlbumCover, scanAlbumPhotos, readAlbumCaptions } from "@/utils/gallery-utils";
 import { url } from "@/utils/url-utils";
 import "@/styles/pages/gallery.css";
 
@@ -22,7 +22,9 @@ const description = i18n(I18nKey.galleryDescription);
 const albums = galleryConfig.albums.map((album) => {
 	const photos = scanAlbumPhotos(album.id);
 	const cover = getAlbumCover(album, photos);
-	return { ...album, cover, photoCount: photos.length };
+	const captions = readAlbumCaptions(album.id);
+	const captionTexts = Object.values(captions).join(" ");
+	return { ...album, cover, photos, photoCount: photos.length, captionTexts };
 });
 
 const allTags = [...new Set(albums.flatMap((a) => a.tags || []))].sort();
@@ -83,6 +85,29 @@ const tabs = [
       </div>
 
       <div data-gallery-section="local">
+        <!-- 搜索框 -->
+        <div class="gallery-search-wrapper">
+          <div class="gallery-search-input-group">
+            <Icon name="material-symbols:search-rounded" class="gallery-search-icon" />
+            <input
+              type="text"
+              class="gallery-search-input"
+              placeholder={i18n(I18nKey.gallerySearchPlaceholder)}
+              data-gallery-search
+              aria-label={i18n(I18nKey.gallerySearch)}
+            />
+            <button
+              class="gallery-search-clear"
+              data-gallery-search-clear
+              type="button"
+              aria-label="Clear search"
+              style="display:none"
+            >
+              <Icon name="material-symbols:close-rounded" />
+            </button>
+          </div>
+        </div>
+
         {albums.length > 0 && allTags.length > 0 && (
           <div class="tools-tab-wrapper">
             <div class="tools-tab-pill" data-gallery-filter>
@@ -106,7 +131,7 @@ const tabs = [
         )}
 
         <div
-          class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 my-6"
+          class="album-grid"
           data-album-grid
           data-static-count={albums.length}
         >
@@ -115,6 +140,7 @@ const tabs = [
               id={album.id}
               name={album.name}
               cover={album.cover}
+              photos={album.photos}
               description={album.description}
               date={album.date}
               location={album.location}
@@ -132,170 +158,201 @@ const tabs = [
           <Icon name="material-symbols:photo-library" class="text-6xl mb-4 opacity-50" />
           <p class="text-lg">{i18n(I18nKey.galleryNoAlbums)}</p>
         </div>
+        <div
+          class="flex flex-col items-center justify-center py-16 text-neutral-400 dark:text-neutral-500"
+          style="display:none"
+          data-album-search-empty
+        >
+          <Icon name="material-symbols:search-off-rounded" class="text-6xl mb-4 opacity-50" />
+          <p class="text-lg">{i18n(I18nKey.gallerySearchNoResults)}</p>
+        </div>
       </div>
 
       <div data-gallery-section="network" class="hidden">
-        <NetworkAlbum client:visible />
+        <NetworkAlbum client:load />
       </div>
     </div>
   </div>
 
-  <!-- 样式已迁移至 src/styles/pages/gallery.css -->
+  <!-- 标签筛选 + 搜索 + tab 切换 JS -->
+  <script>
+    (function () {
+      /* ---- Tab 切换 ---- */
+      var tabNav = document.querySelector("[data-gallery-tab-nav]");
+      var tabBtns = tabNav ? tabNav.querySelectorAll("[data-gallery-tab]") : [];
+      var indicator = tabNav ? tabNav.querySelector("[data-gallery-tab-indicator]") : null;
+      var sections = {
+        local: document.querySelector('[data-gallery-section="local"]'),
+        network: document.querySelector('[data-gallery-section="network"]'),
+      };
 
-  <!-- 事件委托：document 级别，只注册一次，swup 导航后自动生效 -->
-  <script is:inline>
-    (function() {
-      if (window.__galleryReady) return;
-      window.__galleryReady = true;
-
-      /* ---- Gallery Tab 切换 ---- */
-      function updateGalleryIndicator(targetBtn) {
-        if (!targetBtn) return;
-        var nav = targetBtn.closest("[data-gallery-tab-nav]");
-        if (!nav) return;
-        var indicator = nav.querySelector("[data-gallery-tab-indicator]");
-        if (!indicator) return;
-        var navRect = nav.getBoundingClientRect();
-        var btnRect = targetBtn.getBoundingClientRect();
-        indicator.style.left = (btnRect.left - navRect.left) + "px";
+      function updateTabIndicator(btn) {
+        if (!indicator || !tabNav) return;
+        var navRect = tabNav.getBoundingClientRect();
+        var btnRect = btn.getBoundingClientRect();
+        indicator.style.left = btnRect.left - navRect.left + "px";
         indicator.style.width = btnRect.width + "px";
-        indicator.style.opacity = "1";
       }
 
-      function activateGalleryTab(targetTab) {
-        if (!targetTab) return;
-        var tabButtons = document.querySelectorAll("[data-gallery-tab]");
-        var sections = document.querySelectorAll("[data-gallery-section]");
-        var targetButton = null;
-        tabButtons.forEach(function(btn) {
-          if (btn.dataset.galleryTab === targetTab) targetButton = btn;
+      tabBtns.forEach(function (btn) {
+        btn.addEventListener("click", function () {
+          var id = btn.dataset.galleryTab;
+          tabBtns.forEach(function (b) {
+            b.classList.remove("gallery-tab-btn-active");
+            b.classList.add("gallery-tab-btn-inactive");
+          });
+          btn.classList.remove("gallery-tab-btn-inactive");
+          btn.classList.add("gallery-tab-btn-active");
+          updateTabIndicator(btn);
+          if (sections.local) {
+            sections.local.classList.toggle("hidden", id !== "local");
+          }
+          if (sections.network) {
+            sections.network.classList.toggle("hidden", id !== "network");
+          }
         });
-        if (!targetButton) return;
-
-        tabButtons.forEach(function(btn) {
-          btn.classList.remove("gallery-tab-btn-active");
-          btn.classList.add("gallery-tab-btn-inactive");
-        });
-        targetButton.classList.remove("gallery-tab-btn-inactive");
-        targetButton.classList.add("gallery-tab-btn-active");
-        updateGalleryIndicator(targetButton);
-
-        sections.forEach(function(section) {
-          if (section.dataset.gallerySection === targetTab) section.classList.remove("hidden");
-          else section.classList.add("hidden");
-        });
-
-        var nextHash = "#gallery-" + encodeURIComponent(targetTab);
-        if (window.location.hash !== nextHash) {
-          window.history.replaceState(null, "", nextHash);
-        }
-      }
-
-      // 事件委托：gallery tab 点击
-      document.addEventListener("click", function(e) {
-        var btn = e.target.closest("[data-gallery-tab]");
-        if (btn) activateGalleryTab(btn.dataset.galleryTab);
       });
 
-      // hashchange
-      window.addEventListener("hashchange", function() {
-        var hash = window.location.hash.replace(/^#gallery-/, "");
-        if (hash) {
-          try { hash = decodeURIComponent(hash); } catch(e) { return; }
-          activateGalleryTab(hash);
-        }
-      });
-
-      // resize：更新指示器
-      window.addEventListener("resize", function() {
-        var activeBtn = document.querySelector(".gallery-tab-btn-active");
-        if (activeBtn) updateGalleryIndicator(activeBtn);
-      });
-
-      // 初始化 gallery tab 指示器
-      function initGalleryIndicator() {
-        var activeBtn = document.querySelector(".gallery-tab-btn-active");
-        if (activeBtn) {
-          requestAnimationFrame(function() { updateGalleryIndicator(activeBtn); });
-        }
+      function initTabIndicator() {
+        var active = tabNav ? tabNav.querySelector(".gallery-tab-btn-active") : null;
+        if (active) updateTabIndicator(active);
       }
+      initTabIndicator();
+      document.addEventListener("astro:page-load", initTabIndicator);
 
-      // 从 hash 恢复 tab
-      function initGalleryFromHash() {
-        var hash = window.location.hash.replace(/^#gallery-/, "");
-        if (hash) {
-          try { hash = decodeURIComponent(hash); } catch(e) { hash = ""; }
-          if (hash) activateGalleryTab(hash);
-          else initGalleryIndicator();
-        } else {
-          initGalleryIndicator();
+      /* ---- 搜索 ---- */
+      var searchInput = document.querySelector("[data-gallery-search]");
+      var searchClear = document.querySelector("[data-gallery-search-clear]");
+      var cardContainer = document.querySelector("[data-album-grid]");
+      var searchEmpty = document.querySelector("[data-album-search-empty]");
+      var filterEmpty = document.querySelector("[data-album-empty]");
+      var searchTimer = null;
+
+      function doSearch() {
+        if (!searchInput || !cardContainer) return;
+        var query = searchInput.value.trim().toLowerCase();
+        var hasQuery = query.length > 0;
+
+        // 清除按钮显隐
+        if (searchClear) {
+          searchClear.style.display = hasQuery ? "" : "none";
         }
-      }
 
-      initGalleryFromHash();
-      document.addEventListener("astro:page-load", initGalleryFromHash);
-
-      /* ---- Gallery Filter 筛选 ---- */
-      function updateFilterIndicator(container, button) {
-        var indicator = container.querySelector(".gallery-filter-indicator");
-        if (!indicator || !button) return;
-        indicator.style.left = button.offsetLeft + "px";
-        indicator.style.top = button.offsetTop + "px";
-        indicator.style.width = button.offsetWidth + "px";
-        indicator.style.height = button.offsetHeight + "px";
-        indicator.style.opacity = "1";
-      }
-
-      // 事件委托：gallery filter 点击
-      document.addEventListener("click", function(e) {
-        var button = e.target.closest("[data-gallery-filter] .tools-tab-btn");
-        if (!button) return;
-        var container = button.closest("[data-gallery-filter]");
-        if (!container) return;
-        var cardContainer = container.closest(".card-base");
-        if (!cardContainer) return;
-
-        var selectedTag = button.dataset.tag;
-        var filters = container.querySelectorAll(".tools-tab-btn");
-
-        filters.forEach(function(f) {
-          f.classList.remove("tools-tab-btn-active");
-          f.classList.add("tools-tab-btn-inactive");
-          f.disabled = false;
-        });
-        button.classList.remove("tools-tab-btn-inactive");
-        button.classList.add("tools-tab-btn-active");
-        button.disabled = true;
-
-        updateFilterIndicator(container, button);
+        // 获取当前选中的标签
+        var activeFilter = document.querySelector("[data-gallery-filter] [data-tag].tools-tab-btn-active");
+        var selectedTag = activeFilter ? activeFilter.dataset.tag : "all";
 
         var cards = cardContainer.querySelectorAll(".album-card");
-        cards.forEach(function(card) {
+        var visibleCount = 0;
+
+        cards.forEach(function (card) {
+          var searchText = (card.dataset.search || "").toLowerCase();
           var tags = (card.dataset.tags || "").split(",");
-          if (selectedTag === "all" || (selectedTag && tags.includes(selectedTag))) {
+
+          var matchesTag = selectedTag === "all" || (selectedTag && tags.includes(selectedTag));
+          var matchesSearch = !hasQuery || searchText.includes(query);
+
+          if (matchesTag && matchesSearch) {
             card.style.display = "";
             card.classList.remove("gallery-card-fade-in");
             void card.offsetHeight;
             card.classList.add("gallery-card-fade-in");
+            visibleCount++;
           } else {
             card.style.display = "none";
             card.classList.remove("gallery-card-fade-in");
           }
         });
-      });
 
-      // 初始化 filter 指示器
-      function initFilterIndicator() {
-        var filterEl = document.querySelector("[data-gallery-filter]");
-        if (!filterEl) return;
-        var allBtn = filterEl.querySelector('[data-tag="all"]');
-        if (allBtn) updateFilterIndicator(filterEl, allBtn);
+        // 空态切换
+        var noResults = hasQuery && visibleCount === 0;
+        if (searchEmpty) searchEmpty.style.display = noResults ? "flex" : "none";
+        if (filterEmpty) {
+          var staticCount = Number(cardContainer.dataset.staticCount || 0);
+          filterEmpty.style.display = (staticCount === 0 && !noResults) ? "flex" : "none";
+        }
       }
 
-      initFilterIndicator();
-      document.addEventListener("astro:page-load", initFilterIndicator);
+      if (searchInput) {
+        searchInput.addEventListener("input", function () {
+          clearTimeout(searchTimer);
+          searchTimer = setTimeout(doSearch, 250);
+        });
+      }
 
-      /* ---- 管理入口显隐（当前会话已登录管理员才显示） ---- */
+      if (searchClear) {
+        searchClear.addEventListener("click", function () {
+          if (searchInput) {
+            searchInput.value = "";
+            searchInput.focus();
+          }
+          doSearch();
+        });
+      }
+
+      // 搜索初始化时从 data-search 属性读数据
+      function initSearchData() {
+        if (!cardContainer) return;
+        cardContainer.querySelectorAll(".album-card").forEach(function (card) {
+          // 如果还没有 data-search，从卡片内容构造
+          if (!card.dataset.search) {
+            var name = card.querySelector(".polaroid-title")?.textContent || "";
+            var meta = card.querySelector(".polaroid-meta")?.textContent || "";
+            var tags = card.dataset.tags || "";
+            card.dataset.search = name + " " + meta + " " + tags;
+          }
+        });
+      }
+      initSearchData();
+      document.addEventListener("astro:page-load", initSearchData);
+
+      /* ---- 标签筛选（继承现有逻辑，增加搜索叠加） ---- */
+      var filterContainer = document.querySelector("[data-gallery-filter]");
+      if (filterContainer) {
+        filterContainer.addEventListener("click", function (e) {
+          var btn = e.target.closest("[data-tag]");
+          if (!btn || btn.classList.contains("tools-tab-btn-active")) return;
+
+          var filters = filterContainer.querySelectorAll("[data-tag]");
+          filters.forEach(function (f) {
+            f.classList.remove("tools-tab-btn-active");
+            f.classList.add("tools-tab-btn-inactive");
+            f.disabled = false;
+          });
+          btn.classList.remove("tools-tab-btn-inactive");
+          btn.classList.add("tools-tab-btn-active");
+          btn.disabled = true;
+
+          // 更新指示器
+          var indicator2 = filterContainer.querySelector(".gallery-filter-indicator");
+          if (indicator2) {
+            updateFilterIndicator(filterContainer, btn);
+          }
+
+          // 重新搜索（叠加标签筛选）
+          doSearch();
+        });
+
+        function updateFilterIndicator(container, button) {
+          var indicator2 = container.querySelector(".gallery-filter-indicator");
+          if (!indicator2) return;
+          var containerRect = container.getBoundingClientRect();
+          var btnRect = button.getBoundingClientRect();
+          indicator2.style.left = btnRect.left - containerRect.left + "px";
+          indicator2.style.width = btnRect.width + "px";
+          indicator2.style.opacity = "1";
+        }
+
+        // 初始化 filter 指示器
+        function initFilterIndicator() {
+          var allBtn = filterContainer.querySelector('[data-tag="all"]');
+          if (allBtn) updateFilterIndicator(filterContainer, allBtn);
+        }
+        initFilterIndicator();
+        document.addEventListener("astro:page-load", initFilterIndicator);
+      }
+
+      /* ---- 管理入口显隐 ---- */
       function updateAdminEntryVisibility() {
         var entry = document.querySelector("[data-gallery-admin-entry]");
         if (!entry) return;
@@ -313,7 +370,7 @@ const tabs = [
     })();
   </script>
 
-  <!-- 相册卡片入场动效（gsap）：模糊散去 + 淡入上浮 + 错开 -->
+  <!-- 相册卡片入场动效（gsap） -->
   <script>
     import gsap from "gsap";
 
@@ -321,7 +378,6 @@ const tabs = [
       window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const isMobile = () => window.matchMedia("(max-width: 768px)").matches;
 
-    // 已入场卡片集合（Swup 导航后新 DOM 是新元素，自然重新触发）
     const entered = new WeakSet<Element>();
     let localObserver: MutationObserver | null = null;
     let networkObserver: MutationObserver | null = null;
@@ -346,13 +402,11 @@ const tabs = [
           y: 0,
           filter: "blur(0px)",
           duration: 0.6,
-          // 错开页面容器 fade-in-up（400ms），避免两层动画叠加闪动
           delay: 0.15,
           stagger: 0.12,
           ease: "power2.out",
           overwrite: true,
           onComplete() {
-            // 清除 inline 样式，避免覆盖 .album-card 子元素 hover 效果
             gsap.set(targets, { clearProps: "transform,opacity,filter" });
           },
         },

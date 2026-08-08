@@ -1,4 +1,4 @@
-backend:
+﻿backend:
   name: github
   repo: MisakaMikato0/my-blog
   branch: master
@@ -120,3 +120,30 @@ collections:
         widget: markdown
         required: true
         hint: 支持标准 Markdown，可插入图片、代码块等。
+
+  # 照片说明 - 集中管理所有相册的 captions
+  - name: "gallery-captions"
+    label: "照片说明"
+    label_singular: "照片说明"
+    description: "编辑各相册照片的说明文字（键为相册ID，值为 { 文件名: 说明 } 映射）"
+    files:
+      - name: "captions"
+        label: "所有相册说明"
+        file: "public/gallery/captions.json"
+        format: "json"
+        fields:
+          - label: "相册照片说明"
+            name: "body"
+            widget: "json"
+            hint: |
+              格式说明：
+              顶层键为相册 ID（如 "gpt-img2-2026"），值为对象。
+              每个对象中，键为文件名（如 "1.webp"），值为说明文字。
+              示例：
+              {
+                "gpt-img2-2026": {
+                  "1.webp": "星空下的漫步",
+                  "2.webp": "傍晚的夕阳"
+                }
+              }
+              提示：不要包含 cover.* 文件，旧相册没有说明无需添加。

@@ -1,4 +1,4 @@
----
+﻿---
 import Icon from "@components/common/Icon.astro";
 import DynamicPhotos from "@/components/pages/gallery/DynamicPhotos.svelte";
 import PhotoCard from "@/components/pages/gallery/PhotoCard.svelte";
@@ -6,7 +6,7 @@ import { galleryConfig, siteConfig } from "@/config";
 import I18nKey from "@/i18n/i18nKey";
 import { i18n } from "@/i18n/translation";
 import MainGridLayout from "@/layouts/MainGridLayout.astro";
-import { getAlbumCover, scanAlbumPhotos } from "@/utils/gallery-utils";
+import { getAlbumCover, scanAlbumPhotos, readAlbumCaptions } from "@/utils/gallery-utils";
 import { url } from "@/utils/url-utils";
 import "@/styles/pages/gallery.css";
 
@@ -31,10 +31,18 @@ if (!albumMeta) {
 const photos = scanAlbumPhotos(albumMeta.id);
 const cover = getAlbumCover(albumMeta, photos);
 const columnWidth = galleryConfig.columnWidth || 240;
+const captions = readAlbumCaptions(albumMeta.id);
+
+// 从照片URL中提取文件名，在 captions 中查找说明
+// 照片URL格式: /gallery/{albumId}/{filename}
+function getCaption(photoUrl: string): string {
+	const parts = photoUrl.split("/");
+	const filename = parts[parts.length - 1];
+	return captions[filename] || "";
+}
 ---
 
 <MainGridLayout title={albumMeta.name} description={albumMeta.description || ""}>
-  <!-- 相册封面横幅 -->
   <div class="w-full rounded-(--radius-large) overflow-hidden relative">
     {cover ? (
       <div class="relative w-full aspect-[3/1] min-h-[200px] max-h-[360px]">
@@ -44,7 +52,6 @@ const columnWidth = galleryConfig.columnWidth || 240;
           class="w-full h-full object-cover"
         />
         <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent" />
-        <!-- 返回按钮 -->
         <a
           href={url("/gallery/")}
           class="absolute top-4 left-4 inline-flex items-center gap-1.5 text-sm text-white/90 hover:text-white bg-black/30 hover:bg-black/50 backdrop-blur-sm px-3 py-1.5 rounded-lg transition-colors"
@@ -52,7 +59,6 @@ const columnWidth = galleryConfig.columnWidth || 240;
           <Icon name="material-symbols:arrow-back" class="text-base" />
           {i18n(I18nKey.galleryBackToAlbums)}
         </a>
-        <!-- 封面上的信息 -->
         <div class="absolute bottom-0 left-0 right-0 p-6">
           <div class="text-2xl sm:text-3xl font-bold text-white mb-2 drop-shadow-lg">
             {albumMeta.name}
@@ -122,7 +128,6 @@ const columnWidth = galleryConfig.columnWidth || 240;
     )}
   </div>
 
-  <!-- 瀑布流照片网格 -->
   <div class="w-full rounded-(--radius-large) overflow-hidden relative mt-4">
     <div class="card-base z-10 px-6 py-6 relative w-full">
       {photos.length > 0 ? (
@@ -131,7 +136,12 @@ const columnWidth = galleryConfig.columnWidth || 240;
           style={`column-count: 2; column-gap: 0.75rem; --col-width: ${columnWidth}px;`}
         >
           {photos.map((photo) => (
-            <PhotoCard src={photo} albumId={albumMeta.id} client:visible />
+            <PhotoCard
+              src={photo}
+              albumId={albumMeta.id}
+              caption={getCaption(photo)}
+              client:visible
+            />
           ))}
           <DynamicPhotos albumId={albumMeta.id} client:visible />
         </div>
@@ -143,6 +153,4 @@ const columnWidth = galleryConfig.columnWidth || 240;
       )}
     </div>
   </div>
-
-  <!-- 样式已迁移至 src/styles/pages/gallery.css -->
 </MainGridLayout>

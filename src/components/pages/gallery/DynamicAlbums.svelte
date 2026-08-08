@@ -1,4 +1,4 @@
-<script lang="ts">
+﻿<script lang="ts">
 import I18nKey from "@i18n/i18nKey";
 import { i18n } from "@i18n/translation";
 import { onMount } from "svelte";
@@ -14,6 +14,7 @@ interface DynamicAlbum {
 	tags: string[];
 	photoCount: number;
 	coverUrl: string;
+	photos: string[]; // 前3张照片URL
 }
 
 let dynamicAlbums = $state<DynamicAlbum[]>([]);
@@ -29,6 +30,8 @@ onMount(async () => {
 			.map((a) => {
 				const photos = a.photos || [];
 				const coverPath: string = a.cover || photos[0]?.path || "";
+				// 取前3张照片URL
+				const photoUrls = photos.slice(0, 3).map((p) => `${cdnBase}${p.path}`);
 				return {
 					id: a.id,
 					name: a.name,
@@ -38,6 +41,7 @@ onMount(async () => {
 					tags: a.tags || [],
 					photoCount: photos.length,
 					coverUrl: coverPath ? `${cdnBase}${coverPath}` : "",
+					photos: photoUrls,
 				};
 			});
 		dynamicAlbums = list;
@@ -63,7 +67,7 @@ onMount(async () => {
 			}
 		}
 
-		// 空态控制：静态相册与动态相册都为空时才显示
+		// 空态控制
 		const grid = document.querySelector<HTMLElement>("[data-album-grid]");
 		const empty = document.querySelector<HTMLElement>("[data-album-empty]");
 		if (grid && empty) {
@@ -72,7 +76,7 @@ onMount(async () => {
 				staticCount === 0 && list.length === 0 ? "flex" : "none";
 		}
 	} catch {
-		// 加载失败静默处理，不影响静态相册展示
+		// 加载失败静默处理
 	}
 });
 </script>
@@ -83,44 +87,43 @@ onMount(async () => {
 		data-tags={(album.tags || []).join(",") || ""}
 		class="album-card group"
 	>
-		<div class="album-card-imgbox">
-			{#if album.coverUrl}
-				<img
-					src={album.coverUrl}
-					alt={album.name}
-					class="album-card-img"
-					loading="lazy"
-					decoding="async"
-					width="400"
-					height="300"
-				/>
-			{:else}
-				<div class="w-full h-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
-					<div class="text-gray-400 text-5xl">📷</div>
+		<div class="polaroid-stack">
+			{#each (album.photos.length >= 3 ? album.photos : (() => { const p = [...album.photos]; while (p.length < 3) { p.push(album.coverUrl || ""); } return p; })()) as photo, i}
+				<div
+					class="polaroid-photo"
+					style="--polaroid-rotate: {[-3, 5, -2][i]}deg; --polaroid-offset: {[0, 4, 8][i]}px; z-index: {3 - i};"
+				>
+					{#if photo}
+						<img
+							src={photo}
+							alt={album.name}
+							class="polaroid-img"
+							loading="lazy"
+							decoding="async"
+							width="400"
+							height="300"
+						/>
+					{:else}
+						<div class="w-full h-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
+							<span class="text-gray-400 text-3xl">📷</span>
+						</div>
+					{/if}
 				</div>
-			{/if}
-
-			<div class="album-card-badge">
-				{album.photoCount} {i18n(I18nKey.galleryPhotos)}
-			</div>
-
-			{#if album.tags.length > 0}
-				<div class="album-card-tags-overlay">
-					{#each album.tags.slice(0, 4) as tag (tag)}
-						<span class="album-card-tag-overlay">{tag}</span>
-					{/each}
-				</div>
-			{/if}
+			{/each}
 		</div>
 
-		<div class="album-card-details">
-			<h3 class="album-card-title">{album.name}</h3>
-			<div class="album-card-meta">
+		<div class="album-card-badge">
+			{album.photoCount} {i18n(I18nKey.galleryPhotos)}
+		</div>
+
+		<div class="polaroid-details">
+			<h3 class="polaroid-title">{album.name}</h3>
+			<div class="polaroid-meta">
 				{#if album.date}
 					<span>{album.date}</span>
 				{/if}
 				{#if album.location}
-					<span class="album-card-location">
+					<span class="polaroid-location">
 						<svg class="w-3 h-3" viewBox="0 0 24 24" fill="currentColor">
 							<path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5a2.5 2.5 0 010-5 2.5 2.5 0 010 5z"/>
 						</svg>
@@ -128,6 +131,13 @@ onMount(async () => {
 					</span>
 				{/if}
 			</div>
+			{#if album.tags.length > 0}
+				<div class="polaroid-tags">
+					{#each album.tags.slice(0, 4) as tag (tag)}
+						<span class="polaroid-tag">{tag}</span>
+					{/each}
+				</div>
+			{/if}
 		</div>
 	</a>
 {/each}

@@ -341,6 +341,9 @@ enum I18nKey {
 	galleryCloudAlbum = "galleryCloudAlbum",
 	galleryAlbumNotFound = "galleryAlbumNotFound",
 	galleryLoadError = "galleryLoadError",
+	gallerySearch = "gallerySearch",
+	gallerySearchPlaceholder = "gallerySearchPlaceholder",
+	gallerySearchNoResults = "gallerySearchNoResults",
 
 	// 收藏API页面
 	collections = "collections",

@@ -370,6 +370,9 @@ export const en: Translation = {
 	[Key.galleryCloudAlbum]: "Cloud Albums",
 	[Key.galleryAlbumNotFound]: "Album not found",
 	[Key.galleryLoadError]: "Failed to load, please try again later",
+	[Key.gallerySearch]: "Search Albums",
+	[Key.gallerySearchPlaceholder]: "Search album name, description, location or photo captions…",
+	[Key.gallerySearchNoResults]: "No albums match your search",
 
 	// Collections API page
 	[Key.collections]: "Tools",

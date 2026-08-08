@@ -1,11 +1,12 @@
-<script lang="ts">
+﻿<script lang="ts">
 interface Props {
 	src: string;
 	albumId: string;
 	alt?: string;
+	caption?: string;
 }
 
-const { src, albumId, alt = "" }: Props = $props();
+const { src, albumId, alt = "", caption = "" }: Props = $props();
 
 let container: HTMLDivElement | undefined = $state();
 let visible = $state(false);
@@ -40,30 +41,42 @@ function onError() {
     data-fancybox={`gallery-${albumId}`}
     data-src={src}
     data-type="image"
+    data-caption={caption || undefined}
     class="block rounded-xl overflow-hidden group cursor-pointer relative {visible ? '' : 'invisible'}"
   >
     {#if status !== "error"}
-      <!-- 骨架屏：加载期间作为正常流元素撑起容器高度，加载完成后淡出 -->
+      <!-- 骨架屏 -->
       <div
         class="w-full aspect-[4/3] bg-neutral-200 dark:bg-neutral-800 transition-opacity duration-500 {status === 'loaded' ? 'opacity-0 absolute inset-0' : 'animate-pulse'}"
       ></div>
       <img
         {src}
-        {alt}
+        alt={caption || alt}
         loading="lazy"
         decoding="async"
         onload={onLoad}
         onerror={onError}
         class="block w-full h-auto object-cover transition-all duration-500 {status === 'loaded' ? 'opacity-100 group-hover:scale-105' : 'opacity-0 absolute inset-0'}"
       />
-      <!-- 悬停遮罩 + 放大镜图标 -->
-      <div class="absolute inset-0 flex items-center justify-center bg-transparent transition-colors duration-200 group-hover:bg-black/35 pointer-events-none">
-        <svg class="w-7 h-7 text-white opacity-0 scale-75 transition-all duration-200 group-hover:opacity-100 group-hover:scale-100" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="11" cy="11" r="8"/>
-          <line x1="21" y1="21" x2="16.65" y2="16.65"/>
-          <line x1="11" y1="8" x2="11" y2="14"/>
-          <line x1="8" y1="11" x2="14" y2="11"/>
-        </svg>
+      <!-- 悬停渐变遮罩 + 说明文字 + 放大镜图标 -->
+      <div class="absolute inset-0 flex flex-col justify-end pointer-events-none">
+        <!-- 渐变遮罩 -->
+        <div class="absolute inset-0 bg-transparent transition-colors duration-200 group-hover:bg-black/35"></div>
+        <!-- 说明文字（底部上浮） -->
+        {#if caption}
+          <div class="gallery-photo-caption">
+            <span class="gallery-photo-caption-text">{caption}</span>
+          </div>
+        {/if}
+        <!-- 放大镜图标 -->
+        <div class="absolute inset-0 flex items-center justify-center">
+          <svg class="w-7 h-7 text-white opacity-0 scale-75 transition-all duration-200 group-hover:opacity-100 group-hover:scale-100" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"/>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+            <line x1="11" y1="8" x2="11" y2="14"/>
+            <line x1="8" y1="11" x2="14" y2="11"/>
+          </svg>
+        </div>
       </div>
     {:else}
       <div class="flex items-center justify-center w-full aspect-[4/3]">

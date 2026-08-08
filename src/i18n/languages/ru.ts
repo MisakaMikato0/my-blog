@@ -371,6 +371,9 @@ export const ru: Translation = {
 	[Key.galleryCloudAlbum]: "Облачные альбомы",
 	[Key.galleryAlbumNotFound]: "Альбом не найден",
 	[Key.galleryLoadError]: "Не удалось загрузить, попробуйте позже",
+	[Key.gallerySearch]: "Поиск альбомов",
+	[Key.gallerySearchPlaceholder]: "Поиск по названию, описанию, местоположению или подписям…",
+	[Key.gallerySearchNoResults]: "Нет альбомов, соответствующих запросу",
 
 	// Страница коллекций API
 	[Key.collections]: "Коллекции",

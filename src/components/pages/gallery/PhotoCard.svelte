@@ -7,13 +7,7 @@ interface Props {
 	caption?: string;
 }
 
-const {
-	src,
-	thumbSrc = "",
-	albumId,
-	alt = "",
-	caption = "",
-}: Props = $props();
+const { src, thumbSrc = "", albumId, alt = "", caption = "" }: Props = $props();
 
 let container: HTMLDivElement | undefined = $state();
 let visible = $state(false);

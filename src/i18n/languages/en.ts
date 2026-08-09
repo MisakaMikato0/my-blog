@@ -371,7 +371,8 @@ export const en: Translation = {
 	[Key.galleryAlbumNotFound]: "Album not found",
 	[Key.galleryLoadError]: "Failed to load, please try again later",
 	[Key.gallerySearch]: "Search Albums",
-	[Key.gallerySearchPlaceholder]: "Search album name, description, location or photo captions…",
+	[Key.gallerySearchPlaceholder]:
+		"Search album name, description, location or photo captions…",
 	[Key.gallerySearchNoResults]: "No albums match your search",
 	[Key.galleryBackgroundChange]: "Change background",
 

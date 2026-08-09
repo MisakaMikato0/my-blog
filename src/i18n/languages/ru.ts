@@ -372,7 +372,8 @@ export const ru: Translation = {
 	[Key.galleryAlbumNotFound]: "Альбом не найден",
 	[Key.galleryLoadError]: "Не удалось загрузить, попробуйте позже",
 	[Key.gallerySearch]: "Поиск альбомов",
-	[Key.gallerySearchPlaceholder]: "Поиск по названию, описанию, местоположению или подписям…",
+	[Key.gallerySearchPlaceholder]:
+		"Поиск по названию, описанию, местоположению или подписям…",
 	[Key.gallerySearchNoResults]: "Нет альбомов, соответствующих запросу",
 	[Key.galleryBackgroundChange]: "Сменить фон",
 

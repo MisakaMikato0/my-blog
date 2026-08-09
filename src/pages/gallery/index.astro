@@ -1,4 +1,4 @@
-﻿---
+---
 import Icon from "@components/common/Icon.astro";
 import PageTitle from "@/components/common/PageTitle.astro";
 import AlbumCard from "@/components/pages/gallery/AlbumCard.astro";
@@ -9,7 +9,11 @@ import { coverImageConfig, galleryConfig, siteConfig } from "@/config";
 import I18nKey from "@/i18n/i18nKey";
 import { i18n } from "@/i18n/translation";
 import MainGridLayout from "@/layouts/MainGridLayout.astro";
-import { getAlbumCover, scanAlbumPhotos, readAlbumCaptions } from "@/utils/gallery-utils";
+import {
+	getAlbumCover,
+	readAlbumCaptions,
+	scanAlbumPhotos,
+} from "@/utils/gallery-utils";
 import { getApiUrlList } from "@/utils/image-utils";
 import { url } from "@/utils/url-utils";
 import "@/styles/pages/gallery.css";
@@ -190,10 +194,11 @@ const tabs = [
 
   <!-- 标签筛选 + 搜索 + tab 切换 JS -->
   <script>
+    // @ts-nocheck - 内联 UI 脚本，保持纯 JS，跳过 TS 严格 DOM 类型检查
     (function () {
       /* ---- Tab 切换 ---- */
       var tabNav = document.querySelector("[data-gallery-tab-nav]");
-      var tabBtns = tabNav ? tabNav.querySelectorAll("[data-gallery-tab]") : [];
+      var tabBtns = tabNav ? Array.from(tabNav.querySelectorAll("[data-gallery-tab]")) : [];
       var indicator = tabNav ? tabNav.querySelector("[data-gallery-tab-indicator]") : null;
       var sections = {
         local: document.querySelector('[data-gallery-section="local"]'),
@@ -289,7 +294,7 @@ const tabs = [
 
       if (searchInput) {
         searchInput.addEventListener("input", function () {
-          clearTimeout(searchTimer);
+          if (searchTimer) clearTimeout(searchTimer);
           searchTimer = setTimeout(doSearch, 250);
         });
       }
@@ -324,7 +329,8 @@ const tabs = [
       var filterContainer = document.querySelector("[data-gallery-filter]");
       if (filterContainer) {
         filterContainer.addEventListener("click", function (e) {
-          var btn = e.target.closest("[data-tag]");
+          var target = e.target;
+          var btn = target && target.closest ? target.closest("[data-tag]") : null;
           if (!btn || btn.classList.contains("tools-tab-btn-active")) return;
 
           var filters = filterContainer.querySelectorAll("[data-tag]");

@@ -6,9 +6,15 @@
 .gallery-bg-host {
 	position: fixed;
 	inset: 0;
-	z-index: -1;
+	z-index: 0;
 	overflow: hidden;
 	pointer-events: none;
+}
+
+/* 内容层抬升到模糊背景之上（gallery.css 仅被相册页面引用，不影响其他页面） */
+#main-grid-wrapper {
+	position: relative;
+	z-index: 1;
 }
 
 .gallery-bg-img {

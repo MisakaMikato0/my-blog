@@ -1,0 +1,12 @@
+﻿{
+  "name": "my-waline",
+  "version": "1.0.0",
+  "description": "Waline comment system for my blog",
+  "main": "api/comment.js",
+  "scripts": {
+    "build": "echo build completed"
+  },
+  "dependencies": {
+    "@waline/vercel": "^3.0.0"
+  }
+}

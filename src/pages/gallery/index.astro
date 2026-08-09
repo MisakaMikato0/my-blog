@@ -3,12 +3,14 @@ import Icon from "@components/common/Icon.astro";
 import PageTitle from "@/components/common/PageTitle.astro";
 import AlbumCard from "@/components/pages/gallery/AlbumCard.astro";
 import DynamicAlbums from "@/components/pages/gallery/DynamicAlbums.svelte";
+import GalleryBackground from "@/components/pages/gallery/GalleryBackground.svelte";
 import NetworkAlbum from "@/components/pages/gallery/NetworkAlbum.svelte";
-import { galleryConfig, siteConfig } from "@/config";
+import { coverImageConfig, galleryConfig, siteConfig } from "@/config";
 import I18nKey from "@/i18n/i18nKey";
 import { i18n } from "@/i18n/translation";
 import MainGridLayout from "@/layouts/MainGridLayout.astro";
 import { getAlbumCover, scanAlbumPhotos, readAlbumCaptions } from "@/utils/gallery-utils";
+import { getApiUrlList } from "@/utils/image-utils";
 import { url } from "@/utils/url-utils";
 import "@/styles/pages/gallery.css";
 
@@ -29,6 +31,12 @@ const albums = galleryConfig.albums.map((album) => {
 
 const allTags = [...new Set(albums.flatMap((a) => a.tags || []))].sort();
 
+// 模糊背景：优先使用第一个相册封面，其次文章封面随机图接口，最后本地兜底
+const bgPreferred = albums[0]?.cover || "";
+const bgApiUrls = getApiUrlList(undefined, "gallery");
+const bgFallback =
+	coverImageConfig.randomCoverImage.fallback || "/assets/images/aut.webp";
+
 const tabs = [
 	{
 		id: "local",
@@ -44,8 +52,14 @@ const tabs = [
 ---
 
 <MainGridLayout title={title} description={description}>
+  <GalleryBackground
+    client:load
+    preferredSrc={bgPreferred}
+    apiUrls={bgApiUrls}
+    fallback={bgFallback}
+  />
   <div class="flex w-full rounded-(--radius-large) overflow-hidden relative min-h-32">
-    <div class="card-base z-10 px-9 py-6 relative w-full">
+    <div class="gallery-panel z-10 px-9 py-6 relative w-full">
       <div class="mb-4 flex items-center justify-between gap-4">
         <PageTitle title={title} variant="stacked" />
         <a

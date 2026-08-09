@@ -344,6 +344,7 @@ enum I18nKey {
 	gallerySearch = "gallerySearch",
 	gallerySearchPlaceholder = "gallerySearchPlaceholder",
 	gallerySearchNoResults = "gallerySearchNoResults",
+	galleryBackgroundChange = "galleryBackgroundChange",
 
 	// 收藏API页面
 	collections = "collections",

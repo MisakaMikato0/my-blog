@@ -374,6 +374,7 @@ export const ru: Translation = {
 	[Key.gallerySearch]: "Поиск альбомов",
 	[Key.gallerySearchPlaceholder]: "Поиск по названию, описанию, местоположению или подписям…",
 	[Key.gallerySearchNoResults]: "Нет альбомов, соответствующих запросу",
+	[Key.galleryBackgroundChange]: "Сменить фон",
 
 	// Страница коллекций API
 	[Key.collections]: "Коллекции",

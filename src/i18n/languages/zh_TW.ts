@@ -366,6 +366,7 @@ export const zh_TW: Translation = {
 	[Key.gallerySearch]: "搜尋相簿",
 	[Key.gallerySearchPlaceholder]: "搜尋相簿名稱、描述、地點或照片說明…",
 	[Key.gallerySearchNoResults]: "沒有找到符合的相簿",
+	[Key.galleryBackgroundChange]: "換一張背景",
 
 	// 收藏API頁面
 	[Key.collections]: "工具導航",

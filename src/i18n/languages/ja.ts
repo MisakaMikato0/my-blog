@@ -373,6 +373,7 @@ export const ja: Translation = {
 	[Key.gallerySearch]: "アルバムを検索",
 	[Key.gallerySearchPlaceholder]: "アルバム名、説明、場所、写真の説明文で検索…",
 	[Key.gallerySearchNoResults]: "該当するアルバムはありません",
+	[Key.galleryBackgroundChange]: "背景を変更",
 
 	// 收藏APIページ
 	[Key.collections]: "コレクション",

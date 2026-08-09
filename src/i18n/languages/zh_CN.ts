@@ -365,6 +365,7 @@ export const zh_CN: Translation = {
 	[Key.gallerySearch]: "搜索相册",
 	[Key.gallerySearchPlaceholder]: "搜索相册名称、描述、地点或照片说明…",
 	[Key.gallerySearchNoResults]: "没有找到匹配的相册",
+	[Key.galleryBackgroundChange]: "换一张背景",
 
 	// 收藏API页面
 	[Key.collections]: "工具导航",

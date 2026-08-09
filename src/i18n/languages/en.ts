@@ -373,6 +373,7 @@ export const en: Translation = {
 	[Key.gallerySearch]: "Search Albums",
 	[Key.gallerySearchPlaceholder]: "Search album name, description, location or photo captions…",
 	[Key.gallerySearchNoResults]: "No albums match your search",
+	[Key.galleryBackgroundChange]: "Change background",
 
 	// Collections API page
 	[Key.collections]: "Tools",

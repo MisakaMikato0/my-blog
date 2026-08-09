@@ -38,6 +38,34 @@ export function scanAlbumPhotos(albumId: string): string[] {
 }
 
 /**
+ * 获取照片的缩略图 URL。
+ *
+ * 缩略图由 scripts/generate-gallery-thumbs.js 在构建前生成，存放于
+ * public/gallery/.thumbs/{albumId}/{filename}.webp。列表展示使用缩略图，
+ * 点击放大仍使用原图（fancybox data-src）。
+ *
+ * 若缩略图不存在（如动态相册的 CDN 图），返回 undefined，调用方应回退原图。
+ */
+export function getPhotoThumb(photoUrl: string): string | undefined {
+	if (!photoUrl) return undefined;
+	// 只处理本地静态相册路径：/gallery/{albumId}/{filename}
+	const m = photoUrl.match(/^\/gallery\/([^/]+)\/([^/]+)$/);
+	if (!m) return undefined;
+	const [, albumId, filename] = m;
+	const thumbName = `${filename.replace(/\.(jpe?g|png|webp|avif|gif)$/i, "")}.webp`;
+	const thumbPath = path.join(
+		process.cwd(),
+		"public",
+		"gallery",
+		".thumbs",
+		albumId,
+		thumbName,
+	);
+	if (!fs.existsSync(thumbPath)) return undefined;
+	return withBase(`/gallery/.thumbs/${albumId}/${thumbName}`);
+}
+
+/**
  * 获取相册封面图
  * 优先级：手动指定 > cover.* 文件 > 第一张图片
  */

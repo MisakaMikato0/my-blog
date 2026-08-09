@@ -1,12 +1,19 @@
 ﻿<script lang="ts">
 interface Props {
 	src: string;
+	thumbSrc?: string;
 	albumId: string;
 	alt?: string;
 	caption?: string;
 }
 
-const { src, albumId, alt = "", caption = "" }: Props = $props();
+const {
+	src,
+	thumbSrc = "",
+	albumId,
+	alt = "",
+	caption = "",
+}: Props = $props();
 
 let container: HTMLDivElement | undefined = $state();
 let visible = $state(false);
@@ -50,7 +57,7 @@ function onError() {
         class="w-full aspect-[4/3] bg-neutral-200 dark:bg-neutral-800 transition-opacity duration-500 {status === 'loaded' ? 'opacity-0 absolute inset-0' : 'animate-pulse'}"
       ></div>
       <img
-        {src}
+        src={thumbSrc || src}
         alt={caption || alt}
         loading="lazy"
         decoding="async"

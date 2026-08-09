@@ -7,7 +7,12 @@ import { coverImageConfig, galleryConfig, siteConfig } from "@/config";
 import I18nKey from "@/i18n/i18nKey";
 import { i18n } from "@/i18n/translation";
 import MainGridLayout from "@/layouts/MainGridLayout.astro";
-import { getAlbumCover, scanAlbumPhotos, readAlbumCaptions } from "@/utils/gallery-utils";
+import {
+	getAlbumCover,
+	getPhotoThumb,
+	scanAlbumPhotos,
+	readAlbumCaptions,
+} from "@/utils/gallery-utils";
 import { getApiUrlList } from "@/utils/image-utils";
 import { url } from "@/utils/url-utils";
 import "@/styles/pages/gallery.css";
@@ -152,6 +157,7 @@ const bgFallback =
           {photos.map((photo) => (
             <PhotoCard
               src={photo}
+              thumbSrc={getPhotoThumb(photo)}
               albumId={albumMeta.id}
               caption={getCaption(photo)}
               client:visible

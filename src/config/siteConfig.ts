@@ -91,10 +91,6 @@ export const siteConfig: SiteConfig = {
 			src: "/favicon/android-chrome-512x512.png",
 			sizes: "512x512",
 		},
-		{
-			src: "/favicon/safari-pinned-tab.svg",
-			sizes: "any",
-		},
 	],
 
 	// 导航栏配置

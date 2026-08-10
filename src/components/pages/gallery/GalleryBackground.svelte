@@ -4,11 +4,11 @@ import { i18n } from "@i18n/translation";
 import { onMount } from "svelte";
 
 interface Props {
-	/** 优先使用的图片（当前相册封面等本地图） */
+	/** Preferred image (e.g. current album cover, served locally) */
 	preferredSrc?: string;
-	/** 文章封面随机图接口 URL 列表（构建时生成，带 seed） */
+	/** Article cover random-image API URLs (generated at build time with seed) */
 	apiUrls?: string[];
-	/** 全部加载失败时的本地兜底图 */
+	/** Local fallback image when every candidate fails */
 	fallback?: string;
 }
 
@@ -20,27 +20,34 @@ let {
 
 let loading = false;
 
-const candidates = [preferredSrc, ...apiUrls, fallback].filter(Boolean);
+// Shared background layer reused across Swup navigations to avoid
+// re-creating the DOM and re-requesting external APIs on every page swap
+let sharedHost: HTMLDivElement | null = null;
+let sharedImg: HTMLImageElement | null = null;
+let sharedBtn: HTMLButtonElement | null = null;
+let activeCount = 0;
+
+function applyImg(src: string): void {
+	if (!sharedImg) return;
+	sharedImg.dataset.src = src;
+	sharedImg.classList.remove("gallery-bg-loaded");
+	sharedImg.src = src;
+}
 
 /**
- * 按顺序尝试加载图片，全部失败时使用 fallback 兜底
+ * Try candidates in order; fall back to `fallback` when all fail.
  */
 function loadFrom(list: string[], start: number): void {
+	if (!sharedImg) return;
 	if (start >= list.length) {
-		const img = document.querySelector<HTMLImageElement>(
-			".gallery-bg-host .gallery-bg-img",
-		);
-		if (img) img.src = fallback;
+		applyImg(fallback);
 		loading = false;
 		return;
 	}
 	const src = list[start];
 	const probe = new Image();
 	probe.onload = () => {
-		const img = document.querySelector<HTMLImageElement>(
-			".gallery-bg-host .gallery-bg-img",
-		);
-		if (img) img.src = src;
+		applyImg(src);
 		loading = false;
 	};
 	probe.onerror = () => loadFrom(list, start + 1);
@@ -48,7 +55,8 @@ function loadFrom(list: string[], start: number): void {
 }
 
 /**
- * 换一张背景：重新请求接口（加时间戳参数确保拿到新图）
+ * Swap to a fresh background by re-requesting the API
+ * (cache-busted with a timestamp parameter).
  */
 function changeBackground(): void {
 	if (loading || apiUrls.length === 0) return;
@@ -59,49 +67,62 @@ function changeBackground(): void {
 }
 
 onMount(() => {
-	const host = document.createElement("div");
-	host.className = "gallery-bg-host";
-	host.setAttribute("aria-hidden", "true");
-	const cleanup: Array<() => void> = [];
+	activeCount += 1;
 
-	const img = document.createElement("img");
-	img.className = "gallery-bg-img";
-	img.alt = "";
-	img.decoding = "async";
-	img.onload = () => img.classList.add("gallery-bg-loaded");
-	cleanup.push(() => (img.onload = null));
+	// Reuse the existing layer when present (during Swup transitions the old
+	// component may unmount after the new one mounts)
+	if (!sharedHost?.isConnected) {
+		sharedHost = document.createElement("div");
+		sharedHost.className = "gallery-bg-host";
+		sharedHost.setAttribute("aria-hidden", "true");
 
-	const overlay = document.createElement("div");
-	overlay.className = "gallery-bg-overlay";
+		sharedImg = document.createElement("img");
+		sharedImg.className = "gallery-bg-img";
+		sharedImg.alt = "";
+		sharedImg.decoding = "async";
+		sharedImg.onload = () => sharedImg?.classList.add("gallery-bg-loaded");
 
-	host.append(img, overlay);
+		const overlay = document.createElement("div");
+		overlay.className = "gallery-bg-overlay";
 
-	// 仅在配置了随机图接口时显示"换一张"按钮
-	let btn: HTMLButtonElement | null = null;
-	if (apiUrls.length > 0) {
-		btn = document.createElement("button");
-		btn.type = "button";
-		btn.className = "gallery-bg-switch";
-		btn.title = i18n(I18nKey.galleryBackgroundChange);
-		btn.setAttribute("aria-label", i18n(I18nKey.galleryBackgroundChange));
-		btn.innerHTML =
-			'<svg viewBox="0 0 24 24" width="1.15em" height="1.15em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12a8 8 0 0 1 14-4.9L21 10"/><path d="M21 4v6h-6"/><path d="M20 12a8 8 0 0 1-14 4.9L3 14"/><path d="M3 20v-6h6"/></svg>';
-		btn.addEventListener("click", changeBackground);
-		cleanup.push(() => btn?.remove());
+		sharedHost.append(sharedImg, overlay);
+		document.body.appendChild(sharedHost);
+		sharedBtn = null;
 	}
 
-	document.body.appendChild(host);
-	// 按钮独立挂到 body（避免被 z-index: -1 的背景层 stacking context 困住）
-	if (btn) document.body.appendChild(btn);
-	loadFrom(candidates, 0);
+	// Only show the "swap background" button when random-image APIs are configured
+	if (!sharedBtn && apiUrls.length > 0) {
+		sharedBtn = document.createElement("button");
+		sharedBtn.type = "button";
+		sharedBtn.className = "gallery-bg-switch";
+		sharedBtn.title = i18n(I18nKey.galleryBackgroundChange);
+		sharedBtn.setAttribute("aria-label", i18n(I18nKey.galleryBackgroundChange));
+		sharedBtn.innerHTML =
+			'<svg viewBox="0 0 24 24" width="1.15em" height="1.15em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12a8 8 0 0 1 14-4.9L21 10"/><path d="M21 4v6h-6"/><path d="M20 12a8 8 0 0 1-14 4.9L3 14"/><path d="M3 20v-6h6"/></svg>';
+		sharedBtn.addEventListener("click", changeBackground);
+		document.body.appendChild(sharedBtn);
+	}
+
+	// When the page specifies a local cover, switch directly (fast, no probing);
+	// otherwise keep the current background
+	if (preferredSrc && sharedImg && sharedImg.dataset.src !== preferredSrc) {
+		applyImg(preferredSrc);
+	} else if (sharedImg && !sharedImg.dataset.src) {
+		loadFrom([preferredSrc, ...apiUrls, fallback].filter(Boolean), 0);
+	}
 
 	return () => {
-		host.remove();
-		cleanup.forEach((fn) => {
-			fn();
-		});
+		activeCount -= 1;
+		if (activeCount <= 0) {
+			activeCount = 0;
+			sharedBtn?.remove();
+			sharedBtn = null;
+			sharedHost?.remove();
+			sharedHost = null;
+			sharedImg = null;
+		}
 	};
 });
 </script>
 
-<!-- 背景层在客户端挂载时注入 document.body，SSR 无输出 -->
+<!-- The background layer is injected into document.body on the client; SSR outputs nothing -->

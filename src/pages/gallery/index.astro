@@ -11,6 +11,7 @@ import { i18n } from "@/i18n/translation";
 import MainGridLayout from "@/layouts/MainGridLayout.astro";
 import {
 	getAlbumCover,
+	getPhotoThumb,
 	readAlbumCaptions,
 	scanAlbumPhotos,
 } from "@/utils/gallery-utils";
@@ -27,10 +28,19 @@ const description = i18n(I18nKey.galleryDescription);
 
 const albums = galleryConfig.albums.map((album) => {
 	const photos = scanAlbumPhotos(album.id);
+	// Use 640px WebP thumbs in the list view; detail pages still load originals
+	const thumbPhotos = photos.map((photo) => getPhotoThumb(photo) || photo);
 	const cover = getAlbumCover(album, photos);
+	const thumbCover = getPhotoThumb(cover) || cover;
 	const captions = readAlbumCaptions(album.id);
 	const captionTexts = Object.values(captions).join(" ");
-	return { ...album, cover, photos, photoCount: photos.length, captionTexts };
+	return {
+		...album,
+		cover: thumbCover,
+		photos: thumbPhotos,
+		photoCount: photos.length,
+		captionTexts,
+	};
 });
 
 const allTags = [...new Set(albums.flatMap((a) => a.tags || []))].sort();
@@ -394,6 +404,9 @@ const tabs = [
   <script>
     import gsap from "gsap";
 
+    // 数据窗口：等待又拍云动态卡片插入，静态+动态卡片统一入场（避免两次特效）
+    const DATA_WINDOW_MS = 900;
+
     const prefersReducedMotion = () =>
       window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const isMobile = () => window.matchMedia("(max-width: 768px)").matches;
@@ -401,6 +414,7 @@ const tabs = [
     const entered = new WeakSet<Element>();
     let localObserver: MutationObserver | null = null;
     let networkObserver: MutationObserver | null = null;
+    let entranceTimer: ReturnType<typeof setTimeout> | null = null;
 
     function shouldAnimate(): boolean {
       return !prefersReducedMotion() && !isMobile();
@@ -433,9 +447,38 @@ const tabs = [
       );
     }
 
+    /**
+     * 统一入场：窗口内静态+动态卡片一起动画；
+     * 窗口已结束则只动画新插入的卡片（兜底，不会一直空白）。
+     */
+    function playEntrance(localSection: HTMLElement): void {
+      if (entranceTimer) {
+        clearTimeout(entranceTimer);
+        entranceTimer = null;
+      }
+      animateCards(localSection, ".album-card");
+    }
+
+    /** 判断 mutation 是否新增了相册卡片 */
+    function hasNewAlbumCards(mutations: MutationRecord[]): boolean {
+      return mutations.some((m) =>
+        Array.from(m.addedNodes).some((n) => {
+          if (n.nodeType !== Node.ELEMENT_NODE) return false;
+          const el = n as HTMLElement;
+          return (
+            el.matches?.(".album-card") || !!el.querySelector?.(".album-card")
+          );
+        }),
+      );
+    }
+
     function initGalleryEntrance(): void {
       localObserver?.disconnect();
       networkObserver?.disconnect();
+      if (entranceTimer) {
+        clearTimeout(entranceTimer);
+        entranceTimer = null;
+      }
 
       const localSection = document.querySelector<HTMLElement>(
         '[data-gallery-section="local"]',
@@ -445,14 +488,28 @@ const tabs = [
       );
 
       if (localSection) {
-        animateCards(localSection, ".album-card");
-        localObserver = new MutationObserver(() =>
-          animateCards(localSection, ".album-card"),
-        );
+        // 先隐藏静态卡片，避免数据窗口期可见、播放时才隐藏造成闪烁
+        if (shouldAnimate()) {
+          gsap.set(localSection.querySelectorAll(".album-card"), {
+            opacity: 0,
+          });
+        }
+
+        localObserver = new MutationObserver((mutations) => {
+          if (!hasNewAlbumCards(mutations)) return;
+          // 窗口内：统一入场（清定时器）；窗口后：兜底单独入场
+          playEntrance(localSection);
+        });
         localObserver.observe(localSection, {
           childList: true,
           subtree: true,
         });
+
+        // 数据窗口结束仍无动态卡片时，先播静态卡片
+        entranceTimer = setTimeout(() => {
+          entranceTimer = null;
+          playEntrance(localSection);
+        }, DATA_WINDOW_MS);
       }
 
       if (networkSection) {
@@ -473,4 +530,5 @@ const tabs = [
     }
     initGalleryEntrance();
   </script>
+
 </MainGridLayout>

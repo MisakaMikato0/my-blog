@@ -60,6 +60,9 @@ const canonicalUrl = new URL(Astro.url.pathname, Astro.site).toString();
 const favicons: Favicon[] =
 	siteConfig.favicon.length > 0 ? siteConfig.favicon : defaultFavicons;
 
+// 图标版本号：修改 favicon 后递增，用于绕过浏览器与 CDN 的缓存
+const FAVICON_VERSION = "20260810";
+
 if (!lang) {
 	lang = `${siteConfig.lang}`;
 }
@@ -140,7 +143,7 @@ const siteLang = lang.replace("_", "-");
     {favicons.map((favicon) => (
       <link
         rel={favicon.src.includes("apple-touch-icon") ? "apple-touch-icon" : "icon"}
-        href={favicon.src.startsWith("/") ? url(favicon.src) : favicon.src}
+        href={favicon.src.startsWith("/") ? `${url(favicon.src)}?v=${FAVICON_VERSION}` : `${favicon.src}?v=${FAVICON_VERSION}`}
         sizes={favicon.sizes}
         media={favicon.theme && `(prefers-color-scheme: ${favicon.theme})`}
       />

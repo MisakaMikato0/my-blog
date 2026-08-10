@@ -509,3 +509,7 @@
 }
 
 /* --- 入场动画（已兼容 GSAP） --- */
+/* --- Pre-paint hide: index.astro marks <html> before first paint; cards appear once with the entrance --- */
+html.gallery-entrance-pending .album-card {
+	opacity: 0;
+}

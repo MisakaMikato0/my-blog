@@ -66,6 +66,10 @@ const tabs = [
 ---
 
 <MainGridLayout title={title} description={description}>
+  <script is:inline>
+    // Pre-paint marker: keep local album cards hidden until the unified entrance plays
+    document.documentElement.classList.add("gallery-entrance-pending");
+  </script>
   <GalleryBackground
     client:load
     preferredSrc={bgPreferred}
@@ -452,6 +456,8 @@ const tabs = [
      * 窗口已结束则只动画新插入的卡片（兜底，不会一直空白）。
      */
     function playEntrance(localSection: HTMLElement): void {
+      // Entrance starts: remove the CSS pre-hide so cards appear with the animation
+      document.documentElement.classList.remove("gallery-entrance-pending");
       if (entranceTimer) {
         clearTimeout(entranceTimer);
         entranceTimer = null;
@@ -489,10 +495,9 @@ const tabs = [
 
       if (localSection) {
         // 先隐藏静态卡片，避免数据窗口期可见、播放时才隐藏造成闪烁
-        if (shouldAnimate()) {
-          gsap.set(localSection.querySelectorAll(".album-card"), {
-            opacity: 0,
-          });
+        if (!shouldAnimate()) {
+          // Reduced motion or mobile: show immediately without the entrance
+          document.documentElement.classList.remove("gallery-entrance-pending");
         }
 
         localObserver = new MutationObserver((mutations) => {

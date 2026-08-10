@@ -1,6 +1,7 @@
 <script lang="ts">
 import I18nKey from "@i18n/i18nKey";
 import { i18n } from "@i18n/translation";
+import Icon from "@/components/common/Icon.svelte";
 import type { AlbumDraft } from "./types";
 
 interface Props {
@@ -98,7 +99,12 @@ async function submit() {
 	<div class="album-form__actions">
 		<button type="button" class="admin-btn" onclick={onCancel}>{i18n(I18nKey.galleryAdminCancel)}</button>
 		<button type="submit" class="admin-btn admin-btn--primary" disabled={busy || !name.trim()}>
-			{editing ? i18n(I18nKey.galleryAdminSave) : i18n(I18nKey.galleryAdminCreate)}
+			{#if busy}
+				<Icon name="svg-spinners:ring-resize" size="sm" />
+				{editing ? i18n(I18nKey.galleryAdminSaving) : i18n(I18nKey.galleryAdminCreating)}
+			{:else}
+				{editing ? i18n(I18nKey.galleryAdminSave) : i18n(I18nKey.galleryAdminCreate)}
+			{/if}
 		</button>
 	</div>
 </form>

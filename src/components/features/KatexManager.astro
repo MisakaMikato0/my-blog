@@ -1,4 +1,13 @@
 ---
-// KaTeX CSS - 直接在文章页加载
-import "katex/dist/katex.min.css";
+// KaTeX CSS - 延迟加载（不阻塞首屏），恒定 URL 便于浏览器缓存与 swup 复用
+// 资源由 scripts/copy-katex-assets.js 在构建时复制到 public/katex/
 ---
+<link
+	rel="stylesheet"
+	href="/katex/katex.min.css"
+	media="print"
+	onload="this.media='all'"
+/>
+<noscript>
+	<link rel="stylesheet" href="/katex/katex.min.css" />
+</noscript>

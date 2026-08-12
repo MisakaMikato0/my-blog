@@ -23,15 +23,12 @@ export let tagPostsLabel = "";
 export let progressLabel = "";
 export let goalLabel = "";
 export let monthPostsLabel = "";
-export let writingSpanLabel = "";
 export let loadingLabel = "";
 export let unavailableLabel = "--";
 
 let displayedScopePosts = totalPosts;
 let displayedMonthPosts = currentMonthPosts;
 let scopePostsLabel = totalPostsLabel;
-let writingSpanDays: number | null = null;
-let displayedWritingSpanDays: number | null = null;
 let displayedProgress: number | null = null;
 let displayedGithub: number | null = null;
 let githubStatus: GithubStatus = "idle";
@@ -141,12 +138,9 @@ onMount(() => {
 	).matches;
 	const scopeSummary = getScopeSummary();
 	scopePostsLabel = scopeSummary.label;
-	writingSpanDays = scopeSummary.spanDays;
-	displayedWritingSpanDays = writingSpanDays;
 
 	if (!reducedMotion) {
 		displayedScopePosts = 0;
-		displayedWritingSpanDays = writingSpanDays === null ? null : 0;
 		displayedMonthPosts = 0;
 		displayedProgress = progressTarget === null ? null : 0;
 	}
@@ -156,13 +150,6 @@ onMount(() => {
 		(value) => (displayedScopePosts = value),
 		reducedMotion,
 	);
-	if (writingSpanDays !== null) {
-		animateNumber(
-			writingSpanDays,
-			(value) => (displayedWritingSpanDays = value),
-			reducedMotion,
-		);
-	}
 	animateNumber(
 		currentMonthPosts,
 		(value) => (displayedMonthPosts = value),
@@ -235,16 +222,6 @@ $: githubStatusText =
 			<span class="archive-stats__value" aria-hidden="true">{formatNumber(displayedScopePosts)}</span>
 			<span class="archive-stats__label">{scopePostsLabel}</span>
 		</div>
-		{#if displayedWritingSpanDays !== null}
-			<div
-				class="archive-stats__metric"
-				role="group"
-				aria-label={`${writingSpanLabel}: ${formatNumber(displayedWritingSpanDays)}`}
-			>
-				<span class="archive-stats__value" aria-hidden="true">{formatNumber(displayedWritingSpanDays)}</span>
-				<span class="archive-stats__label">{writingSpanLabel}</span>
-			</div>
-		{/if}
 		<div
 			class="archive-stats__metric"
 			role="group"

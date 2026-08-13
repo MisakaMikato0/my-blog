@@ -338,12 +338,14 @@
 	border: 2px solid transparent;
 	border-radius: var(--radius-medium);
 	background: transparent;
-	transition: border-color 180ms ease;
+	transition:
+		border-color 180ms ease,
+		box-shadow 300ms ease;
 }
 
 .article-list-card--regular:hover,
 .article-list-card--regular:focus-within {
-	border-color: var(--deep-text);
+	box-shadow: 0 12px 32px -18px color-mix(in oklch, var(--deep-text) 40%, transparent);
 }
 
 /* ========================================================================== 
@@ -669,11 +671,13 @@
 [data-view="list"] .article-list-card--regular {
 	border: 2px solid transparent;
 	background: transparent;
-	transition: border-color 180ms ease;
+	transition:
+		border-color 180ms ease,
+		box-shadow 300ms ease;
 }
 [data-view="list"] .article-list-card--regular:hover,
 [data-view="list"] .article-list-card--regular:focus-within {
-	border-color: var(--deep-text);
+	box-shadow: 0 12px 32px -18px color-mix(in oklch, var(--deep-text) 40%, transparent);
 }
 
 /* 置顶标识兼容 */
@@ -708,9 +712,7 @@
 
 .article-list-card__link {
 	transform-style: preserve-3d;
-	transition:
-		transform 0.6s cubic-bezier(0.22, 1, 0.36, 1),
-		box-shadow 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+	transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
 	will-change: transform;
 }
 
@@ -747,10 +749,4 @@
 		color: var(--primary);
 	}
 
-	/* 悬停增强：网格卡片阴影 + 描边 */
-	[data-view="grid"] .article-list-card__link:hover {
-		box-shadow:
-			inset 0 0 0 1px color-mix(in oklch, var(--deep-text) 20%, transparent),
-			0 16px 40px -16px color-mix(in oklch, var(--deep-text) 35%, transparent);
-	}
 }

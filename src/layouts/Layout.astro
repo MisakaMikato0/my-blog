@@ -40,7 +40,9 @@ let { lang } = Astro.props;
 const configHue = siteConfig.themeColor.hue;
 
 let pageTitle: string;
-if (title) {
+if (title === siteConfig.title) {
+	pageTitle = siteConfig.title;
+} else if (title) {
 	pageTitle = `${title} - ${siteConfig.title}`;
 } else {
 	pageTitle = siteConfig.subtitle

@@ -182,6 +182,39 @@ function handleImageError(e: Event, apiUrls: string[], fallback = "") {
 	}
 }
 
+	const cardRects = new WeakMap<HTMLElement, DOMRect>();
+
+	function handleCardMouseEnter(e: MouseEvent) {
+		const link = e.currentTarget as HTMLElement;
+		cardRects.set(link, link.getBoundingClientRect());
+	}
+
+	function handleCardMouseMove(e: MouseEvent) {
+		const link = e.currentTarget as HTMLElement;
+		let rect = cardRects.get(link);
+		if (!rect) {
+			rect = link.getBoundingClientRect();
+			cardRects.set(link, rect);
+		}
+		const x = e.clientX - rect.left;
+		const y = e.clientY - rect.top;
+		const zone =
+			x < rect.width / 2
+				? y < rect.height / 2
+					? "tl"
+					: "bl"
+				: y < rect.height / 2
+					? "tr"
+					: "br";
+		if (link.dataset.hoverZone !== zone) link.dataset.hoverZone = zone;
+	}
+
+	function handleCardMouseLeave(e: MouseEvent) {
+		const link = e.currentTarget as HTMLElement;
+		cardRects.delete(link);
+		link.removeAttribute("data-hover-zone");
+	}
+
 onMount(() => {
 	initLayoutMode();
 	window.addEventListener("layoutChange", handleLayoutChange);
@@ -262,7 +295,7 @@ onMount(() => {
 			<div class="article-list-pinned__collection">
 				{#each pinnedPosts as post (post.id)}
 					<article class="article-list-card article-list-card--pinned" class:has-image={!!post.coverImage}>
-						<a href={post.url} class="article-list-card__link" aria-label={`查看文章：${post.title}`}>
+						<a href={post.url} class="article-list-card__link" aria-label={`查看文章：${post.title}`} onmousemove={handleCardMouseMove} onmouseenter={handleCardMouseEnter} onmouseleave={handleCardMouseLeave}>
 							{#if post.coverImage}
 								<div class="article-list-card__media" class:skeleton-shimmer={layoutMode === "grid" && !loadedImageIds.has(post.id)} aria-hidden="true">
 									<picture>
@@ -358,8 +391,8 @@ onMount(() => {
 						<a
 							href={post.url}
 							class="article-list-card__link"
-							aria-label={`查看文章：${post.title}`}
-						>
+						aria-label={`查看文章：${post.title}`}
+						onmousemove={handleCardMouseMove} onmouseenter={handleCardMouseEnter} onmouseleave={handleCardMouseLeave}>
 							{#if post.coverImage}
 								<div
 									class="article-list-card__media"

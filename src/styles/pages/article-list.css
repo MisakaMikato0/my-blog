@@ -343,11 +343,6 @@
 		box-shadow 300ms ease;
 }
 
-.article-list-card--regular:hover,
-.article-list-card--regular:focus-within {
-	box-shadow: 0 12px 32px -18px color-mix(in oklch, var(--deep-text) 40%, transparent);
-}
-
 /* ========================================================================== 
    分页与空状态
    ========================================================================== */
@@ -676,11 +671,6 @@
 		border-color 180ms ease,
 		box-shadow 300ms ease;
 }
-[data-view="list"] .article-list-card--regular:hover,
-[data-view="list"] .article-list-card--regular:focus-within {
-	box-shadow: 0 12px 32px -18px color-mix(in oklch, var(--deep-text) 40%, transparent);
-}
-
 /* 置顶标识兼容 */
 .article-list-card.is-pinned {
 	--article-list-card-active-border: #ef4444;
@@ -732,8 +722,11 @@
 }
 
 [data-view="grid"] .article-list-card__link:hover {
-	background: color-mix(in oklch, var(--page-bg) 66%, transparent);
 	border-color: color-mix(in oklch, var(--deep-text) 22%, transparent);
+}
+/* 深色模式下 hover 玻璃微微亮起（浅色模式保持原样，避免白色叠加变白块） */
+:root.dark [data-view="grid"] .article-list-card__link:hover {
+	background: color-mix(in oklch, var(--page-bg) 66%, transparent);
 }
 
 /* 封面图微缩放过渡 */

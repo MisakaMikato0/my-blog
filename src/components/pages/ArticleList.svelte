@@ -182,38 +182,38 @@ function handleImageError(e: Event, apiUrls: string[], fallback = "") {
 	}
 }
 
-	const cardRects = new WeakMap<HTMLElement, DOMRect>();
+const cardRects = new WeakMap<HTMLElement, DOMRect>();
 
-	function handleCardMouseEnter(e: MouseEvent) {
-		const link = e.currentTarget as HTMLElement;
-		cardRects.set(link, link.getBoundingClientRect());
-	}
+function handleCardMouseEnter(e: MouseEvent) {
+	const link = e.currentTarget as HTMLElement;
+	cardRects.set(link, link.getBoundingClientRect());
+}
 
-	function handleCardMouseMove(e: MouseEvent) {
-		const link = e.currentTarget as HTMLElement;
-		let rect = cardRects.get(link);
-		if (!rect) {
-			rect = link.getBoundingClientRect();
-			cardRects.set(link, rect);
-		}
-		const x = e.clientX - rect.left;
-		const y = e.clientY - rect.top;
-		const zone =
-			x < rect.width / 2
-				? y < rect.height / 2
-					? "tl"
-					: "bl"
-				: y < rect.height / 2
-					? "tr"
-					: "br";
-		if (link.dataset.hoverZone !== zone) link.dataset.hoverZone = zone;
+function handleCardMouseMove(e: MouseEvent) {
+	const link = e.currentTarget as HTMLElement;
+	let rect = cardRects.get(link);
+	if (!rect) {
+		rect = link.getBoundingClientRect();
+		cardRects.set(link, rect);
 	}
+	const x = e.clientX - rect.left;
+	const y = e.clientY - rect.top;
+	const zone =
+		x < rect.width / 2
+			? y < rect.height / 2
+				? "tl"
+				: "bl"
+			: y < rect.height / 2
+				? "tr"
+				: "br";
+	if (link.dataset.hoverZone !== zone) link.dataset.hoverZone = zone;
+}
 
-	function handleCardMouseLeave(e: MouseEvent) {
-		const link = e.currentTarget as HTMLElement;
-		cardRects.delete(link);
-		link.removeAttribute("data-hover-zone");
-	}
+function handleCardMouseLeave(e: MouseEvent) {
+	const link = e.currentTarget as HTMLElement;
+	cardRects.delete(link);
+	link.removeAttribute("data-hover-zone");
+}
 
 onMount(() => {
 	initLayoutMode();

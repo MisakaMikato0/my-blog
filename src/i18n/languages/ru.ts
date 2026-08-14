@@ -430,4 +430,10 @@ export const ru: Translation = {
 	[Key.calendarNearestHoliday]: "Ближайшие праздники",
 	[Key.calendarNearestBirthday]: "Ближайшие дни рождения",
 	[Key.calendarNearestSchedule]: "Ближайшие события",
+
+	[Key.albumsView]: "Смотреть",
+	[Key.albumsLoading]: "Загрузка…",
+	[Key.albumsEmpty]: "Пока нет фотографий",
+	[Key.albumsHint]: "Прокрутите или перетащите, чтобы выбрать альбом",
+	[Key.albumsAllTitle]: "Все альбомы",
 };

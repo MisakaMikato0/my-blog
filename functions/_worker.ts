@@ -1,6 +1,6 @@
 import { handleCloudflareAiSearch } from "../src/workers/cloudflare/ai-search/runtime";
-import { handleGithubContributions } from "../src/workers/cloudflare/github-contributions/handler";
 import { handleGallery } from "../src/workers/cloudflare/gallery/handler";
+import { handleGithubContributions } from "../src/workers/cloudflare/github-contributions/handler";
 
 const STATIC_SECURITY_HEADERS: Record<string, string> = {
 	"Content-Security-Policy-Report-Only": [
@@ -39,7 +39,11 @@ function withHeaders(response: Response): Response {
 }
 
 export default {
-	async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
+	async fetch(
+		request: Request,
+		env: Env,
+		ctx: ExecutionContext,
+	): Promise<Response> {
 		const url = new URL(request.url);
 
 		if (url.pathname === "/api/ai-chat") {
@@ -59,6 +63,20 @@ export default {
 			const assetResponse = await env.ASSETS.fetch(request);
 			if (assetResponse.status === 404) {
 				const shellUrl = new URL("/gallery/dynamic-album/", request.url);
+				const shellRequest = new Request(shellUrl.toString(), request);
+				const shellResponse = await env.ASSETS.fetch(shellRequest);
+				return withHeaders(shellResponse);
+			}
+			return withHeaders(assetResponse);
+		}
+
+		// 相册(滚轮体验)动态相册兜底：/albums/{id}/ 在静态构建中不存在时，
+		// 交给客户端渲染壳 /albums/dynamic-album/ 处理（URL 保持不变）。
+		const albumsAlbumMatch = url.pathname.match(/^\/albums\/([^/]+)\/$/);
+		if (albumsAlbumMatch && env.ASSETS) {
+			const assetResponse = await env.ASSETS.fetch(request);
+			if (assetResponse.status === 404) {
+				const shellUrl = new URL("/albums/dynamic-album/", request.url);
 				const shellRequest = new Request(shellUrl.toString(), request);
 				const shellResponse = await env.ASSETS.fetch(shellRequest);
 				return withHeaders(shellResponse);

@@ -71,6 +71,7 @@ export type SiteConfig = {
 		sponsor: boolean; // 赞助页面开关
 		guestbook: boolean; // 留言板页面开关
 		gallery: boolean; // 相册页面开关
+		albums: boolean; // 相册(滚轮体验)页面开关
 		collections: boolean; // 收藏API页面开关
 		calendar: boolean; // 日历页面开关
 	};
@@ -196,6 +197,7 @@ export enum LinkPreset {
 	NavMy = 18,
 	Music = 19,
 	WritePost = 20,
+	Albums = 21,
 }
 
 export type NavBarLink = {

@@ -49,8 +49,8 @@ const buildNavBarConfig = (): NavBarConfig => {
 	if (siteConfig.pages.calendar) {
 		myChildren.push(LinkPreset.Calendar);
 	}
-	if (siteConfig.pages.gallery) {
-		myChildren.push(LinkPreset.Gallery);
+	if (siteConfig.pages.albums) {
+		myChildren.push(LinkPreset.Albums);
 	}
 	if (siteConfig.pages.sponsor) {
 		myChildren.push(LinkPreset.Sponsor);

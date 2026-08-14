@@ -429,4 +429,10 @@ export const en: Translation = {
 	[Key.calendarNearestHoliday]: "Upcoming Holidays",
 	[Key.calendarNearestBirthday]: "Upcoming Birthdays",
 	[Key.calendarNearestSchedule]: "Upcoming Schedules",
+
+	[Key.albumsView]: "View",
+	[Key.albumsLoading]: "Loading…",
+	[Key.albumsEmpty]: "No photos yet",
+	[Key.albumsHint]: "Scroll or drag to choose an album",
+	[Key.albumsAllTitle]: "All Albums",
 };

@@ -417,4 +417,10 @@ export const zh_TW: Translation = {
 	[Key.calendarNearestHoliday]: "最近的節日",
 	[Key.calendarNearestBirthday]: "最近的生日/紀念日",
 	[Key.calendarNearestSchedule]: "最近的安排",
+
+	[Key.albumsView]: "查看",
+	[Key.albumsLoading]: "載入中…",
+	[Key.albumsEmpty]: "暫無照片",
+	[Key.albumsHint]: "滾動或拖曳選擇相簿",
+	[Key.albumsAllTitle]: "全部相簿",
 };

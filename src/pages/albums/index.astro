@@ -1,0 +1,77 @@
+---
+import Icon from "@components/common/Icon.astro";
+import AlbumWheel from "@/components/pages/albums/AlbumWheel.svelte";
+import { galleryConfig, siteConfig } from "@/config";
+import I18nKey from "@/i18n/i18nKey";
+import { i18n } from "@/i18n/translation";
+import MainGridLayout from "@/layouts/MainGridLayout.astro";
+import {
+	getAlbumCover,
+	getPhotoThumb,
+	scanAlbumPhotos,
+} from "@/utils/gallery-utils";
+import { url } from "@/utils/url-utils";
+import "@/styles/pages/albums.css";
+
+if (!siteConfig.pages.albums) {
+	return Astro.redirect("/404/");
+}
+
+const title = i18n(I18nKey.gallery);
+const description = i18n(I18nKey.galleryDescription);
+
+// 滚轮选项：全部 + 本地相册（封面优先缩略图）
+const localOptions = galleryConfig.albums.map((album) => {
+	const photos = scanAlbumPhotos(album.id);
+	const cover = getAlbumCover(album, photos);
+	const thumbCover = getPhotoThumb(cover) || cover;
+	return {
+		id: album.id,
+		name: album.name,
+		cover: thumbCover,
+		count: photos.length,
+	};
+});
+
+const allCover = localOptions[0]?.cover || "";
+const wheelOptions = [
+	{ id: "all", name: i18n(I18nKey.all), cover: allCover, count: undefined },
+	...localOptions,
+];
+---
+
+<MainGridLayout title={title} description={description}>
+	<script is:inline>
+		// 管理入口显隐：登录过相册管理后显示设置按钮
+		(function () {
+			function updateAdminEntryVisibility() {
+				var entry = document.querySelector("[data-gallery-admin-entry]");
+				if (!entry) return;
+				var hasToken = false;
+				try {
+					hasToken = !!sessionStorage.getItem("gallery-admin-token");
+				} catch (e) {
+					hasToken = false;
+				}
+				entry.style.display = hasToken ? "" : "none";
+			}
+			updateAdminEntryVisibility();
+			document.addEventListener("astro:page-load", updateAdminEntryVisibility);
+		})();
+	</script>
+
+	<div class="albums-panel">
+		<a
+			href={url("/gallery/admin/")}
+			class="absolute top-4 right-4 z-10 inline-flex h-9 w-9 items-center justify-center rounded-lg bg-black/30 text-neutral-300 backdrop-blur-sm transition-colors hover:text-white"
+			title={i18n(I18nKey.galleryAdmin)}
+			aria-label={i18n(I18nKey.galleryAdmin)}
+			data-gallery-admin-entry
+			style="display:none"
+		>
+			<Icon name="material-symbols:manage-accounts-rounded" class="text-xl" />
+		</a>
+
+		<AlbumWheel options={wheelOptions} client:load />
+	</div>
+</MainGridLayout>

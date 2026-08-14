@@ -1,0 +1,13 @@
+---
+import DynamicAlbumShell from "@/components/pages/albums/DynamicAlbumShell.svelte";
+import MainGridLayout from "@/layouts/MainGridLayout.astro";
+import "@/styles/pages/albums.css";
+---
+
+<MainGridLayout title="Album">
+	<div class="albums-panel">
+		<div class="px-6 pb-6 pt-6">
+			<DynamicAlbumShell client:only="svelte" />
+		</div>
+	</div>
+</MainGridLayout>

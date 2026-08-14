@@ -411,6 +411,13 @@ enum I18nKey {
 	navPosts = "navPosts",
 	navMy = "navMy",
 	writePost = "writePost",
+
+	// 相册(滚轮体验)页面
+	albumsView = "albumsView",
+	albumsLoading = "albumsLoading",
+	albumsEmpty = "albumsEmpty",
+	albumsHint = "albumsHint",
+	albumsAllTitle = "albumsAllTitle",
 }
 
 export default I18nKey;

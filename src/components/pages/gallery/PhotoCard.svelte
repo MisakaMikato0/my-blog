@@ -5,9 +5,18 @@ interface Props {
 	albumId: string;
 	alt?: string;
 	caption?: string;
+	/** 灯箱分组名（默认 gallery-{albumId}），/albums 全部视图可传统一分组 */
+	fancyboxGroup?: string;
 }
 
-const { src, thumbSrc = "", albumId, alt = "", caption = "" }: Props = $props();
+const {
+	src,
+	thumbSrc = "",
+	albumId,
+	alt = "",
+	caption = "",
+	fancyboxGroup = `gallery-${albumId}`,
+}: Props = $props();
 
 let container: HTMLDivElement | undefined = $state();
 let visible = $state(false);
@@ -39,7 +48,7 @@ function onError() {
 
 <div class="break-inside-avoid mb-3" bind:this={container}>
   <div
-    data-fancybox={`gallery-${albumId}`}
+    data-fancybox={fancyboxGroup}
     data-src={src}
     data-type="image"
     data-caption={caption || undefined}

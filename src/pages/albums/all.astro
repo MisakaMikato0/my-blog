@@ -1,0 +1,64 @@
+---
+import Icon from "@components/common/Icon.astro";
+import PageTitle from "@/components/common/PageTitle.astro";
+import AlbumMasonry from "@/components/pages/albums/AlbumMasonry.svelte";
+import { galleryConfig, siteConfig } from "@/config";
+import I18nKey from "@/i18n/i18nKey";
+import { i18n } from "@/i18n/translation";
+import MainGridLayout from "@/layouts/MainGridLayout.astro";
+import {
+	getPhotoThumb,
+	readAlbumCaptions,
+	scanAlbumPhotos,
+} from "@/utils/gallery-utils";
+import { url } from "@/utils/url-utils";
+import "@/styles/pages/albums.css";
+
+if (!siteConfig.pages.albums) {
+	return Astro.redirect("/404/");
+}
+
+const title = i18n(I18nKey.albumsAllTitle);
+const description = i18n(I18nKey.galleryDescription);
+
+// 全部照片：所有本地相册合并（动态相册由客户端索引合并）
+const photos = galleryConfig.albums.flatMap((album) => {
+	const raw = scanAlbumPhotos(album.id);
+	const captions = readAlbumCaptions(album.id);
+	return raw.map((src) => {
+		const filename = src.split("/").pop() || "";
+		return {
+			src,
+			thumb: getPhotoThumb(src),
+			caption: captions[filename] || album.name,
+			albumId: album.id,
+		};
+	});
+});
+
+const columnWidth = galleryConfig.columnWidth || 240;
+---
+
+<MainGridLayout title={title} description={description}>
+	<div class="albums-panel">
+		<div class="flex flex-wrap items-center justify-between gap-3 px-6 pt-6">
+			<PageTitle title={title} variant="stacked" />
+			<a
+				href={url("/albums/")}
+				class="inline-flex items-center gap-1 text-sm text-(--primary) hover:underline"
+			>
+				<Icon name="material-symbols:arrow-back" class="text-base" />
+				{i18n(I18nKey.galleryBackToAlbums)}
+			</a>
+		</div>
+		<div class="px-6 pb-6 pt-4">
+			<AlbumMasonry
+				photos={photos}
+				columnWidth={columnWidth}
+				loadingLabel={i18n(I18nKey.albumsLoading)}
+				emptyLabel={i18n(I18nKey.albumsEmpty)}
+				client:load
+			/>
+		</div>
+	</div>
+</MainGridLayout>

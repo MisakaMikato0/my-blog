@@ -426,4 +426,10 @@ export const ja: Translation = {
 	[Key.calendarNearestHoliday]: "直近の祝日",
 	[Key.calendarNearestBirthday]: "直近の誕生日",
 	[Key.calendarNearestSchedule]: "直近のスケジュール",
+
+	[Key.albumsView]: "表示",
+	[Key.albumsLoading]: "読み込み中…",
+	[Key.albumsEmpty]: "写真がありません",
+	[Key.albumsHint]: "スクロールまたはドラッグでアルバムを選択",
+	[Key.albumsAllTitle]: "すべてのアルバム",
 };

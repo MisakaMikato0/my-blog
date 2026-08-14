@@ -1,0 +1,118 @@
+---
+import Icon from "@components/common/Icon.astro";
+import AlbumMasonry from "@/components/pages/albums/AlbumMasonry.svelte";
+import { galleryConfig, siteConfig } from "@/config";
+import I18nKey from "@/i18n/i18nKey";
+import { i18n } from "@/i18n/translation";
+import MainGridLayout from "@/layouts/MainGridLayout.astro";
+import {
+	getAlbumCover,
+	getPhotoThumb,
+	readAlbumCaptions,
+	scanAlbumPhotos,
+} from "@/utils/gallery-utils";
+import { url } from "@/utils/url-utils";
+import "@/styles/pages/albums.css";
+
+if (!siteConfig.pages.albums) {
+	return Astro.redirect("/404/");
+}
+
+export function getStaticPaths() {
+	return galleryConfig.albums.map((album) => ({
+		params: { album: album.id },
+	}));
+}
+
+const { album: albumId } = Astro.params;
+const albumMeta = galleryConfig.albums.find((a) => a.id === albumId);
+
+if (!albumMeta) {
+	return Astro.redirect("/404/");
+}
+
+const rawPhotos = scanAlbumPhotos(albumMeta.id);
+const cover = getAlbumCover(albumMeta, rawPhotos);
+const thumbCover = getPhotoThumb(cover) || cover;
+const captions = readAlbumCaptions(albumMeta.id);
+
+const photos = rawPhotos.map((src) => {
+	const filename = src.split("/").pop() || "";
+	return {
+		src,
+		thumb: getPhotoThumb(src),
+		caption: captions[filename] || "",
+		albumId: albumMeta.id,
+	};
+});
+
+const columnWidth = galleryConfig.columnWidth || 240;
+---
+
+<MainGridLayout
+	title={albumMeta.name}
+	description={albumMeta.description || i18n(I18nKey.galleryDescription)}
+>
+	<div class="albums-panel">
+		{thumbCover ? (
+			<div class="relative aspect-[3/1] min-h-[200px] max-h-[340px]">
+				<img src={thumbCover} alt={albumMeta.name} class="h-full w-full object-cover" />
+				<div class="absolute inset-0 bg-gradient-to-t from-black/75 via-black/30 to-transparent" />
+				<a
+					href={url("/albums/")}
+					class="absolute left-4 top-4 inline-flex items-center gap-1.5 rounded-lg bg-black/30 px-3 py-1.5 text-sm text-white/90 backdrop-blur-sm transition-colors hover:bg-black/50 hover:text-white"
+				>
+					<Icon name="material-symbols:arrow-back" class="text-base" />
+					{i18n(I18nKey.galleryBackToAlbums)}
+				</a>
+				<div class="absolute bottom-0 left-0 right-0 p-6">
+					<h1 class="mb-1 font-serif text-2xl font-bold text-white drop-shadow-lg sm:text-3xl">
+						{albumMeta.name}
+					</h1>
+					<div class="flex flex-wrap items-center gap-4 text-sm text-white/80">
+						{albumMeta.date && (
+							<span class="inline-flex items-center gap-1">
+								<Icon name="material-symbols:calendar-today" class="text-sm" />
+								{albumMeta.date}
+							</span>
+						)}
+						{albumMeta.location && (
+							<span class="inline-flex items-center gap-1">
+								<Icon name="material-symbols:location-on" class="text-sm" />
+								{albumMeta.location}
+							</span>
+						)}
+						<span class="inline-flex items-center gap-1">
+							<Icon name="material-symbols:photo-library" class="text-sm" />
+							{rawPhotos.length} {i18n(I18nKey.galleryPhotos)}
+						</span>
+					</div>
+				</div>
+			</div>
+		) : (
+			<div class="px-6 pt-6">
+				<a
+					href={url("/albums/")}
+					class="inline-flex items-center gap-1 text-sm text-(--primary) hover:underline"
+				>
+					<Icon name="material-symbols:arrow-back" class="text-base" />
+					{i18n(I18nKey.galleryBackToAlbums)}
+				</a>
+				<h1 class="mt-3 font-serif text-2xl font-bold sm:text-3xl">
+					{albumMeta.name}
+				</h1>
+			</div>
+		)}
+
+		<div class="px-6 pb-6 pt-4">
+			<AlbumMasonry
+				photos={photos}
+				albumId={albumMeta.id}
+				columnWidth={columnWidth}
+				loadingLabel={i18n(I18nKey.albumsLoading)}
+				emptyLabel={i18n(I18nKey.albumsEmpty)}
+				client:load
+			/>
+		</div>
+	</div>
+</MainGridLayout>

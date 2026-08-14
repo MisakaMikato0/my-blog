@@ -157,6 +157,8 @@ export const siteConfig: SiteConfig = {
 		guestbook: true,
 		// 相册页面开关
 		gallery: true,
+		// 相册(滚轮体验)页面开关
+		albums: true,
 		// 收藏API页面开关
 		collections: true,
 		// 日历页面开关

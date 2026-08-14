@@ -4,7 +4,7 @@ import AlbumWheel from "@/components/pages/albums/AlbumWheel.svelte";
 import { galleryConfig, siteConfig } from "@/config";
 import I18nKey from "@/i18n/i18nKey";
 import { i18n } from "@/i18n/translation";
-import MainGridLayout from "@/layouts/MainGridLayout.astro";
+import FullscreenLayout from "@/layouts/FullscreenLayout.astro";
 import {
 	getAlbumCover,
 	getPhotoThumb,
@@ -40,7 +40,7 @@ const wheelOptions = [
 ];
 ---
 
-<MainGridLayout title={title} description={description}>
+<FullscreenLayout title={title} description={description}>
 	<script is:inline>
 		// 管理入口显隐：登录过相册管理后显示设置按钮
 		(function () {
@@ -63,7 +63,7 @@ const wheelOptions = [
 	<div class="albums-panel">
 		<a
 			href={url("/gallery/admin/")}
-			class="absolute top-4 right-4 z-10 inline-flex h-9 w-9 items-center justify-center rounded-lg bg-black/30 text-neutral-300 backdrop-blur-sm transition-colors hover:text-white"
+			class="absolute top-16 right-4 z-10 inline-flex h-9 w-9 items-center justify-center rounded-lg bg-black/30 text-neutral-300 backdrop-blur-sm transition-colors hover:text-white"
 			title={i18n(I18nKey.galleryAdmin)}
 			aria-label={i18n(I18nKey.galleryAdmin)}
 			data-gallery-admin-entry
@@ -74,4 +74,4 @@ const wheelOptions = [
 
 		<AlbumWheel options={wheelOptions} client:load />
 	</div>
-</MainGridLayout>
+</FullscreenLayout>

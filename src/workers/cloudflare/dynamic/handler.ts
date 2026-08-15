@@ -28,10 +28,7 @@ import {
 	updateDynamicIndex,
 	writeDynamicText,
 } from "./storage";
-import type {
-	DynamicEntry,
-	DynamicFeedItem,
-} from "./types";
+import type { DynamicEntry, DynamicFeedItem } from "./types";
 
 const IMAGE_EXT_RE = /\.(jpe?g|png|webp|gif)$/i;
 const DYNAMIC_ID_RE = /^[a-z0-9][a-z0-9-]{0,63}$/i;
@@ -203,9 +200,7 @@ function toFeedItem(entry: DynamicEntry, cdnBase: string): DynamicFeedItem {
 function sortDynamics(dynamics: DynamicEntry[]): DynamicEntry[] {
 	return [...dynamics].sort((a, b) => {
 		if (a.pinned !== b.pinned) return a.pinned ? -1 : 1;
-		return (
-			new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-		);
+		return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
 	});
 }
 
@@ -218,7 +213,9 @@ async function handleGetFeed(env: Env): Promise<Response> {
 			content: await readDynamicText(env, entry.id),
 		})),
 	);
-	const items = sortDynamics(dynamics).map((entry) => toFeedItem(entry, cdnBase));
+	const items = sortDynamics(dynamics).map((entry) =>
+		toFeedItem(entry, cdnBase),
+	);
 	return jsonResponse(items, 200);
 }
 
@@ -240,10 +237,7 @@ async function handleUploadToken(
 	return jsonResponse(token, 200);
 }
 
-async function handleCreate(
-	request: Request,
-	env: Env,
-): Promise<Response> {
+async function handleCreate(request: Request, env: Env): Promise<Response> {
 	const body = await readJsonBody(request);
 	const content = asString(body.content);
 	if (!content) {
@@ -277,10 +271,7 @@ async function handleCreate(
 	return jsonResponse({ ok: true, id }, 200);
 }
 
-async function handleUpdate(
-	request: Request,
-	env: Env,
-): Promise<Response> {
+async function handleUpdate(request: Request, env: Env): Promise<Response> {
 	const body = await readJsonBody(request);
 	const id = asString(body.id);
 	if (!validateDynamicId(id)) {
@@ -317,10 +308,7 @@ async function handleUpdate(
 			if (images) entry.images = images;
 		}
 		if (body.location !== undefined) {
-			entry.location = asString(body.location).slice(
-				0,
-				MAX_LOCATION_LENGTH,
-			);
+			entry.location = asString(body.location).slice(0, MAX_LOCATION_LENGTH);
 		}
 		if (body.pinned !== undefined) {
 			entry.pinned = asBoolean(body.pinned);
@@ -330,10 +318,7 @@ async function handleUpdate(
 	return jsonResponse({ ok: true }, 200);
 }
 
-async function handleDelete(
-	request: Request,
-	env: Env,
-): Promise<Response> {
+async function handleDelete(request: Request, env: Env): Promise<Response> {
 	const body = await readJsonBody(request);
 	const id = asString(body.id);
 	if (!validateDynamicId(id)) {
@@ -365,10 +350,7 @@ async function handleDelete(
 	return jsonResponse({ ok: true, failedDeletes: failures }, 200);
 }
 
-async function handlePin(
-	request: Request,
-	env: Env,
-): Promise<Response> {
+async function handlePin(request: Request, env: Env): Promise<Response> {
 	const body = await readJsonBody(request);
 	const id = asString(body.id);
 	if (!validateDynamicId(id)) {
@@ -411,10 +393,7 @@ export async function handleDynamic(
 					content: await readDynamicText(env, entry.id),
 				})),
 			);
-			return jsonResponse(
-				{ cdnBase, dynamics: sortDynamics(dynamics) },
-				200,
-			);
+			return jsonResponse({ cdnBase, dynamics: sortDynamics(dynamics) }, 200);
 		}
 		if (method === "POST" && path === "/api/dynamic/upload-token") {
 			return await handleUploadToken(request, env);

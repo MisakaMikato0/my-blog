@@ -25,9 +25,7 @@ export const DYNAMIC_TEXT_DIR = "dynamic/text";
 export const DYNAMIC_IMAGE_PREFIX = "/dynamic/img";
 
 /** 读取动态索引；不存在时返回空索引 */
-export async function readDynamicIndex(
-	env: Env,
-): Promise<DynamicIndex> {
+export async function readDynamicIndex(env: Env): Promise<DynamicIndex> {
 	const data = await readJsonFile<DynamicIndex>(env, DYNAMIC_INDEX_KEY);
 	if (
 		!data ||
@@ -53,10 +51,7 @@ export function updateDynamicIndex(
 }
 
 /** 读取一条动态的正文（md 文件）；不存在时返回空串 */
-export async function readDynamicText(
-	env: Env,
-	id: string,
-): Promise<string> {
+export async function readDynamicText(env: Env, id: string): Promise<string> {
 	const text = await readBucketFile(env, `${DYNAMIC_TEXT_DIR}/${id}.md`);
 	return text ?? "";
 }
@@ -76,9 +71,6 @@ export function writeDynamicText(
 }
 
 /** 删除一条动态的正文（md 文件）；文件不存在视为成功 */
-export function deleteDynamicText(
-	env: Env,
-	id: string,
-): Promise<void> {
+export function deleteDynamicText(env: Env, id: string): Promise<void> {
 	return deleteFile(env, `/${DYNAMIC_TEXT_DIR}/${id}.md`);
 }

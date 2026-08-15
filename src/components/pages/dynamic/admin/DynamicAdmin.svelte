@@ -1,7 +1,7 @@
 <script lang="ts">
-import dayjs from "dayjs";
 import I18nKey from "@i18n/i18nKey";
 import { i18n } from "@i18n/translation";
+import dayjs from "dayjs";
 import Icon from "@/components/common/Icon.svelte";
 import { normalizeImageOrientation } from "@/utils/image-orientation";
 import { url } from "@/utils/url-utils";
@@ -169,7 +169,10 @@ $effect(() => {
 		return;
 	}
 	let cancelled = false;
-	api("/api/dynamic/manage/verify", { method: "POST", body: JSON.stringify({}) })
+	api("/api/dynamic/manage/verify", {
+		method: "POST",
+		body: JSON.stringify({}),
+	})
 		.then(() => {
 			if (!cancelled) {
 				authed = true;
@@ -271,7 +274,11 @@ async function handleFiles(files: File[]) {
 			);
 			formImages = [
 				...formImages,
-				{ path: tok.path, alt: file.name.replace(/\.[^.]+$/, ""), cdnUrl: tok.cdnUrl },
+				{
+					path: tok.path,
+					alt: file.name.replace(/\.[^.]+$/, ""),
+					cdnUrl: tok.cdnUrl,
+				},
 			];
 			updateUpload(item.id, { status: "success", progress: 1 });
 		} catch (e) {

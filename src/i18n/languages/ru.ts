@@ -471,8 +471,7 @@ export const ru: Translation = {
 	[Key.dynamicAdminSaveSuccess]: "Сохранено",
 	[Key.dynamicAdminDeleteSuccess]: "Удалено",
 	[Key.dynamicUpload]: "Загрузить изображения",
-	[Key.dynamicUploadHint]:
-		"Перетащите или выберите (jpg/png/webp/gif, до 5MB)",
+	[Key.dynamicUploadHint]: "Перетащите или выберите (jpg/png/webp/gif, до 5MB)",
 	[Key.dynamicDropHere]: "Отпустите, чтобы добавить",
 	[Key.dynamicUploading]: "Загрузка",
 	[Key.dynamicUploadSuccess]: "Загружено",

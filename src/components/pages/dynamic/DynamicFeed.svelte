@@ -1,7 +1,7 @@
 <script lang="ts">
-import dayjs from "dayjs";
 import I18nKey from "@i18n/i18nKey";
 import { i18n } from "@i18n/translation";
+import dayjs from "dayjs";
 import Icon from "@/components/common/Icon.svelte";
 import { dynamicConfig, siteConfig } from "@/config";
 import { url } from "@/utils/url-utils";
@@ -27,11 +27,15 @@ let year = $state("all");
 let visibleCount = $state(dynamicConfig.itemsPerPage);
 
 const years = $derived(
-	[...new Set(items.map((i) => dayjs(i.published).year()))].sort((a, b) => b - a),
+	[...new Set(items.map((i) => dayjs(i.published).year()))].sort(
+		(a, b) => b - a,
+	),
 );
 
 const filtered = $derived(
-	year === "all" ? items : items.filter((i) => dayjs(i.published).year() === Number(year)),
+	year === "all"
+		? items
+		: items.filter((i) => dayjs(i.published).year() === Number(year)),
 );
 
 const visibleItems = $derived(filtered.slice(0, visibleCount));

@@ -452,8 +452,7 @@ export const en: Translation = {
 	[Key.dynamicAdminBackToDynamic]: "Back to dynamics",
 	[Key.dynamicAdminRefresh]: "Refresh",
 	[Key.dynamicAdminContent]: "Content",
-	[Key.dynamicAdminContentPlaceholder]:
-		"Write something... Markdown supported",
+	[Key.dynamicAdminContentPlaceholder]: "Write something... Markdown supported",
 	[Key.dynamicAdminImages]: "Images (optional)",
 	[Key.dynamicAdminLocation]: "Location (optional)",
 	[Key.dynamicAdminLocationPlaceholder]: "e.g. Guangxi, Shanghai...",

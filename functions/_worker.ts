@@ -1,4 +1,5 @@
 import { handleCloudflareAiSearch } from "../src/workers/cloudflare/ai-search/runtime";
+import { handleDynamic } from "../src/workers/cloudflare/dynamic/handler";
 import { handleGithubContributions } from "../src/workers/cloudflare/github-contributions/handler";
 import { handleGallery } from "../src/workers/cloudflare/gallery/handler";
 
@@ -50,6 +51,9 @@ export default {
 		}
 		if (url.pathname.startsWith("/api/gallery/")) {
 			return handleGallery(request, env);
+		}
+		if (url.pathname.startsWith("/api/dynamic")) {
+			return handleDynamic(request, env);
 		}
 
 		// 动态相册兜底：/gallery/{id}/ 在静态构建中不存在时，

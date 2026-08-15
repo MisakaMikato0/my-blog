@@ -10,6 +10,7 @@ declare global {
 		ALLOWED_ORIGINS?: string;
 		PUBLIC_SITE_URL?: string;
 		GALLERY_ADMIN_TOKEN?: string;
+		DYNAMIC_ADMIN_TOKEN?: string;
 		UPYUN_BUCKET?: string;
 		UPYUN_OPERATOR?: string;
 		UPYUN_OPERATOR_PASSWORD?: string;

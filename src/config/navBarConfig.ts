@@ -52,6 +52,9 @@ const buildNavBarConfig = (): NavBarConfig => {
 	if (siteConfig.pages.gallery) {
 		myChildren.push(LinkPreset.Gallery);
 	}
+	if (siteConfig.pages.dynamic) {
+		myChildren.push(LinkPreset.Dynamic);
+	}
 	if (siteConfig.pages.sponsor) {
 		myChildren.push(LinkPreset.Sponsor);
 	}

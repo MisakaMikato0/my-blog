@@ -73,6 +73,7 @@ export type SiteConfig = {
 		gallery: boolean; // 相册页面开关
 		collections: boolean; // 收藏API页面开关
 		calendar: boolean; // 日历页面开关
+		dynamic: boolean; // 动态页面开关
 	};
 
 	// 分类导航栏开关
@@ -196,6 +197,7 @@ export enum LinkPreset {
 	NavMy = 18,
 	Music = 19,
 	WritePost = 20,
+	Dynamic = 21,
 }
 
 export type NavBarLink = {
@@ -911,6 +913,15 @@ export type GalleryConfig = {
 		// 默认获取数量
 		defaultQuantity?: number;
 	};
+};
+
+// 动态配置
+export type DynamicConfig = {
+	title: string; // 页面标题，留空则使用 i18n 翻译
+	description: string; // 页面描述，留空则使用 i18n 翻译
+	profileUrl: string; // 动态头像和名称的跳转地址
+	itemsPerPage: number; // 每页显示的动态数量
+	apiUrl: string; // 动态数据接口地址（Worker 运行时返回）
 };
 
 // 收藏API单项

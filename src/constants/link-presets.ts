@@ -110,4 +110,9 @@ export const LinkPresets: { [key in LinkPreset]: NavBarLink } = {
 		url: "/admin/",
 		icon: "material-symbols:edit-note",
 	},
+	[LinkPreset.Dynamic]: {
+		name: i18n(I18nKey.dynamic),
+		url: "/dynamic/",
+		icon: "material-symbols:dynamic-feed",
+	},
 };

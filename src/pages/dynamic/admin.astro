@@ -1,0 +1,23 @@
+---
+import DynamicAdmin from "@/components/pages/dynamic/admin/DynamicAdmin.svelte";
+import { siteConfig } from "@/config";
+import I18nKey from "@/i18n/i18nKey";
+import { i18n } from "@/i18n/translation";
+import MainGridLayout from "@/layouts/MainGridLayout.astro";
+// 复用相册管理后台的通用样式（admin-btn / admin-panel / dialog / uploadzone 等）
+import "@/styles/pages/gallery-admin.css";
+
+if (!siteConfig.pages.dynamic) {
+	return Astro.redirect("/404/");
+}
+
+const title = i18n(I18nKey.dynamicAdmin);
+---
+
+<MainGridLayout title={title} description={title}>
+	<div class="w-full rounded-(--radius-large) overflow-hidden relative">
+		<div class="card-base z-10 px-6 py-6 relative w-full">
+			<DynamicAdmin client:only="svelte" />
+		</div>
+	</div>
+</MainGridLayout>

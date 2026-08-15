@@ -141,20 +141,107 @@ async function restHeaders(
 	return headers;
 }
 
-/** 读取索引；不存在时返回空索引 */
-export async function readIndex(env: UpyunEnv): Promise<GalleryIndex> {
+/**
+ * 读取 bucket 内 JSON 文件（key 为 bucket 内文件名，如 gallery-index.json）。
+ * 文件不存在时返回 null。
+ */
+export async function readJsonFile<T>(
+	env: UpyunEnv,
+	key: string,
+): Promise<T | null> {
+	const text = await readBucketFile(env, key);
+	if (text === null) return null;
+	return JSON.parse(text) as T;
+}
+
+/**
+ * 读取 bucket 内任意文本文件（key 为 bucket 内文件名）。
+ * 文件不存在时返回 null。
+ */
+export async function readBucketFile(
+	env: UpyunEnv,
+	key: string,
+): Promise<string | null> {
 	const config = getUpyunConfig(env);
-	const uri = `/${config.bucket}/${INDEX_KEY}`;
+	const uri = `/${config.bucket}/${key}`;
 	const res = await fetch(`${UPYUN_API_BASE}${uri}`, {
 		headers: await restHeaders("GET", uri, config),
 	});
-	if (res.status === 404) {
-		return { version: 0, albums: [] };
-	}
+	if (res.status === 404) return null;
 	if (!res.ok) {
-		throw new Error(`Upyun read index failed: ${res.status}`);
+		throw new Error(`Upyun read ${key} failed: ${res.status}`);
 	}
-	const data = (await res.json()) as GalleryIndex;
+	return await res.text();
+}
+
+/** 写入 bucket 内 JSON 文件（key 为 bucket 内文件名）。 */
+export async function writeJsonFile(
+	env: UpyunEnv,
+	key: string,
+	data: unknown,
+): Promise<void> {
+	await writeBucketFile(env, key, JSON.stringify(data), "application/json");
+}
+
+/**
+ * 写入 bucket 内任意文本文件（key 为 bucket 内文件名）。
+ * 对同一 key 的并发写会返回 42900007，指数退避重试。
+ */
+export async function writeBucketFile(
+	env: UpyunEnv,
+	key: string,
+	body: string,
+	contentType: string,
+): Promise<void> {
+	const config = getUpyunConfig(env);
+	const uri = `/${config.bucket}/${key}`;
+	for (let attempt = 0; attempt < 5; attempt++) {
+		const res = await fetch(`${UPYUN_API_BASE}${uri}`, {
+			method: "PUT",
+			headers: await restHeaders("PUT", uri, config, {
+				contentType,
+				body,
+			}),
+			body,
+		});
+		if (res.ok) return;
+		const text = await res.text();
+		if (res.status === 429 && attempt < 4) {
+			await sleep(300 * 2 ** attempt);
+			continue;
+		}
+		throw new Error(`Upyun write ${key} failed: ${res.status} ${text}`);
+	}
+}
+
+/**
+ * 读-改-写 JSON 文件（乐观锁：写前重读校验版本，冲突则重试）。
+ * 个人博客并发极低，此策略足够。data 需带 version 字段。
+ */
+export async function updateJsonFile<T extends { version?: number }>(
+	env: UpyunEnv,
+	key: string,
+	mutate: (data: T) => void,
+): Promise<T> {
+	for (let attempt = 0; attempt < 4; attempt++) {
+		const data = (await readJsonFile<T>(env, key)) ?? ({} as T);
+		const version = data.version || 0;
+		mutate(data);
+		data.version = version + 1;
+		// 写前重读，校验版本未被其他写入者修改（尽力而为的 CAS）
+		const fresh = (await readJsonFile<T>(env, key)) ?? ({} as T);
+		if ((fresh.version || 0) !== version) {
+			continue;
+		}
+		await writeJsonFile(env, key, data);
+		return data;
+	}
+	throw new Error(`update ${key} conflict, please retry`);
+}
+
+/** 读取相册索引；不存在时返回空索引 */
+export async function readIndex(env: UpyunEnv): Promise<GalleryIndex> {
+	const data = await readJsonFile<GalleryIndex>(env, INDEX_KEY);
 	if (
 		!data ||
 		!Array.isArray(data.albums) ||
@@ -165,32 +252,12 @@ export async function readIndex(env: UpyunEnv): Promise<GalleryIndex> {
 	return data;
 }
 
-/** 写索引 */
+/** 写相册索引 */
 export async function writeIndex(
 	env: UpyunEnv,
 	index: GalleryIndex,
 ): Promise<void> {
-	const config = getUpyunConfig(env);
-	const uri = `/${config.bucket}/${INDEX_KEY}`;
-	const body = JSON.stringify(index);
-	for (let attempt = 0; attempt < 5; attempt++) {
-		const res = await fetch(`${UPYUN_API_BASE}${uri}`, {
-			method: "PUT",
-			headers: await restHeaders("PUT", uri, config, {
-				contentType: "application/json",
-				body,
-			}),
-			body,
-		});
-		if (res.ok) return;
-		const text = await res.text();
-		// 又拍云对同一 key 的并发写会返回 42900007，指数退避重试
-		if (res.status === 429 && attempt < 4) {
-			await sleep(300 * 2 ** attempt);
-			continue;
-		}
-		throw new Error(`Upyun write index failed: ${res.status} ${text}`);
-	}
+	await writeJsonFile(env, INDEX_KEY, index);
 }
 
 /** 删除 bucket 内文件（path 含前导斜杠）；文件不存在视为成功 */
@@ -213,27 +280,13 @@ export async function deleteFile(env: UpyunEnv, path: string): Promise<void> {
 }
 
 /**
- * 读-改-写索引（乐观锁：写前重读校验版本，冲突则重试）。
- * 个人博客并发极低，此策略足够。
+ * 读-改-写相册索引（乐观锁，同 updateJsonFile）
  */
 export async function updateIndex(
 	env: UpyunEnv,
 	mutate: (index: GalleryIndex) => void,
 ): Promise<GalleryIndex> {
-	for (let attempt = 0; attempt < 4; attempt++) {
-		const index = await readIndex(env);
-		const version = index.version || 0;
-		mutate(index);
-		index.version = version + 1;
-		// 写前重读，校验版本未被其他写入者修改（尽力而为的 CAS）
-		const fresh = await readIndex(env);
-		if ((fresh.version || 0) !== version) {
-			continue;
-		}
-		await writeIndex(env, index);
-		return index;
-	}
-	throw new Error("gallery index update conflict, please retry");
+	return updateJsonFile<GalleryIndex>(env, INDEX_KEY, mutate);
 }
 
 export interface UploadToken {
@@ -244,15 +297,18 @@ export interface UploadToken {
 	cdnUrl: string;
 }
 
-/** 签发浏览器直传凭证（又拍云表单 API） */
-export function createUploadToken(
+/**
+ * 签发浏览器直传凭证（又拍云表单 API）。
+ * prefix 为 bucket 内目录（含前导斜杠），如 /gallery/{albumId} 或 /dynamic。
+ */
+export function createUploadTokenFor(
 	env: UpyunEnv,
-	albumId: string,
+	prefix: string,
 	ext: string,
 ): UploadToken {
 	const config = getUpyunConfig(env);
 	const random = Math.random().toString(36).slice(2, 6);
-	const path = `/gallery/${albumId}/${Date.now()}-${random}.${ext}`;
+	const path = `${prefix}/${Date.now()}-${random}.${ext}`;
 	const policyObj = {
 		bucket: config.bucket,
 		"save-key": path,
@@ -269,4 +325,13 @@ export function createUploadToken(
 		path,
 		cdnUrl: `${config.cdnHost}${path}`,
 	};
+}
+
+/** 签发相册直传凭证（向后兼容） */
+export function createUploadToken(
+	env: UpyunEnv,
+	albumId: string,
+	ext: string,
+): UploadToken {
+	return createUploadTokenFor(env, `/gallery/${albumId}`, ext);
 }

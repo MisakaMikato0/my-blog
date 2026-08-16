@@ -8,9 +8,10 @@ import FilterControls from "./FilterControls.astro";
 interface Props {
 	items: UserSubjectCollection[];
 	sectionId: "anime" | "book";
+	itemsPerPage?: number;
 }
 
-const { items, sectionId } = Astro.props;
+const { items, sectionId, itemsPerPage = 12 } = Astro.props;
 
 // bgm 收藏状态：1=想看 2=看过 3=在看 4=搁置 5=抛弃
 const statusMap: Record<number, string> = {
@@ -96,19 +97,410 @@ const filters = [
 		count: statusCounts.dropped || 0,
 	},
 ].filter((filter) => filter.value === "all" || filter.count > 0);
+
+const statusTexts = {
+	wish: i18n(
+		isBook ? I18nKey.bangumiStatusBookWish : I18nKey.bangumiStatusWish,
+	),
+	collect: i18n(
+		isBook ? I18nKey.bangumiStatusBookRead : I18nKey.bangumiStatusWatched,
+	),
+	doing: i18n(
+		isBook ? I18nKey.bangumiStatusBookReading : I18nKey.bangumiStatusWatching,
+	),
+	on_hold: i18n(I18nKey.bangumiStatusOnHold),
+	dropped: i18n(I18nKey.bangumiStatusDropped),
+	unknown: i18n(I18nKey.bangumiStatusUnknown),
+};
+
+const statusColors: Record<string, string> = {
+	wish: "bg-blue-500",
+	collect: "bg-green-500",
+	doing: "bg-yellow-500",
+	on_hold: "bg-orange-500",
+	dropped: "bg-red-500",
+};
+
+const paginationLabels = {
+	prev: i18n(I18nKey.bangumiPrevPage),
+	next: i18n(I18nKey.bangumiNextPage),
+};
+
+const cfg = {
+	sectionId,
+	itemsPerPage,
+	statusTexts,
+	statusColors,
+	paginationLabels,
+};
 ---
 
 <div class="bangumi-section" data-section={sectionId}>
 	<FilterControls filters={filters} activeFilter="all" sectionId={sectionId} />
-	<div class="bangumi-grid">
-		{sortedItems.map((item) => (
+	<div class="bangumi-grid" data-bangumi-grid>
+		{sortedItems.map((item, index) => (
 			<div
 				class="bangumi-item"
 				data-item-section={sectionId}
 				data-item-status={statusMap[item.type] || "unknown"}
+				data-item-index={index}
 			>
 				<BangumiCard item={item} />
 			</div>
 		))}
 	</div>
+	<nav
+		class="bangumi-pagination"
+		data-bangumi-pagination
+		aria-label={i18n(I18nKey.bangumi)}
+		hidden
+	></nav>
 </div>
+
+<script is:inline define:vars={{ cfg }}>
+	(function () {
+		var sectionId = cfg.sectionId;
+		var perPage = cfg.itemsPerPage;
+		var state = { filter: "all", page: 1 };
+
+		var statusOrder = {
+			doing: 0,
+			collect: 1,
+			wish: 2,
+			on_hold: 3,
+			dropped: 4,
+		};
+
+		var guard = "__bangumiGrid_" + sectionId;
+		if (window[guard]) return;
+		window[guard] = true;
+
+		var grid = document.querySelector(
+			'[data-section="' + sectionId + '"] [data-bangumi-grid]',
+		);
+		var pagination = document.querySelector(
+			'[data-section="' + sectionId + '"] [data-bangumi-pagination]',
+		);
+		if (!grid) return;
+
+		function escapeHtml(value) {
+			return String(value == null ? "" : value)
+				.replace(/&/g, "&amp;")
+				.replace(/</g, "&lt;")
+				.replace(/>/g, "&gt;")
+				.replace(/"/g, "&quot;")
+				.replace(/'/g, "&#39;");
+		}
+
+		function cardHtml(item) {
+			var subject = item.subject || {};
+			var name = subject.name_cn || subject.name || "";
+			var img = subject.images && subject.images.medium;
+			var year = subject.date ? String(subject.date).substring(0, 4) : "";
+			var score = subject.score > 0 ? subject.score : null;
+			var type = item.type || 0;
+			var statusKey = {
+				1: "wish",
+				2: "collect",
+				3: "doing",
+				4: "on_hold",
+				5: "dropped",
+			};
+			var status = statusKey[type] || "unknown";
+			var tags = (
+				item.tags && item.tags.length
+					? item.tags
+					: (subject.tags || []).map(function (t) {
+							return t.name;
+						})
+			).slice(0, 3);
+
+			return [
+				'<div class="bangumi-item" data-item-section="' +
+					sectionId +
+					'" data-item-status="' +
+					status +
+					'">',
+				'<a href="https://bgm.tv/subject/' +
+					subject.id +
+					'" target="_blank" rel="noopener noreferrer nofollow" class="group relative overflow-hidden rounded-xl border border-(--line-divider) bg-(--card-bg) block transition-all duration-300 hover:shadow-lg hover:border-(--primary)/30 hover:-translate-y-1">',
+				'<div class="aspect-[2/3] relative overflow-hidden">',
+				img
+					? '<img src="' +
+							escapeHtml(img) +
+							'" alt="' +
+							escapeHtml(name) +
+							'" class="w-full h-full object-cover pointer-events-none transition-transform duration-500 group-hover:scale-105" loading="lazy" decoding="async">'
+					: '<div class="w-full h-full bg-neutral-200 dark:bg-neutral-700 flex items-center justify-center"><div class="text-neutral-400 dark:text-neutral-500 text-4xl">' +
+							(subject.type === 1 ? "📖" : "🎬") +
+							"</div></div>",
+				'<div class="absolute top-2 left-2 px-2 py-1 rounded-full text-xs text-white font-medium ' +
+					(cfg.statusColors[status] || "bg-gray-500") +
+					'">' +
+					escapeHtml(cfg.statusTexts[status] || cfg.statusTexts.unknown) +
+					"</div>",
+				score
+					? '<div class="absolute top-2 right-2 px-2 py-1 rounded-full text-xs text-white font-medium bg-black/50 backdrop-blur-sm flex items-center gap-1"><span class="text-yellow-400">⭐</span>' +
+							score +
+							"</div>"
+					: "",
+				'<div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent"></div>',
+				'<div class="absolute bottom-0 left-0 right-0 p-3">',
+				'<h3 class="font-bold text-sm text-white line-clamp-2 drop-shadow-lg">' +
+					escapeHtml(name) +
+					"</h3>",
+				year
+					? '<p class="text-xs text-white/60 mt-1">' +
+							escapeHtml(year) +
+							"</p>"
+					: "",
+				item.comment
+					? '<p class="text-xs text-white/75 line-clamp-1 mt-1 leading-relaxed" title="' +
+							escapeHtml(item.comment) +
+							'">' +
+							escapeHtml(item.comment) +
+							"</p>"
+					: "",
+				tags.length
+					? '<div class="flex flex-wrap gap-1 mt-1.5">' +
+							tags
+								.map(function (tag) {
+									return '<span class="text-[0.6rem] px-1.5 py-0.5 rounded bg-white/20 text-white/90 backdrop-blur-sm">' +
+										escapeHtml(tag) +
+										"</span>";
+								})
+								.join("") +
+							"</div>"
+					: "",
+				"</div></div></a></div>",
+			].join("");
+		}
+
+		function collectItems() {
+			return Array.prototype.slice.call(
+				grid.querySelectorAll(".bangumi-item"),
+			);
+		}
+
+		function matchesFilter(item) {
+			return (
+				state.filter === "all" ||
+				item.getAttribute("data-item-status") === state.filter
+			);
+		}
+
+		function totalPages() {
+			var filtered = collectItems().filter(matchesFilter);
+			return Math.max(1, Math.ceil(filtered.length / perPage));
+		}
+
+		function generatePageNumbers(current, total) {
+			var range = [];
+			if (total <= 7) {
+				for (var i = 1; i <= total; i++) range.push(i);
+				return range;
+			}
+			var left = Math.max(2, current - 2);
+			var right = Math.min(total - 1, current + 2);
+			range.push(1);
+			if (left > 2) range.push("...");
+			for (var i = left; i <= right; i++) range.push(i);
+			if (right < total - 1) range.push("...");
+			if (total > 1) range.push(total);
+			return range;
+		}
+
+		function renderPagination(pages) {
+			if (!pagination) return;
+			if (pages <= 1) {
+				pagination.setAttribute("hidden", "");
+				pagination.innerHTML = "";
+				return;
+			}
+			pagination.removeAttribute("hidden");
+
+			var chevronLeft =
+				'<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M15.41 7.41 14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>';
+			var chevronRight =
+				'<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M10 6 8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg>';
+
+			var parts = [];
+			parts.push(
+				'<button type="button" class="bangumi-page-btn" data-section="' +
+					sectionId +
+					'" data-page="prev" aria-label="' +
+					escapeHtml(cfg.paginationLabels.prev) +
+					'"' +
+					(state.page === 1 ? " disabled" : "") +
+					">" +
+					chevronLeft +
+					"</button>",
+			);
+			generatePageNumbers(state.page, pages).forEach(function (num) {
+				if (num === "...") {
+					parts.push('<span class="bangumi-page-ellipsis">…</span>');
+					return;
+				}
+				var active = num === state.page;
+				parts.push(
+					'<button type="button" class="bangumi-page-btn' +
+						(active ? " bangumi-page-btn--active" : "") +
+						'" data-section="' +
+						sectionId +
+						'" data-page="' +
+						num +
+						'" aria-current="' +
+						(active ? "page" : "false") +
+						'">' +
+						num +
+						"</button>",
+				);
+			});
+			parts.push(
+				'<button type="button" class="bangumi-page-btn" data-section="' +
+					sectionId +
+					'" data-page="next" aria-label="' +
+					escapeHtml(cfg.paginationLabels.next) +
+					'"' +
+					(state.page === pages ? " disabled" : "") +
+					">" +
+					chevronRight +
+					"</button>",
+			);
+			pagination.innerHTML = parts.join("");
+		}
+
+		function updateFilterCounts() {
+			var counts = { all: 0 };
+			collectItems().forEach(function (item) {
+				var status = item.getAttribute("data-item-status");
+				counts.all++;
+				if (counts[status] === undefined) counts[status] = 0;
+				counts[status]++;
+			});
+			document
+				.querySelectorAll(
+					'[data-section="' + sectionId + '"][data-filter]',
+				)
+				.forEach(function (btn) {
+					var value = btn.getAttribute("data-filter");
+					var span = btn.querySelector("span");
+					if (span && counts[value] !== undefined) {
+						span.textContent = "(" + counts[value] + ")";
+					}
+				});
+		}
+
+		function updateFilterButtonStates() {
+			document
+				.querySelectorAll(
+					'[data-section="' + sectionId + '"][data-filter]',
+				)
+				.forEach(function (btn) {
+					var active = btn.getAttribute("data-filter") === state.filter;
+					btn.classList.toggle("bg-(--primary)", active);
+					btn.classList.toggle("text-white", active);
+					btn.classList.toggle("shadow-md", active);
+					btn.classList.toggle("bg-(--btn-regular-bg)", !active);
+					btn.classList.toggle("text-(--btn-content)", !active);
+					btn.classList.toggle("hover:bg-(--btn-regular-bg-hover)", !active);
+				});
+		}
+
+		function render() {
+			var items = collectItems();
+			var pages = totalPages();
+			if (state.page > pages) state.page = pages;
+
+			items.forEach(function (item) {
+				var index = parseInt(item.getAttribute("data-item-index"), 10);
+				var show =
+					matchesFilter(item) &&
+					Math.floor(index / perPage) === state.page - 1;
+				item.classList.toggle("hidden", !show);
+			});
+
+			updateFilterCounts();
+			renderPagination(pages);
+		}
+
+		function setFilter(filter) {
+			state.filter = filter;
+			state.page = 1;
+			updateFilterButtonStates();
+			render();
+		}
+
+		function rebuildGrid(items) {
+			var sorted = items.slice().sort(function (a, b) {
+				var statusKey = {
+					1: "wish",
+					2: "collect",
+					3: "doing",
+					4: "on_hold",
+					5: "dropped",
+				};
+				var oa = statusOrder[statusKey[a.type]];
+				var ob = statusOrder[statusKey[b.type]];
+				return (oa === undefined ? 5 : oa) - (ob === undefined ? 5 : ob);
+			});
+			grid.innerHTML = sorted
+				.map(function (item, index) {
+					return cardHtml(item).replace(
+						'class="bangumi-item"',
+						'class="bangumi-item" data-item-index="' + index + '"',
+					);
+				})
+				.join("");
+			state.filter = "all";
+			state.page = 1;
+			updateFilterButtonStates();
+			render();
+		}
+
+		document.addEventListener("click", function (e) {
+			var target = e.target;
+			if (!target || !target.closest) return;
+
+			var filterBtn = target.closest(
+				'[data-section="' + sectionId + '"][data-filter]',
+			);
+			if (filterBtn) {
+				setFilter(filterBtn.getAttribute("data-filter"));
+				return;
+			}
+
+			var pageBtn = target.closest(
+				'[data-section="' + sectionId + '"][data-page]',
+			);
+			if (pageBtn) {
+				var value = pageBtn.getAttribute("data-page");
+				if (value === "prev") {
+					if (state.page > 1) state.page--;
+				} else if (value === "next") {
+					if (state.page < totalPages()) state.page++;
+				} else {
+					state.page = parseInt(value, 10);
+				}
+				render();
+			}
+		});
+
+		document.addEventListener("bangumi:refreshed", function (e) {
+			var detail = e.detail;
+			if (detail && detail.sectionId === sectionId && Array.isArray(detail.items)) {
+				rebuildGrid(detail.items);
+			}
+		});
+
+		function init() {
+			render();
+		}
+		if (document.readyState === "loading") {
+			document.addEventListener("DOMContentLoaded", init);
+		} else {
+			init();
+		}
+		document.addEventListener("astro:page-load", init);
+	})();
+</script>

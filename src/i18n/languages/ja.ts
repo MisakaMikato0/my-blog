@@ -36,6 +36,9 @@ export const ja: Translation = {
 	[Key.tableOfContents]: "目次",
 	[Key.tocEmpty]: "このページには目次がありません",
 	[Key.music]: "音楽",
+	[Key.hobby]: "趣味",
+	[Key.books]: "本",
+	[Key.booksSubtitle]: "私の読書の旅を記録する",
 	[Key.musicNoPlaying]: "再生中なし",
 	[Key.musicLyrics]: "歌詞",
 	[Key.musicVolume]: "音量",
@@ -159,6 +162,10 @@ export const ja: Translation = {
 	[Key.bangumiLastUpdated]: "データ更新",
 	[Key.bangumiUpdatedAt]: "ビルド時間",
 	[Key.bangumiDataStatic]: "静的データ",
+	[Key.bangumiRefresh]: "更新",
+	[Key.bangumiRefreshing]: "更新中…",
+	[Key.bangumiRefreshSuccess]: "更新しました",
+	[Key.bangumiRefreshFailed]: "更新に失敗しました",
 
 	// ページネーション
 	[Key.paginationFirst]: "最初",

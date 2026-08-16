@@ -1,0 +1,356 @@
+---
+import Icon from "@components/common/Icon.astro";
+import { siteConfig } from "@/config";
+import I18nKey from "@/i18n/i18nKey";
+import { i18n } from "@/i18n/translation";
+
+interface Props {
+	sectionId: "anime" | "book";
+	subjectType: number;
+}
+
+const { sectionId, subjectType } = Astro.props;
+const userId = siteConfig.bangumi?.userId || "";
+const isBook = sectionId === "book";
+
+const cfg = {
+	userId,
+	subjectType,
+	sectionId,
+	labels: {
+		all: i18n(I18nKey.bangumiFilterAll),
+		doing: i18n(
+			isBook ? I18nKey.bangumiFilterBookReading : I18nKey.bangumiFilterWatching,
+		),
+		collect: i18n(
+			isBook ? I18nKey.bangumiFilterBookRead : I18nKey.bangumiFilterWatched,
+		),
+		wish: i18n(
+			isBook ? I18nKey.bangumiFilterBookWish : I18nKey.bangumiFilterWish,
+		),
+		on_hold: i18n(I18nKey.bangumiFilterOnHold),
+		dropped: i18n(I18nKey.bangumiFilterDropped),
+	},
+	statusTexts: {
+		1: i18n(isBook ? I18nKey.bangumiStatusBookWish : I18nKey.bangumiStatusWish),
+		2: i18n(
+			isBook ? I18nKey.bangumiStatusBookRead : I18nKey.bangumiStatusWatched,
+		),
+		3: i18n(
+			isBook ? I18nKey.bangumiStatusBookReading : I18nKey.bangumiStatusWatching,
+		),
+		4: i18n(I18nKey.bangumiStatusOnHold),
+		5: i18n(I18nKey.bangumiStatusDropped),
+		0: i18n(I18nKey.bangumiStatusUnknown),
+	},
+	texts: {
+		refresh: i18n(I18nKey.bangumiRefresh),
+		refreshing: i18n(I18nKey.bangumiRefreshing),
+		success: i18n(I18nKey.bangumiRefreshSuccess),
+		failed: i18n(I18nKey.bangumiRefreshFailed),
+		lastUpdated: i18n(I18nKey.bangumiLastUpdated),
+	},
+};
+---
+
+<button
+	type="button"
+	class="btn-card flex items-center rounded-(--radius-large) px-3 h-8 text-xs gap-1.5 shrink-0"
+	data-bangumi-refresh
+	data-section={sectionId}
+	title={cfg.texts.refresh}
+>
+	<span class="bangumi-refresh-icon" aria-hidden="true">
+		<Icon name="material-symbols:refresh" is:inline class="text-[1.1rem]" />
+	</span>
+	<span data-bangumi-refresh-label>{cfg.texts.refresh}</span>
+</button>
+
+<script is:inline define:vars={{ cfg }}>
+	(function () {
+		var sectionId = cfg.sectionId;
+		var API =
+			"https://api.bgm.tv/v0/users/" +
+			encodeURIComponent(cfg.userId) +
+			"/collections";
+
+		var statusKey = {
+			1: "wish",
+			2: "collect",
+			3: "doing",
+			4: "on_hold",
+			5: "dropped",
+		};
+		var statusColor = {
+			1: "bg-blue-500",
+			2: "bg-green-500",
+			3: "bg-yellow-500",
+			4: "bg-orange-500",
+			5: "bg-red-500",
+		};
+		var statusOrder = { doing: 0, collect: 1, wish: 2, on_hold: 3, dropped: 4 };
+
+		function escapeHtml(value) {
+			return String(value == null ? "" : value)
+				.replace(/&/g, "&amp;")
+				.replace(/</g, "&lt;")
+				.replace(/>/g, "&gt;")
+				.replace(/"/g, "&quot;")
+				.replace(/'/g, "&#39;");
+		}
+
+		function statusText(type) {
+			return cfg.statusTexts[type] || cfg.statusTexts[0];
+		}
+
+		function cardHtml(item) {
+			var subject = item.subject || {};
+			var name = subject.name_cn || subject.name || "";
+			var img = subject.images && subject.images.medium;
+			var year = subject.date
+				? String(subject.date).substring(0, 4)
+				: "";
+			var score = subject.score > 0 ? subject.score : null;
+			var type = item.type || 0;
+			var tags = (
+				item.tags && item.tags.length
+					? item.tags
+					: (subject.tags || []).map(function (t) {
+							return t.name;
+						})
+			).slice(0, 3);
+
+			return [
+				'<div class="bangumi-item" data-item-section="' +
+					sectionId +
+					'" data-item-status="' +
+					(statusKey[type] || "unknown") +
+					'">',
+				'<a href="https://bgm.tv/subject/' +
+					subject.id +
+					'" target="_blank" rel="noopener noreferrer nofollow" class="group relative overflow-hidden rounded-xl border border-(--line-divider) bg-(--card-bg) block transition-all duration-300 hover:shadow-lg hover:border-(--primary)/30 hover:-translate-y-1">',
+				'<div class="aspect-[2/3] relative overflow-hidden">',
+				img
+					? '<img src="' +
+							escapeHtml(img) +
+							'" alt="' +
+							escapeHtml(name) +
+							'" class="w-full h-full object-cover pointer-events-none transition-transform duration-500 group-hover:scale-105" loading="lazy" decoding="async">'
+					: '<div class="w-full h-full bg-neutral-200 dark:bg-neutral-700 flex items-center justify-center"><div class="text-neutral-400 dark:text-neutral-500 text-4xl">' +
+							(subject.type === 1 ? "📖" : "🎬") +
+							"</div></div>",
+				'<div class="absolute top-2 left-2 px-2 py-1 rounded-full text-xs text-white font-medium ' +
+					(statusColor[type] || "bg-gray-500") +
+					'">' +
+					escapeHtml(statusText(type)) +
+					"</div>",
+				score
+					? '<div class="absolute top-2 right-2 px-2 py-1 rounded-full text-xs text-white font-medium bg-black/50 backdrop-blur-sm flex items-center gap-1"><span class="text-yellow-400">⭐</span>' +
+							score +
+							"</div>"
+					: "",
+				'<div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent"></div>',
+				'<div class="absolute bottom-0 left-0 right-0 p-3">',
+				'<h3 class="font-bold text-sm text-white line-clamp-2 drop-shadow-lg">' +
+					escapeHtml(name) +
+					"</h3>",
+				year
+					? '<p class="text-xs text-white/60 mt-1">' +
+							escapeHtml(year) +
+							"</p>"
+					: "",
+				item.comment
+					? '<p class="text-xs text-white/75 line-clamp-1 mt-1 leading-relaxed" title="' +
+							escapeHtml(item.comment) +
+							'">' +
+							escapeHtml(item.comment) +
+							"</p>"
+					: "",
+				tags.length
+					? '<div class="flex flex-wrap gap-1 mt-1.5">' +
+							tags
+								.map(function (tag) {
+									return '<span class="text-[0.6rem] px-1.5 py-0.5 rounded bg-white/20 text-white/90 backdrop-blur-sm">' +
+										escapeHtml(tag) +
+										"</span>";
+								})
+								.join("") +
+							"</div>"
+					: "",
+				"</div></div></a></div>",
+			].join("");
+		}
+
+		function fetchJson(url, attempt) {
+			attempt = attempt || 0;
+			var controller = new AbortController();
+			var timer = setTimeout(function () {
+				controller.abort();
+			}, 15000);
+			return fetch(url, {
+				headers: {
+					"User-Agent": "YuuOuRou Blog",
+					Accept: "application/json",
+				},
+				signal: controller.signal,
+			})
+				.then(function (res) {
+					clearTimeout(timer);
+					if (res.ok) return res.json();
+					if (attempt < 3) {
+						return new Promise(function (resolve) {
+							setTimeout(resolve, 1000 * (attempt + 1));
+						}).then(function () {
+							return fetchJson(url, attempt + 1);
+						});
+					}
+					throw new Error("HTTP " + res.status);
+				})
+				.catch(function (err) {
+					clearTimeout(timer);
+					if (attempt < 3) {
+						return new Promise(function (resolve) {
+							setTimeout(resolve, 1000 * (attempt + 1));
+						}).then(function () {
+							return fetchJson(url, attempt + 1);
+						});
+					}
+					throw err;
+				});
+		}
+
+		function fetchAll() {
+			var limit = 50;
+			var offset = 0;
+			var all = [];
+			function next() {
+				var url =
+					API +
+					"?subject_type=" +
+					cfg.subjectType +
+					"&limit=" +
+					limit +
+					"&offset=" +
+					offset;
+				return fetchJson(url).then(function (data) {
+					var batch = (data && data.data) || [];
+					all = all.concat(batch);
+					offset += limit;
+					if (batch.length < limit) return all;
+					return next();
+				});
+			}
+			return next();
+		}
+
+		function sortItems(items) {
+			return items.slice().sort(function (a, b) {
+				var oa = statusOrder[statusKey[a.type]];
+				var ob = statusOrder[statusKey[b.type]];
+				return (oa === undefined ? 5 : oa) - (ob === undefined ? 5 : ob);
+			});
+		}
+
+		function renderGrid(items) {
+			var grid = document.querySelector(
+				'[data-section="' + sectionId + '"] .bangumi-grid',
+			);
+			if (!grid) return;
+			grid.innerHTML = items.map(cardHtml).join("");
+		}
+
+		function updateFilterCounts(items) {
+			var counts = {
+				all: items.length,
+				doing: 0,
+				collect: 0,
+				wish: 0,
+				on_hold: 0,
+				dropped: 0,
+			};
+			items.forEach(function (item) {
+				var key = statusKey[item.type];
+				if (counts[key] !== undefined) counts[key]++;
+			});
+			document
+				.querySelectorAll(
+					'[data-section="' + sectionId + '"][data-filter]',
+				)
+				.forEach(function (btn) {
+					var filter = btn.getAttribute("data-filter");
+					var span = btn.querySelector("span");
+					if (span && counts[filter] !== undefined) {
+						span.textContent = "(" + counts[filter] + ")";
+					}
+				});
+		}
+
+		function updateTimestamp() {
+			var el = document.querySelector("[data-bangumi-updated-at]");
+			if (!el) return;
+			var now = new Date();
+			el.textContent =
+				cfg.texts.lastUpdated +
+				" " +
+				now.toLocaleString("zh-CN", { hour12: false });
+		}
+
+		function setButtonState(state) {
+			var btn = document.querySelector(
+				'[data-bangumi-refresh][data-section="' + sectionId + '"]',
+			);
+			if (!btn) return;
+			var label = btn.querySelector("[data-bangumi-refresh-label]");
+			var icon = btn.querySelector(".bangumi-refresh-icon");
+			var isBusy = state === "loading";
+			btn.disabled = isBusy;
+			if (icon) icon.classList.toggle("animate-spin", isBusy);
+			if (!label) return;
+			label.textContent =
+				state === "loading"
+					? cfg.texts.refreshing
+					: state === "success"
+						? cfg.texts.success
+						: state === "failed"
+							? cfg.texts.failed
+							: cfg.texts.refresh;
+			if (state === "success" || state === "failed") {
+				clearTimeout(btn._bangumiResetTimer);
+				btn._bangumiResetTimer = setTimeout(function () {
+					setButtonState("idle");
+				}, state === "success" ? 2000 : 2500);
+			}
+		}
+
+		function init() {
+			var btn = document.querySelector(
+				'[data-bangumi-refresh][data-section="' + sectionId + '"]',
+			);
+			if (!btn) return;
+			if (btn.dataset.bound === "true") return;
+			btn.dataset.bound = "true";
+			btn.addEventListener("click", function () {
+				if (btn.disabled) return;
+				setButtonState("loading");
+				fetchAll()
+					.then(function (items) {
+						var sorted = sortItems(items);
+						renderGrid(sorted);
+						updateFilterCounts(sorted);
+						updateTimestamp();
+						setButtonState("success");
+					})
+					.catch(function () {
+						setButtonState("failed");
+					});
+			});
+		}
+
+		if (document.readyState === "loading") {
+			document.addEventListener("DOMContentLoaded", init);
+		} else {
+			init();
+		}
+		document.addEventListener("astro:page-load", init);
+	})();
+</script>

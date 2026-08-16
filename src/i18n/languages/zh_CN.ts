@@ -36,6 +36,9 @@ export const zh_CN: Translation = {
 	[Key.tableOfContents]: "目录",
 	[Key.tocEmpty]: "当前页面没有目录",
 	[Key.music]: "音乐",
+	[Key.hobby]: "爱好",
+	[Key.books]: "书籍",
+	[Key.booksSubtitle]: "记录我的阅读旅程",
 	[Key.musicNoPlaying]: "暂未播放",
 	[Key.musicLyrics]: "歌词",
 	[Key.musicVolume]: "音量",
@@ -97,7 +100,7 @@ export const zh_CN: Translation = {
 	[Key.updatedAt]: "更新于",
 	[Key.readTime]: "阅读时长",
 	[Key.license]: "许可协议",
-	[Key.bangumi]: "番组计划",
+	[Key.bangumi]: "追番",
 
 	// 番组计划筛选和状态文本
 	[Key.bangumiTitle]: "我的番组计划",
@@ -156,6 +159,10 @@ export const zh_CN: Translation = {
 	[Key.bangumiLastUpdated]: "数据更新于",
 	[Key.bangumiUpdatedAt]: "构建时间",
 	[Key.bangumiDataStatic]: "静态数据",
+	[Key.bangumiRefresh]: "刷新数据",
+	[Key.bangumiRefreshing]: "刷新中…",
+	[Key.bangumiRefreshSuccess]: "已更新",
+	[Key.bangumiRefreshFailed]: "刷新失败",
 
 	// 分页
 	[Key.paginationFirst]: "首页",

@@ -1,0 +1,114 @@
+---
+import I18nKey from "@/i18n/i18nKey";
+import { i18n } from "@/i18n/translation";
+import type { UserSubjectCollection } from "@/types/bangumi";
+import BangumiCard from "./BangumiCard.astro";
+import FilterControls from "./FilterControls.astro";
+
+interface Props {
+	items: UserSubjectCollection[];
+	sectionId: "anime" | "book";
+}
+
+const { items, sectionId } = Astro.props;
+
+// bgm 收藏状态：1=想看 2=看过 3=在看 4=搁置 5=抛弃
+const statusMap: Record<number, string> = {
+	1: "wish",
+	2: "collect",
+	3: "doing",
+	4: "on_hold",
+	5: "dropped",
+};
+
+// 默认排序：在看 → 看过 → 想看 → 搁置 → 抛弃
+const statusOrder: Record<string, number> = {
+	doing: 0,
+	collect: 1,
+	wish: 2,
+	on_hold: 3,
+	dropped: 4,
+};
+
+const sortedItems = [...items].sort((a, b) => {
+	const orderA = statusOrder[statusMap[a.type] ?? "unknown"] ?? 5;
+	const orderB = statusOrder[statusMap[b.type] ?? "unknown"] ?? 5;
+	return orderA - orderB;
+});
+
+const statusCounts = items.reduce(
+	(acc, item) => {
+		const status = statusMap[item.type] || "unknown";
+		acc[status] = (acc[status] || 0) + 1;
+		return acc;
+	},
+	{} as Record<string, number>,
+);
+
+const isBook = sectionId === "book";
+
+const getFilterLabel = (type: "collect" | "doing" | "wish") => {
+	if (isBook) {
+		switch (type) {
+			case "collect":
+				return i18n(I18nKey.bangumiFilterBookRead);
+			case "doing":
+				return i18n(I18nKey.bangumiFilterBookReading);
+			case "wish":
+				return i18n(I18nKey.bangumiFilterBookWish);
+		}
+	}
+	switch (type) {
+		case "collect":
+			return i18n(I18nKey.bangumiFilterWatched);
+		case "doing":
+			return i18n(I18nKey.bangumiFilterWatching);
+		case "wish":
+			return i18n(I18nKey.bangumiFilterWish);
+	}
+};
+
+const filters = [
+	{ value: "all", label: i18n(I18nKey.bangumiFilterAll), count: items.length },
+	{
+		value: "doing",
+		label: getFilterLabel("doing"),
+		count: statusCounts.doing || 0,
+	},
+	{
+		value: "collect",
+		label: getFilterLabel("collect"),
+		count: statusCounts.collect || 0,
+	},
+	{
+		value: "wish",
+		label: getFilterLabel("wish"),
+		count: statusCounts.wish || 0,
+	},
+	{
+		value: "on_hold",
+		label: i18n(I18nKey.bangumiFilterOnHold),
+		count: statusCounts.on_hold || 0,
+	},
+	{
+		value: "dropped",
+		label: i18n(I18nKey.bangumiFilterDropped),
+		count: statusCounts.dropped || 0,
+	},
+].filter((filter) => filter.value === "all" || filter.count > 0);
+---
+
+<div class="bangumi-section" data-section={sectionId}>
+	<FilterControls filters={filters} activeFilter="all" sectionId={sectionId} />
+	<div class="bangumi-grid">
+		{sortedItems.map((item) => (
+			<div
+				class="bangumi-item"
+				data-item-section={sectionId}
+				data-item-status={statusMap[item.type] || "unknown"}
+			>
+				<BangumiCard item={item} />
+			</div>
+		))}
+	</div>
+</div>

@@ -1,0 +1,118 @@
+---
+import I18nKey from "@/i18n/i18nKey";
+import { i18n } from "@/i18n/translation";
+import type { UserSubjectCollection } from "@/types/bangumi";
+
+interface Props {
+	item: UserSubjectCollection;
+}
+
+const { item } = Astro.props;
+const subjectBaseUrl = "https://bgm.tv/subject/";
+
+const getStatusColor = (type: number) => {
+	switch (type) {
+		case 1:
+			return "bg-blue-500";
+		case 2:
+			return "bg-green-500";
+		case 3:
+			return "bg-yellow-500";
+		case 4:
+			return "bg-orange-500";
+		case 5:
+			return "bg-red-500";
+		default:
+			return "bg-gray-500";
+	}
+};
+
+const getStatusText = (type: number) => {
+	const subjectType = item.subject.type;
+	switch (type) {
+		case 1:
+			if (subjectType === 1) return i18n(I18nKey.bangumiStatusBookWish);
+			return i18n(I18nKey.bangumiStatusWish);
+		case 2:
+			if (subjectType === 1) return i18n(I18nKey.bangumiStatusBookRead);
+			return i18n(I18nKey.bangumiStatusWatched);
+		case 3:
+			if (subjectType === 1) return i18n(I18nKey.bangumiStatusBookReading);
+			return i18n(I18nKey.bangumiStatusWatching);
+		case 4:
+			return i18n(I18nKey.bangumiStatusOnHold);
+		case 5:
+			return i18n(I18nKey.bangumiStatusDropped);
+		default:
+			return i18n(I18nKey.bangumiStatusUnknown);
+	}
+};
+
+const displayTags = (
+	item.tags?.length
+		? item.tags
+		: (item.subject.tags || []).map((tag) => tag.name)
+).slice(0, 3);
+---
+
+<a
+	href={`${subjectBaseUrl}${item.subject.id}`}
+	target="_blank"
+	rel="noopener noreferrer nofollow"
+	class="group relative overflow-hidden rounded-xl border border-(--line-divider) bg-(--card-bg) block transition-all duration-300 hover:shadow-lg hover:border-(--primary)/30 hover:-translate-y-1"
+>
+	<div class="aspect-[2/3] relative overflow-hidden">
+		{item.subject?.images?.medium ? (
+			<img
+				src={item.subject.images.medium}
+				alt={item.subject.name_cn || item.subject.name}
+				class="w-full h-full object-cover pointer-events-none transition-transform duration-500 group-hover:scale-105"
+				loading="lazy"
+				decoding="async"
+			/>
+		) : (
+			<div class="w-full h-full bg-neutral-200 dark:bg-neutral-700 flex items-center justify-center">
+				<div class="text-neutral-400 dark:text-neutral-500 text-4xl">
+					{item.subject.type === 1 ? "📖" : "🎬"}
+				</div>
+			</div>
+		)}
+
+		<div
+			class={`absolute top-2 left-2 px-2 py-1 rounded-full text-xs text-white font-medium ${getStatusColor(item.type)}`}
+		>
+			{getStatusText(item.type)}
+		</div>
+
+		{item.subject.score > 0 && (
+			<div class="absolute top-2 right-2 px-2 py-1 rounded-full text-xs text-white font-medium bg-black/50 backdrop-blur-sm flex items-center gap-1">
+				<span class="text-yellow-400">⭐</span>
+				{item.subject.score}
+			</div>
+		)}
+
+		<div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+		<div class="absolute bottom-0 left-0 right-0 p-3">
+			<h3 class="font-bold text-sm text-white line-clamp-2 drop-shadow-lg">
+				{item.subject.name_cn || item.subject.name}
+			</h3>
+			{item.subject.date && (
+				<p class="text-xs text-white/60 mt-1">{item.subject.date.substring(0, 4)}</p>
+			)}
+			{item.comment && (
+				<p class="text-xs text-white/75 line-clamp-1 mt-1 leading-relaxed" title={item.comment}>
+					{item.comment}
+				</p>
+			)}
+			{displayTags.length > 0 && (
+				<div class="flex flex-wrap gap-1 mt-1.5">
+					{displayTags.map((tag) => (
+						<span class="text-[0.6rem] px-1.5 py-0.5 rounded bg-white/20 text-white/90 backdrop-blur-sm">
+							{tag}
+						</span>
+					))}
+				</div>
+			)}
+		</div>
+	</div>
+</a>

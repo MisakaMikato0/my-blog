@@ -19,6 +19,9 @@ enum I18nKey {
 	tableOfContents = "tableOfContents",
 	tocEmpty = "tocEmpty",
 	music = "music",
+	hobby = "hobby",
+	books = "books",
+	booksSubtitle = "booksSubtitle",
 
 	// 公告栏
 	announcement = "announcement",
@@ -141,6 +144,10 @@ enum I18nKey {
 	bangumiLastUpdated = "bangumiLastUpdated",
 	bangumiUpdatedAt = "bangumiUpdatedAt",
 	bangumiDataStatic = "bangumiDataStatic",
+	bangumiRefresh = "bangumiRefresh",
+	bangumiRefreshing = "bangumiRefreshing",
+	bangumiRefreshSuccess = "bangumiRefreshSuccess",
+	bangumiRefreshFailed = "bangumiRefreshFailed",
 
 	// 分页
 	paginationFirst = "paginationFirst",

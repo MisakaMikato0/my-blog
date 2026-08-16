@@ -44,7 +44,22 @@ const buildNavBarConfig = (): NavBarConfig => {
 				}
 			: null;
 
-	// 3. 构建我的下拉菜单
+	// 3. 构建爱好下拉菜单
+	const hobbyChildren: (NavBarLink | LinkPreset)[] = [];
+	if (siteConfig.pages.bangumi) {
+		hobbyChildren.push(LinkPreset.Bangumi);
+	}
+	hobbyChildren.push(LinkPreset.Music);
+	if (siteConfig.pages.books) {
+		hobbyChildren.push(LinkPreset.Books);
+	}
+
+	const hobbyNav: NavBarLink = {
+		...LinkPresets[LinkPreset.Hobby],
+		children: hobbyChildren,
+	};
+
+	// 4. 构建我的下拉菜单
 	const myChildren: (NavBarLink | LinkPreset)[] = [];
 	if (siteConfig.pages.calendar) {
 		myChildren.push(LinkPreset.Calendar);
@@ -58,7 +73,6 @@ const buildNavBarConfig = (): NavBarConfig => {
 	if (siteConfig.pages.sponsor) {
 		myChildren.push(LinkPreset.Sponsor);
 	}
-	myChildren.push(LinkPreset.Music);
 	myChildren.push(LinkPreset.About);
 
 	const myNav: NavBarLink = {
@@ -66,12 +80,13 @@ const buildNavBarConfig = (): NavBarConfig => {
 		children: myChildren,
 	};
 
-	// 4. 统一组装导航栏链接（顺序：主页 → Touhou → 工具导航 → 文章 → 联系我 → 我的）
+	// 5. 统一组装导航栏链接（顺序：主页 → Touhou → 工具导航 → 文章 → 爱好 → 联系我 → 我的）
 	const links: (NavBarLink | LinkPreset)[] = [
 		LinkPreset.Home,
 		LinkPreset.Feibichi,
 		...(siteConfig.pages.collections ? [LinkPreset.Collections] : []),
 		postsNav,
+		hobbyNav,
 		...(contactNav ? [contactNav] : []),
 		myNav,
 	];

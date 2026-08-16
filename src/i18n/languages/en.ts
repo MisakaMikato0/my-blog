@@ -36,6 +36,9 @@ export const en: Translation = {
 	[Key.tableOfContents]: "Table of Contents",
 	[Key.tocEmpty]: "No table of contents on this page",
 	[Key.music]: "Music",
+	[Key.hobby]: "Hobby",
+	[Key.books]: "Books",
+	[Key.booksSubtitle]: "Record my reading journey",
 	[Key.musicNoPlaying]: "No playing",
 	[Key.musicLyrics]: "Lyrics",
 	[Key.musicVolume]: "Volume",
@@ -159,6 +162,10 @@ export const en: Translation = {
 	[Key.bangumiLastUpdated]: "Data updated at",
 	[Key.bangumiUpdatedAt]: "Build time",
 	[Key.bangumiDataStatic]: "Static data",
+	[Key.bangumiRefresh]: "Refresh",
+	[Key.bangumiRefreshing]: "Refreshing…",
+	[Key.bangumiRefreshSuccess]: "Updated",
+	[Key.bangumiRefreshFailed]: "Refresh failed",
 
 	// Pagination
 	[Key.paginationFirst]: "First",

@@ -1,0 +1,76 @@
+---
+import Icon from "@components/common/Icon.astro";
+import BangumiGrid from "@/components/pages/bangumi/BangumiGrid.astro";
+import BangumiRefreshButton from "@/components/pages/bangumi/BangumiRefreshButton.astro";
+import { siteConfig } from "@/config";
+import I18nKey from "@/i18n/i18nKey";
+import { i18n } from "@/i18n/translation";
+import MainGridLayout from "@/layouts/MainGridLayout.astro";
+import { fetchBangumiCollections } from "@/utils/bangumi";
+import { formatDateI18nWithTime } from "@/utils/date-utils";
+import "@/styles/pages/bangumi.css";
+
+// 检查页面是否启用
+if (!siteConfig.pages.books) {
+	return Astro.redirect("/404/");
+}
+
+// 构建时间作为数据更新时间
+const buildTime = formatDateI18nWithTime(new Date());
+
+// 构建时抓取 bgm 书籍收藏（subject_type=1）
+const bookItems = await fetchBangumiCollections(1);
+
+const isUserIdConfigured =
+	!!siteConfig.bangumi?.userId &&
+	siteConfig.bangumi.userId !== "you-user-id" &&
+	siteConfig.bangumi.userId.trim() !== "";
+---
+
+<MainGridLayout title={i18n(I18nKey.books)} description={i18n(I18nKey.booksSubtitle)}>
+	<div class="flex w-full rounded-(--radius-large) overflow-hidden relative min-h-32">
+		<div class="card-base z-10 px-9 py-6 relative w-full">
+			<!-- 页面标题 -->
+			<div class="relative w-full mb-8">
+				<div class="mb-6">
+					<div class="flex items-center gap-3 mb-3">
+						<Icon name="material-symbols:book-2-rounded" class="text-[1.875rem]"></Icon>
+						<div class="text-3xl font-bold text-neutral-900 dark:text-neutral-100">
+							{i18n(I18nKey.books)}
+						</div>
+					</div>
+					<p class="text-base text-neutral-600 dark:text-neutral-400 leading-relaxed">
+						{i18n(I18nKey.booksSubtitle)}
+					</p>
+					<div class="flex items-center gap-3 mt-2">
+						<p
+							class="text-xs text-neutral-500 dark:text-neutral-500"
+							data-bangumi-updated-at
+						>
+							{i18n(I18nKey.bangumiLastUpdated)} {buildTime}
+						</p>
+						<BangumiRefreshButton sectionId="book" subjectType={1} />
+					</div>
+				</div>
+			</div>
+
+			{bookItems.length > 0 ? (
+				<BangumiGrid items={bookItems} sectionId="book" />
+			) : (
+				<div class="text-center py-16">
+					<div class="inline-flex items-center justify-center w-16 h-16 bg-(--btn-regular-bg) rounded-full mb-6 border border-(--line-divider)">
+						<Icon name="material-symbols:book-2-rounded" class="text-[2rem] text-(--btn-content)" />
+					</div>
+					<h2 class="text-xl font-semibold text-black/80 dark:text-white/80 mb-3">
+						{isUserIdConfigured ? i18n(I18nKey.bangumiEmpty) : "未配置 Bangumi 用户ID"}
+					</h2>
+					<p class="text-black/60 dark:text-white/60 mb-4 max-w-md mx-auto">
+						{isUserIdConfigured
+							? i18n(I18nKey.bangumiEmptyReason)
+							: "请在 src/config/siteConfig.ts 中配置你的 Bangumi 用户ID"}
+					</p>
+				</div>
+			)}
+		</div>
+	</div>
+</MainGridLayout>

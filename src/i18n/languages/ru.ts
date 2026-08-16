@@ -36,6 +36,9 @@ export const ru: Translation = {
 	[Key.tableOfContents]: "Содержание",
 	[Key.tocEmpty]: "На этой странице нет оглавления",
 	[Key.music]: "Музыка",
+	[Key.hobby]: "Хобби",
+	[Key.books]: "Книги",
+	[Key.booksSubtitle]: "Записи о моём чтении",
 	[Key.musicNoPlaying]: "Ничего не воспроизводится",
 	[Key.musicLyrics]: "Текст песни",
 	[Key.musicVolume]: "Громкость",
@@ -159,6 +162,10 @@ export const ru: Translation = {
 	[Key.bangumiLastUpdated]: "Данные обновлены",
 	[Key.bangumiUpdatedAt]: "Время сборки",
 	[Key.bangumiDataStatic]: "Статические данные",
+	[Key.bangumiRefresh]: "Обновить",
+	[Key.bangumiRefreshing]: "Обновление…",
+	[Key.bangumiRefreshSuccess]: "Обновлено",
+	[Key.bangumiRefreshFailed]: "Не удалось обновить",
 
 	// Пагинация
 	[Key.paginationFirst]: "Первая",

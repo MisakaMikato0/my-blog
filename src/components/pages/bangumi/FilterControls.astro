@@ -1,0 +1,92 @@
+---
+interface Filter {
+	value: string;
+	label: string;
+	count?: number;
+}
+
+interface Props {
+	filters: Filter[];
+	activeFilter: string;
+	sectionId: string;
+}
+
+const { filters, activeFilter, sectionId } = Astro.props;
+---
+
+<div class="flex flex-wrap gap-1.5 mb-4">
+	{filters.map((filter) => (
+		<button
+			class:list={[
+				"px-3 py-1 rounded-full text-xs font-medium transition-all duration-200 cursor-pointer",
+				{
+					"bg-(--primary) text-white shadow-md": filter.value === activeFilter,
+					"bg-(--btn-regular-bg) text-(--btn-content) hover:bg-(--btn-regular-bg-hover)":
+						filter.value !== activeFilter,
+				},
+			]}
+			data-filter={filter.value}
+			data-section={sectionId}
+			type="button"
+		>
+			{filter.label}
+			{filter.count !== undefined && <span class="ml-1">({filter.count})</span>}
+		</button>
+	))}
+</div>
+
+<script is:inline define:vars={{ sectionId }}>
+	(function () {
+		function initFilterControls() {
+			const sectionButtons = document.querySelectorAll(
+				`[data-section="${sectionId}"][data-filter]`,
+			);
+			sectionButtons.forEach(function (button) {
+				if (button.dataset.bound === "true") return;
+				button.dataset.bound = "true";
+				button.addEventListener("click", function () {
+					const filter = this.dataset.filter;
+
+					sectionButtons.forEach(function (btn) {
+						btn.classList.remove(
+							"bg-(--primary)",
+							"text-white",
+							"shadow-md",
+						);
+						btn.classList.add(
+							"bg-(--btn-regular-bg)",
+							"text-(--btn-content)",
+							"hover:bg-(--btn-regular-bg-hover)",
+						);
+					});
+					this.classList.remove(
+						"bg-(--btn-regular-bg)",
+						"text-(--btn-content)",
+						"hover:bg-(--btn-regular-bg-hover)",
+					);
+					this.classList.add("bg-(--primary)", "text-white", "shadow-md");
+
+					document
+						.querySelectorAll(`[data-item-section="${sectionId}"]`)
+						.forEach(function (item) {
+							if (
+								filter === "all" ||
+								item.dataset.itemStatus === filter
+							) {
+								item.classList.remove("hidden");
+							} else {
+								item.classList.add("hidden");
+							}
+						});
+				});
+			});
+		}
+
+		if (document.readyState === "loading") {
+			document.addEventListener("DOMContentLoaded", initFilterControls);
+		} else {
+			initFilterControls();
+		}
+		document.addEventListener("astro:page-load", initFilterControls);
+	})();
+</script>

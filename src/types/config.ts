@@ -74,6 +74,8 @@ export type SiteConfig = {
 		collections: boolean; // 收藏API页面开关
 		calendar: boolean; // 日历页面开关
 		dynamic: boolean; // 动态页面开关
+		bangumi: boolean; // 追番页面开关
+		books: boolean; // 书籍页面开关
 	};
 
 	// 分类导航栏开关
@@ -198,6 +200,8 @@ export enum LinkPreset {
 	Music = 19,
 	WritePost = 20,
 	Dynamic = 21,
+	Hobby = 22,
+	Books = 23,
 }
 
 export type NavBarLink = {

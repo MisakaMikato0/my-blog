@@ -115,4 +115,14 @@ export const LinkPresets: { [key in LinkPreset]: NavBarLink } = {
 		url: "/dynamic/",
 		icon: "material-symbols:dynamic-feed",
 	},
+	[LinkPreset.Hobby]: {
+		name: i18n(I18nKey.hobby),
+		url: "/hobby/",
+		icon: "material-symbols:favorite",
+	},
+	[LinkPreset.Books]: {
+		name: i18n(I18nKey.books),
+		url: "/books/",
+		icon: "material-symbols:book-2-rounded",
+	},
 };

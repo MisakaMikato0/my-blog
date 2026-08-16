@@ -163,6 +163,18 @@ export const siteConfig: SiteConfig = {
 		calendar: true,
 		// 动态页面开关
 		dynamic: true,
+		// 追番页面开关
+		bangumi: true,
+		// 书籍页面开关
+		books: true,
+	},
+
+	// bangumi配置
+	bangumi: {
+		// Bangumi用户名或用户ID
+		userId: "yuyuko123",
+		// 条目类型排序顺序（暂只展示动画与书籍）
+		categoryOrder: ["anime", "book"],
 	},
 
 	// 分类导航栏开关，在首页和归档页顶部显示分类快捷导航

@@ -1,0 +1,15 @@
+/* ============================================
+   追番 / 书籍页面 — 卡片网格布局
+   ============================================ */
+
+.bangumi-grid {
+	display: grid;
+	grid-template-columns: repeat(2, 1fr);
+	gap: 0.75rem;
+}
+
+@media (min-width: 640px) {
+	.bangumi-grid {
+		grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+	}
+}

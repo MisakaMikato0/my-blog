@@ -1,9 +1,10 @@
 <script lang="ts">
+import type { Fancybox as FancyboxApi } from "@fancyapps/ui";
 import I18nKey from "@i18n/i18nKey";
 import { i18n } from "@i18n/translation";
 import dayjs from "dayjs";
 import Icon from "@/components/common/Icon.svelte";
-import { dynamicConfig, siteConfig } from "@/config";
+import { dynamicConfig } from "@/config";
 import { url } from "@/utils/url-utils";
 
 interface FeedImage {
@@ -25,6 +26,7 @@ let loading = $state(true);
 let error = $state(false);
 let year = $state("all");
 let visibleCount = $state(dynamicConfig.itemsPerPage);
+let Fancybox: typeof FancyboxApi | undefined;
 
 const years = $derived(
 	[...new Set(items.map((i) => dayjs(i.published).year()))].sort(
@@ -66,6 +68,21 @@ function loadMore() {
 	visibleCount += dynamicConfig.itemsPerPage;
 }
 
+async function openLightbox(item: FeedItem, startIndex: number) {
+	if (!Fancybox) {
+		const mod = await import("@fancyapps/ui");
+		Fancybox = mod.Fancybox;
+	}
+	Fancybox.show(
+		item.images.map((img) => ({
+			src: img.src,
+			type: "image",
+			caption: img.alt,
+		})),
+		{ startIndex },
+	);
+}
+
 $effect(() => {
 	void load();
 });
@@ -102,12 +119,17 @@ $effect(() => {
 			{#each visibleItems as item (item.id)}
 				<article class="dynamic-entry card-base">
 					<header class="dynamic-entry__header">
-						<a href={url(dynamicConfig.profileUrl)} class="dynamic-avatar" aria-label={siteConfig.navbar.title}>
-							<Icon name="material-symbols:person-rounded" />
+						<a href={url(dynamicConfig.profileUrl)} class="dynamic-avatar" aria-label={dynamicConfig.name}>
+							<img
+								src={dynamicConfig.avatar}
+								alt={dynamicConfig.name}
+								width="48"
+								height="48"
+							/>
 						</a>
 						<div class="dynamic-entry__meta">
 							<a href={url(dynamicConfig.profileUrl)} class="dynamic-entry__name">
-								{siteConfig.navbar.title}
+								{dynamicConfig.name}
 							</a>
 							<time class="dynamic-entry__time" datetime={new Date(item.published).toISOString()}>
 								{formatTime(item.published)}
@@ -126,11 +148,11 @@ $effect(() => {
 					{#if item.images.length > 0}
 						<div class="dynamic-gallery" data-count={Math.min(item.images.length, 6)}>
 							{#each item.images.slice(0, 6) as img, idx (img.src)}
-								<a
-									href={img.src}
-									data-fancybox={`dynamic-${item.id}`}
-									data-caption={img.alt}
+								<button
+									type="button"
 									class="dynamic-gallery__item"
+									aria-label={img.alt || `image ${idx + 1}`}
+									onclick={() => openLightbox(item, idx)}
 								>
 									<img
 										src={img.src}
@@ -141,7 +163,7 @@ $effect(() => {
 									{#if item.images.length > 6 && idx === 5}
 										<span class="dynamic-gallery__more">+{item.images.length - 6}</span>
 									{/if}
-								</a>
+								</button>
 							{/each}
 						</div>
 					{/if}

@@ -920,6 +920,8 @@ export type DynamicConfig = {
 	title: string; // 页面标题，留空则使用 i18n 翻译
 	description: string; // 页面描述，留空则使用 i18n 翻译
 	profileUrl: string; // 动态头像和名称的跳转地址
+	name: string; // 发布人名称
+	avatar: string; // 发布人头像（public 下路径，如 /assets/images/user.webp）
 	itemsPerPage: number; // 每页显示的动态数量
 	apiUrl: string; // 动态数据接口地址（Worker 运行时返回）
 };

@@ -11,6 +11,12 @@ export const dynamicConfig: DynamicConfig = {
 	// 动态头像和名称的跳转地址
 	profileUrl: "/about/",
 
+	// 发布人名称
+	name: "幽幽子",
+
+	// 发布人头像（public 目录下的路径）
+	avatar: "/assets/images/user.webp",
+
 	// 每页显示的动态数量
 	itemsPerPage: 20,
 

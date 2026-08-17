@@ -409,15 +409,22 @@ const cfg = {
 
 		function render() {
 			var items = collectItems();
-			var pages = totalPages();
+			// 先按当前筛选过滤，再在过滤后的列表上分页。
+			// 不能用全局 data-item-index 直接分页，否则筛选后每页数量会错。
+			var filtered = items.filter(matchesFilter);
+			var pages = Math.max(1, Math.ceil(filtered.length / perPage));
 			if (state.page > pages) state.page = pages;
 
+			var start = (state.page - 1) * perPage;
+			var end = start + perPage;
+			var visibleSet = {};
+			filtered.slice(start, end).forEach(function (item) {
+				visibleSet[item.getAttribute("data-item-index")] = true;
+			});
+
 			items.forEach(function (item) {
-				var index = parseInt(item.getAttribute("data-item-index"), 10);
-				var show =
-					matchesFilter(item) &&
-					Math.floor(index / perPage) === state.page - 1;
-				item.classList.toggle("hidden", !show);
+				var key = item.getAttribute("data-item-index");
+				item.classList.toggle("hidden", !visibleSet[key]);
 			});
 
 			updateFilterCounts();

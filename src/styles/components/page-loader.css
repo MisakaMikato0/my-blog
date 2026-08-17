@@ -54,7 +54,7 @@
 	z-index: 1;
 	width: var(--page-loader-size);
 	height: auto;
-	aspect-ratio: 480 / 270;
+	aspect-ratio: 560 / 560;
 	filter: none;
 }
 

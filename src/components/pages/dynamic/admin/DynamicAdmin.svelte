@@ -676,6 +676,11 @@ function excerpt(markdown: string, max = 80): string {
 {/if}
 
 <style>
+	/* 动态管理页无侧边栏，覆盖相册后台的双栏布局为单栏全宽 */
+	.admin-body {
+		grid-template-columns: 1fr;
+	}
+
 	.dynamic-form__title {
 		font-size: 1.05rem;
 		font-weight: 600;

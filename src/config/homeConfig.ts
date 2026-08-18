@@ -54,10 +54,9 @@ export const homeConfig: HomeConfig = {
 	},
 
 	dataLayer: {
-		visitImage: "/assets/images/home/home-data-1.webp",
-		archiveImage: "/assets/images/home/home-data-2.webp",
-		contactImage: "/assets/images/home/home-data-3.webp",
-		skillsImage: "/assets/images/home/home-data-4.webp",
+		visitImage: "/assets/images/home/home-data-1.avif",
+		archiveImage: "/assets/images/home/home-data-2.avif",
+		contactImage: "/assets/images/home/home-data-3.avif",
 	},
 
 	// 展示层：垂直线 → 长柱 → 字体显隐 → 柱子扩全屏 → 衔接百叶窗

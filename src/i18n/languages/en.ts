@@ -37,7 +37,16 @@ export const en: Translation = {
 	[Key.tocEmpty]: "No table of contents on this page",
 	[Key.music]: "Music",
 	[Key.techBlogSuffix]: "'s Tech Blog",
-	[Key.hobby]: "Hobby",
+
+	[Key.pinnedPosts]: "Pinned Posts",
+	[Key.latestUpdates]: "Latest Updates",
+	[Key.noPinnedContent]: "No pinned content yet",
+	[Key.contactMethods]: "Contact",
+	[Key.viewsBrowseLabel]: "Views",
+
+	[Key.siteData]: "Site Data",
+	[Key.noPosts]: "No posts yet",
+	[Key.noPostsHint]: "New content will appear here.",	[Key.hobby]: "Hobby",
 	[Key.books]: "Books",
 	[Key.booksSubtitle]: "Record my reading journey",
 	[Key.musicNoPlaying]: "No playing",

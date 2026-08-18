@@ -37,7 +37,16 @@ export const ja: Translation = {
 	[Key.tocEmpty]: "このページには目次がありません",
 	[Key.music]: "音楽",
 	[Key.techBlogSuffix]: "の技術ブログ",
-	[Key.hobby]: "趣味",
+
+	[Key.pinnedPosts]: "ピン留め記事",
+	[Key.latestUpdates]: "最新の更新",
+	[Key.noPinnedContent]: "ピン留めコンテンツはありません",
+	[Key.contactMethods]: "主な連絡先",
+	[Key.viewsBrowseLabel]: "閲覧",
+
+	[Key.siteData]: "サイトデータ",
+	[Key.noPosts]: "記事はまだありません",
+	[Key.noPostsHint]: "新しいコンテンツがここに表示されます。",	[Key.hobby]: "趣味",
 	[Key.books]: "本",
 	[Key.booksSubtitle]: "私の読書の旅を記録する",
 	[Key.musicNoPlaying]: "再生中なし",

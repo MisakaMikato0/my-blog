@@ -464,6 +464,14 @@ enum I18nKey {
 	dynamicUploadSuccess = "dynamicUploadSuccess",
 	dynamicUploadFail = "dynamicUploadFail",
 	techBlogSuffix = "techBlogSuffix",
+	pinnedPosts = "pinnedPosts",
+	latestUpdates = "latestUpdates",
+	noPinnedContent = "noPinnedContent",
+	contactMethods = "contactMethods",
+	viewsBrowseLabel = "viewsBrowseLabel",
+	siteData = "siteData",
+	noPosts = "noPosts",
+	noPostsHint = "noPostsHint",
 }
 
 export default I18nKey;

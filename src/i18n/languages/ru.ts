@@ -37,7 +37,16 @@ export const ru: Translation = {
 	[Key.tocEmpty]: "На этой странице нет оглавления",
 	[Key.music]: "Музыка",
 	[Key.techBlogSuffix]: " — техноблог",
-	[Key.hobby]: "Хобби",
+
+	[Key.pinnedPosts]: "Закреплённые статьи",
+	[Key.latestUpdates]: "Последние обновления",
+	[Key.noPinnedContent]: "Нет закреплённого контента",
+	[Key.contactMethods]: "Контакты",
+	[Key.viewsBrowseLabel]: "Просмотры",
+
+	[Key.siteData]: "Данные сайта",
+	[Key.noPosts]: "Статей пока нет",
+	[Key.noPostsHint]: "Новый контент появится здесь.",	[Key.hobby]: "Хобби",
 	[Key.books]: "Книги",
 	[Key.booksSubtitle]: "Записи о моём чтении",
 	[Key.musicNoPlaying]: "Ничего не воспроизводится",

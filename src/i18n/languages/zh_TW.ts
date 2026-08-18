@@ -37,7 +37,16 @@ export const zh_TW: Translation = {
 	[Key.tocEmpty]: "目前頁面沒有目錄",
 	[Key.music]: "音樂",
 	[Key.techBlogSuffix]: "的技術部落格",
-	[Key.hobby]: "愛好",
+
+	[Key.pinnedPosts]: "置頂文章",
+	[Key.latestUpdates]: "最新更新",
+	[Key.noPinnedContent]: "暫無置頂內容",
+	[Key.contactMethods]: "常用聯絡方式",
+	[Key.viewsBrowseLabel]: "瀏覽",
+
+	[Key.siteData]: "網站資料",
+	[Key.noPosts]: "暫無文章內容",
+	[Key.noPostsHint]: "新的內容會顯示在這裡。",	[Key.hobby]: "愛好",
 	[Key.books]: "書籍",
 	[Key.booksSubtitle]: "記錄我的閱讀旅程",
 	[Key.musicNoPlaying]: "暫未播放",

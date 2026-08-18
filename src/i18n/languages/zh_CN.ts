@@ -37,7 +37,16 @@ export const zh_CN: Translation = {
 	[Key.tocEmpty]: "当前页面没有目录",
 	[Key.music]: "音乐",
 	[Key.techBlogSuffix]: "的技术博客",
-	[Key.hobby]: "爱好",
+
+	[Key.pinnedPosts]: "置顶文章",
+	[Key.latestUpdates]: "最新更新",
+	[Key.noPinnedContent]: "暂无置顶内容",
+	[Key.contactMethods]: "常用联系方式",
+	[Key.viewsBrowseLabel]: "浏览",
+
+	[Key.siteData]: "站点数据",
+	[Key.noPosts]: "暂无文章内容",
+	[Key.noPostsHint]: "新的内容会显示在这里。",	[Key.hobby]: "爱好",
 	[Key.books]: "书籍",
 	[Key.booksSubtitle]: "记录我的阅读旅程",
 	[Key.musicNoPlaying]: "暂未播放",

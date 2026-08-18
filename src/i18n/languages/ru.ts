@@ -46,7 +46,8 @@ export const ru: Translation = {
 
 	[Key.siteData]: "Данные сайта",
 	[Key.noPosts]: "Статей пока нет",
-	[Key.noPostsHint]: "Новый контент появится здесь.",	[Key.hobby]: "Хобби",
+	[Key.noPostsHint]: "Новый контент появится здесь.",
+	[Key.hobby]: "Хобби",
 	[Key.books]: "Книги",
 	[Key.booksSubtitle]: "Записи о моём чтении",
 	[Key.musicNoPlaying]: "Ничего не воспроизводится",

@@ -290,8 +290,9 @@ export function createFlyText(
 		return timeline;
 	};
 
-	// 第二层签名的“字雨”入场：字符从视口右上角级联下落（随 scrub 时间线可逆），
-	// 下落用 power1.in 加速，落定前轻微回弹，最终回到自然居中位置。
+	// 第二层台词的花瓣式入场：字符从视口右上角外出发，沿斜线向左下方飘落
+	// （横向 power2.inOut 减速、纵向 power1.in 加速，形成弧线），带克制旋转与
+	// 轻微漂移，像樱花瓣被风吹入画面；随 scrub 时间线可逆，落定回自然居中位置。
 	const buildRainEntrance = (windowDuration = 0.8) => {
 		if (!chars.length) return null;
 		const timeline = gsap.timeline();
@@ -307,13 +308,15 @@ export function createFlyText(
 			const charLeft = Number.parseFloat(char.element.style.left) || 0;
 			const charTop = Number.parseFloat(char.element.style.top) || 0;
 			const startX =
-				(viewportWidth - hostRect.left - charLeft) * (0.82 + random() * 0.3);
+				(viewportWidth - hostRect.left - charLeft) * (0.9 + random() * 0.2);
 			const startY = -(
 				hostRect.top +
 				charTop +
-				viewportHeight * (0.06 + random() * 0.22)
+				viewportHeight * (0.04 + random() * 0.18)
 			);
-			const rotation = (random() - 0.5) * 26;
+			// 克制旋转 ±15° + 水平漂移（花瓣被风吹的摆动）
+			const rotation = (random() - 0.5) * 30;
+			const drift = (random() - 0.5) * 46;
 			const fallDuration = windowDuration * char.durationFraction * 0.82;
 			const start = char.startFraction * staggerWindow;
 
@@ -325,23 +328,57 @@ export function createFlyText(
 				opacity: 0,
 				transformPerspective: 500,
 			});
+			// 横向：从右上外向左下飘（先快后慢，弧线感）
 			timeline.fromTo(
 				char.element,
-				{ x: startX, y: startY, rotation, opacity: 0 },
+				{ x: startX },
 				{
-					x: 0,
+					x: drift,
+					duration: fallDuration * 0.9,
+					ease: "power2.inOut",
+					immediateRender: false,
+				},
+				start,
+			);
+			// 纵向：下落加速（power1.in）
+			timeline.fromTo(
+				char.element,
+				{ y: startY },
+				{
 					y: 7,
-					rotation: 0,
-					opacity: 1,
 					duration: fallDuration,
 					ease: "power1.in",
 					immediateRender: false,
 				},
 				start,
 			);
+			// 旋转回正（花瓣落定前轻微摆动）
+			timeline.fromTo(
+				char.element,
+				{ rotation },
+				{
+					rotation: 0,
+					duration: fallDuration * 0.85,
+					ease: "power2.out",
+					immediateRender: false,
+				},
+				start,
+			);
+			// 淡入
+			timeline.fromTo(
+				char.element,
+				{ opacity: 0 },
+				{
+					opacity: 1,
+					duration: fallDuration * 0.45,
+					ease: "power1.out",
+					immediateRender: false,
+				},
+				start,
+			);
 			timeline.to(
 				char.element,
-				{ y: 0, duration: 0.16, ease: "back.out(1.8)" },
+				{ x: 0, y: 0, duration: 0.18, ease: "back.out(1.8)" },
 				start + fallDuration,
 			);
 		}

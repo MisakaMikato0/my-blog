@@ -46,7 +46,8 @@ export const en: Translation = {
 
 	[Key.siteData]: "Site Data",
 	[Key.noPosts]: "No posts yet",
-	[Key.noPostsHint]: "New content will appear here.",	[Key.hobby]: "Hobby",
+	[Key.noPostsHint]: "New content will appear here.",
+	[Key.hobby]: "Hobby",
 	[Key.books]: "Books",
 	[Key.booksSubtitle]: "Record my reading journey",
 	[Key.musicNoPlaying]: "No playing",

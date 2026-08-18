@@ -30,10 +30,10 @@ export const homeConfig: HomeConfig = {
 			idleInterval: 900,
 			seed: 20260814,
 			scrub: 0.45,
-			desktopScrollDistance: 6500,
-			mobileScrollDistance: 4600,
-			desktopMinViewports: 8.1,
-			mobileMinViewports: 6.1,
+			desktopScrollDistance: 3500,
+			mobileScrollDistance: 2400,
+			desktopMinViewports: 4,
+			mobileMinViewports: 3,
 			interactionHold: 0.17,
 		},
 		contact: {
@@ -42,7 +42,7 @@ export const homeConfig: HomeConfig = {
 		},
 		// 第二层居中落款：随滚动从右上角逐字如雨下落
 		signature: {
-			text: "且视他人之疑目如盏盏鬼火，大胆地去走你的夜路",
+			text: "当然，是特别的樱花瓣啦。因为播撒这些的话就能让幻想乡当中充满春了。",
 		},
 		// 玻璃雨珠 + 撞击水花（移动端自动降低密度，尊重 prefers-reduced-motion）
 		rain: {

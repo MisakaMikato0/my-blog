@@ -46,7 +46,8 @@ export const zh_CN: Translation = {
 
 	[Key.siteData]: "站点数据",
 	[Key.noPosts]: "暂无文章内容",
-	[Key.noPostsHint]: "新的内容会显示在这里。",	[Key.hobby]: "爱好",
+	[Key.noPostsHint]: "新的内容会显示在这里。",
+	[Key.hobby]: "爱好",
 	[Key.books]: "书籍",
 	[Key.booksSubtitle]: "记录我的阅读旅程",
 	[Key.musicNoPlaying]: "暂未播放",

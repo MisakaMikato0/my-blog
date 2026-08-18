@@ -264,7 +264,7 @@ if (!isHome) {
 				) : item.isCurrent ? (
 					<span class="cb__current">
 						<span class="cb__icon" set:html={getIconSvg(item.icon)} />
-						<span>{item.label}</span>
+						<span data-breadcrumb-current-label>{item.label}</span>
 					</span>
 				) : (
 					<a href={item.href} class="cb__link">

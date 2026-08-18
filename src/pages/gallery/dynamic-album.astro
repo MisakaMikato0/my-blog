@@ -1,5 +1,7 @@
 ---
 import DynamicAlbumViewer from "@/components/pages/gallery/DynamicAlbumViewer.svelte";
+import I18nKey from "@/i18n/i18nKey";
+import { i18n } from "@/i18n/translation";
 import MainGridLayout from "@/layouts/MainGridLayout.astro";
 import "@/styles/pages/gallery.css";
 import "@/styles/pages/gallery-admin.css";
@@ -7,8 +9,9 @@ import "@/styles/pages/gallery-admin.css";
 // 动态相册的客户端渲染壳：
 // _worker.ts 会把构建时不存在的 /gallery/{id}/ 请求转发到本页面，
 // URL 保持不变，本组件从路径中解析相册 ID 并从又拍云索引渲染。
+// 服务端拿不到相册名，默认显示 i18n 的"相册"；DynamicAlbumViewer 加载后更新为真实相册名。
 ---
 
-<MainGridLayout title="Album">
+<MainGridLayout title={i18n(I18nKey.gallery)}>
 	<DynamicAlbumViewer client:only="svelte" />
 </MainGridLayout>

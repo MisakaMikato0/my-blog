@@ -56,10 +56,32 @@ onMount(async () => {
 				url: `${cdnBase}${p.path}`,
 			})),
 		};
+		syncPageMeta(found.name);
 	} catch {
 		error = true;
 	}
 });
+
+/**
+ * 客户端拿到相册名后，同步页面标题与面包屑。
+ * 壳页面 (dynamic-album.astro) 在服务端只知道"相册"，无法预知真实相册名。
+ */
+function syncPageMeta(name: string): void {
+	// 浏览器标签页标题：保留站点名后缀，与 Layout.astro 的 `${title} - ${siteConfig.title}` 一致
+	const sep = " - ";
+	const idx = document.title.lastIndexOf(sep);
+	document.title = idx >= 0 ? `${name}${document.title.slice(idx)}` : name;
+
+	// 面包屑当前项
+	const crumb = document.querySelector<HTMLElement>(
+		"[data-breadcrumb-current-label]",
+	);
+	if (crumb) crumb.textContent = name;
+
+	// 屏幕阅读器 h1
+	const h1 = document.querySelector<HTMLElement>("h1.sr-only");
+	if (h1) h1.textContent = name;
+}
 
 const coverUrl = $derived(
 	album

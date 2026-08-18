@@ -49,7 +49,7 @@ export const homeConfig: HomeConfig = {
 			enabled: true,
 			intensity: 0.6,
 			// 留空则随主题自动取色（暗色→白 / 浅色→深灰）；也可填 "#7fb0ff" 或 "127,176,255"
-			color: "#ffffff",
+			color: "#ffb3c6",
 		},
 	},
 

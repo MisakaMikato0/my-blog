@@ -7,10 +7,18 @@ type RainConfig = {
 type RainDrop = {
 	x: number;
 	y: number;
-	length: number;
 	speed: number;
-	width: number;
 	alpha: number;
+	/** 花瓣大小（px） */
+	size: number;
+	/** 花瓣旋转角（弧度） */
+	rotation: number;
+	/** 旋转速度（弧度/帧） */
+	rotationSpeed: number;
+	/** 水平摆动相位 */
+	swayPhase: number;
+	/** 水平摆动幅度（px） */
+	swayAmplitude: number;
 };
 
 type SplashParticle = {
@@ -40,11 +48,41 @@ function createDrop(width: number, height: number, initial = false): RainDrop {
 	return {
 		x: Math.random() * width,
 		y: initial ? Math.random() * height : -40 - Math.random() * height * 0.3,
-		length: 14 + Math.random() * 34,
-		speed: 5 + Math.random() * 8,
-		width: 0.55 + Math.random() * 0.8,
-		alpha: 0.14 + Math.random() * 0.34,
+		speed: 2.2 + Math.random() * 3.4,
+		alpha: 0.4 + Math.random() * 0.45,
+		size: 7 + Math.random() * 9,
+		rotation: Math.random() * Math.PI * 2,
+		rotationSpeed: (Math.random() - 0.5) * 0.12,
+		swayPhase: Math.random() * Math.PI * 2,
+		swayAmplitude: 14 + Math.random() * 26,
 	};
+}
+
+/** 用贝塞尔曲线绘制一片樱花花瓣（五瓣之一），已旋转到当前角度。 */
+function drawPetal(
+	context: CanvasRenderingContext2D,
+	size: number,
+	rotation: number,
+) {
+	context.save();
+	context.rotate(rotation);
+	// 花瓣：从原点出发，两段三次贝塞尔拼成一片花瓣形状（尖底 + 圆润瓣尖）
+	const w = size;
+	const h = size * 1.35;
+	context.beginPath();
+	context.moveTo(0, h * 0.45);
+	context.bezierCurveTo(
+		-w * 0.55,
+		-h * 0.05,
+		-w * 0.28,
+		-h * 0.85,
+		0,
+		-h * 0.95,
+	);
+	context.bezierCurveTo(w * 0.28, -h * 0.85, w * 0.55, -h * 0.05, 0, h * 0.45);
+	context.closePath();
+	context.fill();
+	context.restore();
 }
 
 function createSplash(x: number, y: number): SplashParticle {
@@ -90,45 +128,9 @@ export function initHomeHeroRain(
 	}
 
 	function collectHitEdges() {
-		const heroBounds = hero.getBoundingClientRect();
 		hitEdges = [
 			{ x1: 0, x2: width, y: Math.max(0, height - 1), captureRate: 1 },
 		];
-		const dialogue = hero.querySelector<HTMLElement>("[data-hero-dialogue]");
-		const dialogueBox = dialogue?.querySelector<HTMLElement>(
-			"[data-dialogue-box]",
-		);
-		if (
-			!dialogue ||
-			!dialogueBox ||
-			dialogue.dataset.sceneVisible !== "true" ||
-			dialogue.dataset.hidden === "true"
-		) {
-			return;
-		}
-		const bounds = dialogueBox.getBoundingClientRect();
-		const x1 = Math.max(0, bounds.left - heroBounds.left);
-		const x2 = Math.min(width, bounds.right - heroBounds.left);
-		const top = Math.max(0, Math.min(height, bounds.top - heroBounds.top));
-		const boxWidth = x2 - x1;
-		const boxHeight = bounds.height;
-		if (boxWidth <= 0 || top <= 0 || top >= height) return;
-
-		const dialogueEdges: HitEdge[] = [
-			{
-				x1,
-				x2: x1 + boxWidth * 0.25,
-				y: top,
-				captureRate: 0.62,
-			},
-			{
-				x1: x1 + boxWidth * 0.3,
-				x2,
-				y: Math.min(height - 2, top + boxHeight * 0.24),
-				captureRate: 0.62,
-			},
-		];
-		hitEdges.unshift(...dialogueEdges);
 	}
 
 	function resize() {
@@ -185,14 +187,16 @@ export function initHomeHeroRain(
 		frameCount += 1;
 		if (frameCount % 8 === 0) collectHitEdges();
 		context.clearRect(0, 0, width, height);
-		context.lineCap = "round";
-		context.strokeStyle = config.color || getComputedStyle(hero).color;
 		context.fillStyle = config.color || getComputedStyle(hero).color;
 
 		for (const drop of drops) {
 			const previousY = drop.y;
-			drop.x -= drop.speed * 0.13;
+			// 花瓣横向：随帧摆动（sin 相位），形成飘落轨迹
+			drop.swayPhase += 0.04;
+			const swayX = Math.sin(drop.swayPhase) * drop.swayAmplitude * 0.06;
+			drop.x += swayX - drop.speed * 0.06;
 			drop.y += drop.speed;
+			drop.rotation += drop.rotationSpeed;
 			const collision = hitEdges.find(
 				(edge) =>
 					previousY <= edge.y &&
@@ -206,16 +210,14 @@ export function initHomeHeroRain(
 				resetDrop(drop);
 				continue;
 			}
-			if (drop.y - drop.length > height || drop.x < -drop.length) {
+			if (drop.y - drop.size > height || drop.x < -drop.size) {
 				resetDrop(drop);
 				continue;
 			}
 			context.globalAlpha = drop.alpha;
-			context.lineWidth = drop.width;
-			context.beginPath();
-			context.moveTo(drop.x, drop.y);
-			context.lineTo(drop.x + drop.length * 0.13, drop.y - drop.length);
-			context.stroke();
+			context.translate(drop.x, drop.y);
+			drawPetal(context, drop.size, drop.rotation);
+			context.translate(-drop.x, -drop.y);
 		}
 
 		for (let index = splashes.length - 1; index >= 0; index -= 1) {

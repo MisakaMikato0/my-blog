@@ -21,7 +21,7 @@ export const homeConfig: HomeConfig = {
 	bio: ["且视他人之疑目如盏盏鬼火，大胆地去走你的夜路"],
 
 	hero: {
-		backgroundImage: "/assets/images/home/home.avif",
+		backgroundImage: "/assets/images/home/hero-home.webp",
 		backgroundImageMobile: "/assets/images/home/home-mobile.avif",
 		mosaic: {
 			rows: 4,

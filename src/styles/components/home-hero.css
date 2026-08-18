@@ -256,6 +256,9 @@ html:has(.home-hero) #top-row {
 }
 
 .home-hero__signature {
+	--home-hero-melt-size: 0.6rem;
+	--home-hero-melt-width: 0.34rem;
+	--home-hero-melt-gap: 0.26rem;
 	position: absolute;
 	left: 50%;
 	top: 50%;

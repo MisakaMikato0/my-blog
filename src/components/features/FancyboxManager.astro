@@ -98,23 +98,25 @@ import "@/styles/fancybox-custom.css";
 
   // 监听 data-fancybox 元素动态出现（如 client:visible 懒水合的 Svelte 组件）
   let observer: MutationObserver | null = null;
-  let observerTimer: ReturnType<typeof setTimeout> | null = null;
+  let observerDebounce: ReturnType<typeof setTimeout> | null = null;
   function stopObserving() {
     if (observer) { observer.disconnect(); observer = null; }
-    if (observerTimer) { clearTimeout(observerTimer); observerTimer = null; }
+    if (observerDebounce) { clearTimeout(observerDebounce); observerDebounce = null; }
   }
   function observeFancyboxElements() {
     stopObserving();
     observer = new MutationObserver(() => {
-      if (document.querySelector("[data-fancybox]")) {
-        setup();
-        stopObserving();
-      }
+      if (observerDebounce) clearTimeout(observerDebounce);
+      observerDebounce = setTimeout(() => {
+        // Fancybox 6 的 bind() 是事件委托（body 上只挂一次 click 监听），重复调用幂等。
+        // 动态内容（如又拍云动态相册照片、懒加载图片）可能在任何时刻插入，
+        // 因此保持监听并在元素出现时重新绑定，而不是观察一次就停止。
+        if (document.querySelector("[data-fancybox]")) {
+          setup();
+        }
+      }, 150);
     });
     observer.observe(document.body, { childList: true, subtree: true });
-    // 兜底：若一段时间内没有出现 fancybox 元素，停止全页监听，避免长期占用；
-    // 下次 Swup 导航（content:replace）会重新 arm。
-    observerTimer = setTimeout(stopObserving, 5000);
   }
 
   // 初始化

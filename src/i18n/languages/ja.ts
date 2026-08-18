@@ -36,6 +36,7 @@ export const ja: Translation = {
 	[Key.tableOfContents]: "目次",
 	[Key.tocEmpty]: "このページには目次がありません",
 	[Key.music]: "音楽",
+	[Key.techBlogSuffix]: "の技術ブログ",
 	[Key.hobby]: "趣味",
 	[Key.books]: "本",
 	[Key.booksSubtitle]: "私の読書の旅を記録する",

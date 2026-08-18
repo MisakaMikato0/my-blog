@@ -277,75 +277,49 @@ export type HomeDisplayLayerConfig = {
 	emitterImage?: string;
 };
 
-// ===== galgame 对话框类型（旧版，已切换为 speech 气泡，保留类型定义备查） =====
-// /** galgame 对话框：单句台词 */
-// export type HeroDialogueLine = {
-// 	/** 说话者：host=站长 / visitor=访客(你)，默认 host。左上角名牌随之切换 */
-// 	speaker?: "host" | "visitor";
-// 	/** 台词文本（逐字打字机播放） */
-// 	text: string;
-// };
-//
-// /** galgame 对话框：话题（点击进入其逐句台词） */
-// export type HeroDialogueTopic = {
-// 	/** 话题菜单标题，如「关于我」 */
-// 	title: string;
-// 	/** 该话题的逐句台词 */
-// 	lines: HeroDialogueLine[];
-// };
-//
-// /** 首页 Hero galgame 对话框配置（写死暗黑主题，config 驱动内容） */
-// export type HeroDialogueConfig = {
-// 	/** 是否启用对话框；关闭则 Hero 不渲染对话框 */
-// 	enabled?: boolean;
-// 	/** 说话者名称 */
-// 	speakers?: {
-// 		host?: string; // 站长名，如「哈基墩」
-// 		visitor?: string; // 访客名，如「访客」
-// 	};
-// 	/** 默认展示的简介台词，逐句播放；末句后可打开话题菜单 */
-// 	intro: HeroDialogueLine[];
-// 	/** 话题列表；点击某话题进入其逐句台词，末句后返回菜单 */
-// 	topics: HeroDialogueTopic[];
-// 	/** 话题菜单提示语，默认「想聊点什么？」 */
-// 	menuTitle?: string;
-// 	/** 打字机速度（毫秒/字），默认 45 */
-// 	typingSpeed?: number;
-// 	/** 自动播放时每句停留时间（毫秒），默认 1600 */
-// 	autoDelay?: number;
-// };
+export type HeroMosaicConfig = {
+	rows: number;
+	columns: number;
+	idleVisible: number;
+	idleInterval: number;
+	seed: number;
+	scrub: number;
+	desktopScrollDistance: number;
+	mobileScrollDistance: number;
+	desktopMinViewports: number;
+	mobileMinViewports: number;
+	/** 第二层全部出现后继续固定 Hero 的时间线长度，用于交互驻留。 */
+	interactionHold: number;
+};
+
+export type HeroContactConfig = {
+	platform: string;
+	handle: string;
+	href?: string;
+};
+
+export type HeroSignatureConfig = {
+	/** 第二层居中落款文案 */
+	text: string;
+};
 
 export type HomeConfig = {
 	avatar?: string;
-	avatarOnWork?: string;
-	avatarOffWork?: string;
 	name: string;
 	displayName?: string; // 首页展示名字（如 MmMing）
-	nameBadge?: string; // 名字旁边的徽章（如 QQ 号）
 	occupation?: string; // 职业/身份标签（如 后端开发 / 技术博主）
 	bio?: string | string[];
 	hero: {
 		backgroundImage: string;
 		backgroundImageMobile?: string;
-		characterImage?: string;
-		speechAccentImage: string;
-		speech?: {
-			text: string;
-			english?: string;
-		};
-		// ===== 旧版 galgame 对话框类型（已切换为上方 speech 气泡，保留类型备用） =====
-		// /** galgame 对话框（写死暗黑主题）。配置后替代底部简介气泡 */
-		// dialogue?: HeroDialogueConfig;
-		rightPanel?: {
-			pill: string;
-			title: string;
-			diamond: string;
-			microText: string;
-		};
-		/** 玻璃雨珠 + 撞击水花动效（仅桌面端、尊重 reduced-motion） */
+		mosaic: HeroMosaicConfig;
+		contact?: HeroContactConfig;
+		/** 第二层居中落款：逐字从右上角如雨下落 */
+		signature?: HeroSignatureConfig;
+		/** 玻璃雨珠 + 撞击水花动效，移动端自动降低密度。 */
 		rain?: {
 			enabled?: boolean;
-			/** 雨量强度，0–1，默认 0.6（克制） */
+			/** 雨量强度，0-1，默认 0.6（克制） */
 			intensity?: number;
 			/** 雨珠颜色（十六进制如 "#ffffff" 或 "r,g,b"）。留空则随主题自动取色（暗→白/亮→深灰） */
 			color?: string;

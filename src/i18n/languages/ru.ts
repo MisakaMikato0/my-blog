@@ -36,6 +36,7 @@ export const ru: Translation = {
 	[Key.tableOfContents]: "Содержание",
 	[Key.tocEmpty]: "На этой странице нет оглавления",
 	[Key.music]: "Музыка",
+	[Key.techBlogSuffix]: " — техноблог",
 	[Key.hobby]: "Хобби",
 	[Key.books]: "Книги",
 	[Key.booksSubtitle]: "Записи о моём чтении",

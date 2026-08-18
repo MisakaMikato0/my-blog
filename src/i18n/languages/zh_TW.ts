@@ -36,6 +36,7 @@ export const zh_TW: Translation = {
 	[Key.tableOfContents]: "目錄",
 	[Key.tocEmpty]: "目前頁面沒有目錄",
 	[Key.music]: "音樂",
+	[Key.techBlogSuffix]: "的技術部落格",
 	[Key.hobby]: "愛好",
 	[Key.books]: "書籍",
 	[Key.booksSubtitle]: "記錄我的閱讀旅程",

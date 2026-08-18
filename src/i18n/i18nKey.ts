@@ -463,6 +463,7 @@ enum I18nKey {
 	dynamicUploading = "dynamicUploading",
 	dynamicUploadSuccess = "dynamicUploadSuccess",
 	dynamicUploadFail = "dynamicUploadFail",
+	techBlogSuffix = "techBlogSuffix",
 }
 
 export default I18nKey;

@@ -36,6 +36,7 @@ export const en: Translation = {
 	[Key.tableOfContents]: "Table of Contents",
 	[Key.tocEmpty]: "No table of contents on this page",
 	[Key.music]: "Music",
+	[Key.techBlogSuffix]: "'s Tech Blog",
 	[Key.hobby]: "Hobby",
 	[Key.books]: "Books",
 	[Key.booksSubtitle]: "Record my reading journey",

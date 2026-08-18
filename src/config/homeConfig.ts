@@ -8,20 +8,11 @@ export const homeConfig: HomeConfig = {
 	// 3. 远程 URL："https://example.com/avatar.jpg"
 	avatar: "assets/images/avatar.webp",
 
-	// 上班时间头像（为空则使用上方 avatar）
-	avatarOnWork: "assets/images/avatar-work-on.webp",
-
-	// 下班时间头像（为空则始终使用上方 avatar）
-	avatarOffWork: "assets/images/avatar-work-off.webp",
-
 	// 名字
 	name: "幽幽子",
 
 	// 首页展示名字（留空则使用 name）
 	displayName: "幽幽子",
-
-	// 名字右侧徽章文字（如 QQ 号）
-	nameBadge: "B站：御坂17017",
 
 	// 职业/身份标签
 	occupation: "[搬砖/打螺丝]",
@@ -30,61 +21,30 @@ export const homeConfig: HomeConfig = {
 	bio: ["且视他人之疑目如盏盏鬼火，大胆地去走你的夜路"],
 
 	hero: {
-		backgroundImage: "https://t.alcy.cc/acg",
-		backgroundImageMobile: "/assets/images/home/home-mobile.webp",
-		speechAccentImage: "/assets/images/home/home2-1.webp",
-		// 固定台词气泡
-		speech: {
-			text: "当然，是特别的樱花瓣啦。因为播撒这些的话就能让幻想乡当中充满春了。",
+		backgroundImage: "/assets/images/home/home.avif",
+		backgroundImageMobile: "/assets/images/home/home-mobile.avif",
+		mosaic: {
+			rows: 4,
+			columns: 6,
+			idleVisible: 6,
+			idleInterval: 900,
+			seed: 20260814,
+			scrub: 0.45,
+			desktopScrollDistance: 6500,
+			mobileScrollDistance: 4600,
+			desktopMinViewports: 8.1,
+			mobileMinViewports: 6.1,
+			interactionHold: 0.17,
 		},
-		// ===== galgame 对话框（旧版，已切换为上方 speech 气泡，保留配置备查） =====
-		// dialogue: {
-		// 	enabled: true,
-		// 	speakers: {
-		// 		host: '哈基墩',
-		// 		visitor: '访客',
-		// 	},
-		// 	menuTitle: '想聊点什么？',
-		// 	typingSpeed: 45,
-		// 	autoDelay: 1600,
-		// 	intro: [
-		// 		{ speaker: 'host', text: '欸——来客人了喵～随便坐，别客气。' },
-		// 		{ speaker: 'host', text: '我是喵墩，老爸在摸鱼，这儿归我管了喵～' },
-		// 		{
-		// 			speaker: 'host',
-		// 			text: '对了喵，得搬上简介了~喵找找：且视他人之疑目如盏盏鬼火，大胆地去走你的夜路。',
-		// 		},
-		// 		{ speaker: 'host', text: '想打听啥喵？戳戳下面的话题，喵跟你慢慢唠～' },
-		// 	],
-		// 	topics: [
-		// 		{
-		// 			title: '关于我',
-		// 			lines: [
-		// 				{ speaker: 'visitor', text: '你爸是哪方面选手呀？' },
-		// 				{ speaker: 'host', text: '嘛……算个半桶水全栈喵，外加一个不务正业的博客写手。' },
-		// 				{ speaker: 'host', text: '前端后端都摸一点，俗称「全干工程师」喵～' },
-		// 				{ speaker: 'visitor', text: '听起来很忙的样子。' },
-		// 				{ speaker: 'host', text: '忙归忙，但好玩呀——折腾本身就是浪漫喵～如果你感兴趣也可以加QQ群喵，放心，傻爸爸不咬人的' },
-		// 			],
-		// 		},
-		// 		{
-		// 			title: '博客特色',
-		// 			lines: [
-		// 				{ speaker: 'visitor', text: '有什么好玩的功能吗？' },
-		// 				{ speaker: 'host', text: '有个音乐3D可视化播放，但博客重点不是文章吗喵~老爸整站基本是AI搓出来的，喵爪都没动几下。' },
-		// 				{ speaker: 'host', text: '傻爸爸最近在捣鼓Agent，不知道又要整啥活喵～' },
-		// 				{ speaker: 'host', text: '慢慢逛，角落里藏着不少彩蛋呢喵！' },
-		// 			],
-		// 		},
-		// 	],
-		// },
-		rightPanel: {
-			pill: "BLOG",
-			title: "博客",
-			diamond: "✦",
-			microText: "システム起動完了",
+		contact: {
+			platform: "B站",
+			handle: "御坂17017",
 		},
-		// 玻璃雨珠 + 撞击水花（仅桌面端生效，自动尊重 prefers-reduced-motion）
+		// 第二层居中落款：随滚动从右上角逐字如雨下落
+		signature: {
+			text: "且视他人之疑目如盏盏鬼火，大胆地去走你的夜路",
+		},
+		// 玻璃雨珠 + 撞击水花（移动端自动降低密度，尊重 prefers-reduced-motion）
 		rain: {
 			enabled: true,
 			intensity: 0.6,

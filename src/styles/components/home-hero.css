@@ -256,9 +256,6 @@ html:has(.home-hero) #top-row {
 }
 
 .home-hero__signature {
-	--home-hero-melt-size: 0.6rem;
-	--home-hero-melt-width: 0.34rem;
-	--home-hero-melt-gap: 0.26rem;
 	position: absolute;
 	left: 50%;
 	top: 50%;
@@ -266,7 +263,8 @@ html:has(.home-hero) #top-row {
 	width: min(74vw, 66rem);
 	margin: 0;
 	transform: translate(-50%, -50%);
-	color: var(--home-hero-ink);
+	color: #ffb3c6;
+	text-shadow: 0 0 22px rgba(255, 179, 198, 0.45);
 	font-family: var(--font-sans);
 	font-size: clamp(1.6rem, 3.1vw, 3.1rem);
 	font-weight: 560;
@@ -278,6 +276,18 @@ html:has(.home-hero) #top-row {
 	opacity: 0;
 	visibility: hidden;
 	will-change: transform, opacity;
+}
+
+/* 第二层签名：纯色少女粉，不使用融化条纹/gooey，保证清晰可读 */
+.home-hero__signature .home-hero__fly-char {
+	background-image: none;
+	background-clip: border-box;
+	background-size: auto;
+	background-position: 0 0;
+	filter: none;
+	animation: none;
+	color: #ffb3c6;
+	text-shadow: 0 0 22px rgba(255, 179, 198, 0.45);
 }
 
 

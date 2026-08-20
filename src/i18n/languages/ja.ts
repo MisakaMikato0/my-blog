@@ -523,4 +523,6 @@ export const ja: Translation = {
 	[Key.changelogTypeStyle]: "スタイル",
 	[Key.changelogTypeRefactor]: "リファクタ",
 	[Key.changelogTypeChore]: "メンテナンス",
+	[Key.aboutDescription]: "{name} の自己紹介・技術方向・ブログテーマ・連絡先。",
+	[Key.close]: "閉じる",
 };

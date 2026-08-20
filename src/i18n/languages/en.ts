@@ -527,4 +527,6 @@ export const en: Translation = {
 	[Key.changelogTypeStyle]: "Style",
 	[Key.changelogTypeRefactor]: "Refactor",
 	[Key.changelogTypeChore]: "Chore",
+	[Key.aboutDescription]: "{name}'s profile, tech focus, blog topics and contact info.",
+	[Key.close]: "Close",
 };

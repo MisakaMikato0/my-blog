@@ -513,4 +513,6 @@ export const zh_TW: Translation = {
 	[Key.changelogTypeStyle]: "樣式",
 	[Key.changelogTypeRefactor]: "重構",
 	[Key.changelogTypeChore]: "維護",
+	[Key.aboutDescription]: "{name} 的個人介紹、技術方向、部落格主題與聯絡方式。",
+	[Key.close]: "關閉",
 };

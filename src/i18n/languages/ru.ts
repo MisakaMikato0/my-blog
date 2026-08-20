@@ -527,4 +527,6 @@ export const ru: Translation = {
 	[Key.changelogTypeStyle]: "Стиль",
 	[Key.changelogTypeRefactor]: "Рефакторинг",
 	[Key.changelogTypeChore]: "Обслуживание",
+	[Key.aboutDescription]: "Профиль {name}: направления, темы блога, контакты.",
+	[Key.close]: "Закрыть",
 };

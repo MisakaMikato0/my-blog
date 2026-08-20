@@ -1,116 +1,135 @@
 <script lang="ts">
-import type { DivinationData } from "mingyu-core/divination";
-import type { DivinationMethodId } from "mingyu-core/divination/config";
-import { fade } from "svelte/transition";
+	import { fade } from "svelte/transition";
+	import type { DivinationData } from "mingyu-core/divination";
+	import type { DivinationMethodId } from "mingyu-core/divination/config";
 
-type SupportedMethod = Exclude<DivinationMethodId, "random">;
+	type SupportedMethod = Exclude<DivinationMethodId, "random">;
 
-interface Props {
-	method: SupportedMethod;
-	data: DivinationData;
-	/** 起卦前定的"所问之事"，作为解卦输入框的初始值 */
-	question?: string;
-}
-
-let { method, data, question: initialQuestion = "" }: Props = $props();
-
-let question = $state(initialQuestion);
-let status: "idle" | "loading" | "done" | "error" = $state("idle");
-let resultText = $state("");
-let errorText = $state("");
-
-// ── 罗盘 loading 数据 ──────────────────────────────
-const CX = 110;
-const CY = 110;
-
-function polar(radius: number, deg: number) {
-	const rad = (deg * Math.PI) / 180;
-	return { x: CX + radius * Math.cos(rad), y: CY + radius * Math.sin(rad) };
-}
-
-// 外圈刻度：每 5° 一个，每 15° 主刻度加长加粗
-const ticks = Array.from({ length: 72 }, (_, i) => {
-	const deg = i * 5;
-	const major = i % 3 === 0;
-	const inner = polar(major ? 82 : 88, deg);
-	const outer = polar(97, deg);
-	return { x: inner.x, y: inner.y, x2: outer.x, y2: outer.y, major };
-});
-
-// 八卦环
-const trigrams = [
-	{ char: "☰", deg: 0 },
-	{ char: "☱", deg: 45 },
-	{ char: "☲", deg: 90 },
-	{ char: "☳", deg: 135 },
-	{ char: "☴", deg: 180 },
-	{ char: "☵", deg: 225 },
-	{ char: "☶", deg: 270 },
-	{ char: "☷", deg: 315 },
-].map((t) => ({ ...t, ...polar(75, t.deg) }));
-
-// 四正方位
-const marks = [
-	{ char: "南", deg: 0 },
-	{ char: "东", deg: 90 },
-	{ char: "北", deg: 180 },
-	{ char: "西", deg: 270 },
-].map((m) => ({ ...m, ...polar(58, m.deg) }));
-
-// 环绕光点
-const sparks = Array.from({ length: 6 }, (_, i) => ({
-	angle: i * 60 + 20,
-	duration: 2.4 + (i % 3) * 0.5,
-	delay: i * 0.15,
-}));
-
-// 面板重新起卦（prop 变化）时，用新的"所问之事"重置解卦输入框
-$effect(() => {
-	question = initialQuestion;
-});
-
-async function interpret() {
-	if (status === "loading") return;
-	status = "loading";
-	errorText = "";
-	resultText = "";
-	try {
-		const response = await fetch("/api/divination/interpret", {
-			method: "POST",
-			headers: { "Content-Type": "application/json" },
-			body: JSON.stringify({
-				method,
-				data,
-				question: question.trim() || undefined,
-			}),
-		});
-		const payload = (await response.json()) as {
-			text?: string;
-			error?: string;
-		};
-		if (!response.ok || !payload.text) {
-			if (payload.error === "AI_KEY_NOT_CONFIGURED") {
-				throw new Error(
-					"站长尚未配置 AI 解卦 API Key，请联系管理员启用此功能。",
-				);
-			}
-			throw new Error(payload.error ?? `请求失败（${response.status}）`);
-		}
-		resultText = payload.text;
-		status = "done";
-	} catch (error) {
-		const message =
-			error instanceof Error ? error.message : "未知错误，请稍后重试";
-		// fetch 网络层失败（断网/跨域/超时等）统一友好提示
-		errorText =
-			error instanceof TypeError ||
-			message === "Failed to fetch" ||
-			message === "Load failed"
-				? "网络异常，请稍后重试"
-				: message;
-		status = "error";
+	interface Props {
+		method: SupportedMethod;
+		data: DivinationData;
+		/** 起卦前定的"所问之事"，作为解卦输入框的初始值 */
+		question?: string;
 	}
-}
+
+	let { method, data, question: initialQuestion = "" }: Props = $props();
+
+	let question = $state(initialQuestion);
+	let status: "idle" | "loading" | "done" | "error" = $state("idle");
+	let resultText = $state("");
+	let errorText = $state("");
+
+	// ── 风水罗盘 loading 数据 ─────────────────────────
+	const CX = 400;
+	const CY = 400;
+
+	// 环间分隔线
+	function dividers(count: number, r1: number, r2: number) {
+		return Array.from({ length: count }, (_, i) => {
+			const rad = ((i * 360) / count / 180) * Math.PI;
+			return {
+				x1: CX + r1 * Math.sin(rad),
+				y1: CY - r1 * Math.cos(rad),
+				x2: CX + r2 * Math.sin(rad),
+				y2: CY - r2 * Math.cos(rad),
+			};
+		});
+	}
+	const div24 = dividers(24, 330, 370);
+	const div12 = dividers(12, 288, 326);
+	const div8 = dividers(8, 184, 208);
+
+	// 二十四山（金环，每 15° 一山）
+	const m24 = [
+		"子", "癸", "丑", "艮", "寅", "甲",
+		"卯", "乙", "辰", "巽", "巳", "丙",
+		"午", "丁", "未", "坤", "申", "庚",
+		"酉", "辛", "戌", "乾", "亥", "壬",
+	];
+	const r24Chars = m24.map((ch, i) => ({ ch, angle: i * 15 }));
+
+	// 十二地支（玉环，每 30° 一字）
+	const branches = ["子", "丑", "寅", "卯", "辰", "巳", "午", "未", "申", "酉", "戌", "亥"];
+	const rBrChars = branches.map((ch, i) => ({ ch, angle: i * 30 }));
+
+	// 八卦（后天方位，卦爻线条：1 阳爻实线 / 0 阴爻断线）
+	const trigrams = [
+		{ angle: 0, name: "坎", lines: [0, 1, 0] },
+		{ angle: 45, name: "艮", lines: [1, 0, 0] },
+		{ angle: 90, name: "震", lines: [0, 0, 1] },
+		{ angle: 135, name: "巽", lines: [1, 1, 0] },
+		{ angle: 180, name: "离", lines: [1, 0, 1] },
+		{ angle: 225, name: "坤", lines: [0, 0, 0] },
+		{ angle: 270, name: "兑", lines: [0, 1, 1] },
+		{ angle: 315, name: "乾", lines: [1, 1, 1] },
+	];
+
+	// 天干（玫瑰环，每 45° 一字）
+	const stems = ["甲", "乙", "丙", "丁", "庚", "辛", "壬", "癸"];
+	const rStChars = stems.map((ch, i) => ({ ch, angle: i * 45 }));
+
+	// 天池四正
+	const dishChars = [
+		{ ch: "子", angle: 0 },
+		{ ch: "卯", angle: 90 },
+		{ ch: "午", angle: 180 },
+		{ ch: "酉", angle: 270 },
+	];
+
+	// 环绕光点
+	const sparks = Array.from({ length: 6 }, (_, i) => ({
+		angle: i * 60 + 20,
+		duration: 2.4 + (i % 3) * 0.5,
+		delay: i * 0.15,
+	}));
+
+	// 面板重新起卦（prop 变化）时，用新的"所问之事"重置解卦输入框
+	$effect(() => {
+		question = initialQuestion;
+	});
+
+	async function interpret() {
+		if (status === "loading") return;
+		status = "loading";
+		errorText = "";
+		resultText = "";
+		try {
+			const response = await fetch("/api/divination/interpret", {
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify({
+					method,
+					data,
+					question: question.trim() || undefined,
+				}),
+			});
+			const payload = (await response.json()) as {
+				text?: string;
+				error?: string;
+			};
+			if (!response.ok || !payload.text) {
+				if (payload.error === "AI_KEY_NOT_CONFIGURED") {
+					throw new Error(
+						"站长尚未配置 AI 解卦 API Key，请联系管理员启用此功能。",
+					);
+				}
+				throw new Error(payload.error ?? `请求失败（${response.status}）`);
+			}
+			resultText = payload.text;
+			status = "done";
+		} catch (error) {
+			const message =
+				error instanceof Error ? error.message : "未知错误，请稍后重试";
+			// fetch 网络层失败（断网/跨域/超时等）统一友好提示
+			errorText =
+				error instanceof TypeError ||
+				message === "Failed to fetch" ||
+				message === "Load failed"
+					? "网络异常，请稍后重试"
+					: message;
+			status = "error";
+		}
+	}
 </script>
 
 <div class="ai-box">
@@ -169,123 +188,254 @@ async function interpret() {
 			<div class="compass" aria-hidden="true">
 				<svg
 					class="compass-svg"
-					viewBox="0 0 220 220"
-					width="232"
-					height="232"
+					viewBox="0 0 800 800"
+					width="264"
+					height="264"
 				>
 					<defs>
 						<radialGradient id="compass-glow" cx="50%" cy="50%" r="50%">
-							<stop offset="0%" stop-color="rgba(255,215,74,0.30)" />
-							<stop offset="60%" stop-color="rgba(255,215,74,0.08)" />
-							<stop offset="100%" stop-color="rgba(255,215,74,0)" />
+							<stop offset="0%" stop-color="rgba(242,207,122,0.26)" />
+							<stop offset="55%" stop-color="rgba(242,207,122,0.08)" />
+							<stop offset="100%" stop-color="rgba(242,207,122,0)" />
 						</radialGradient>
 						<linearGradient id="compass-gold" x1="0" y1="0" x2="1" y2="1">
-							<stop offset="0%" stop-color="#f6e27a" />
-							<stop offset="50%" stop-color="#c9a227" />
-							<stop offset="100%" stop-color="#f6e27a" />
+							<stop offset="0" stop-color="#f9e3a0" />
+							<stop offset="0.45" stop-color="#dfae55" />
+							<stop offset="1" stop-color="#9c742c" />
 						</linearGradient>
-						<linearGradient id="needle-red" x1="0" y1="0" x2="0" y2="1">
-							<stop offset="0%" stop-color="#ff7b6b" />
-							<stop offset="100%" stop-color="#c0392b" />
+						<linearGradient id="compass-jade" x1="0" y1="0" x2="1" y2="1">
+							<stop offset="0" stop-color="#8fe3cf" />
+							<stop offset="0.5" stop-color="#4fb79f" />
+							<stop offset="1" stop-color="#2c7764" />
 						</linearGradient>
+						<radialGradient id="compass-dish" cx="50%" cy="40%" r="70%">
+							<stop offset="0%" stop-color="#33260f" />
+							<stop offset="60%" stop-color="#221708" />
+							<stop offset="100%" stop-color="#150e05" />
+						</radialGradient>
 					</defs>
 
-					<circle cx="110" cy="110" r="106" fill="url(#compass-glow)" />
+					<!-- 呼吸光晕 -->
 					<circle
-						cx="110"
-						cy="110"
-						r="100"
-						fill="rgba(8,10,14,0.72)"
-						stroke="url(#compass-gold)"
-						stroke-width="2.5"
+						cx="400"
+						cy="400"
+						r="300"
+						fill="url(#compass-glow)"
+						class="compass-breath"
+					/>
+
+					<!-- 外圈 -->
+					<circle
+						cx="400"
+						cy="400"
+						r="390"
+						fill="none"
+						stroke="#4a3a20"
+						stroke-width="2"
 					/>
 					<circle
-						cx="110"
-						cy="110"
-						r="96.5"
+						cx="400"
+						cy="400"
+						r="374"
 						fill="none"
-						stroke="rgba(246,226,122,0.25)"
+						stroke="#2f2616"
 						stroke-width="1"
 					/>
 
-					{#each ticks as t (t.x + "-" + t.y)}
-						<line
-							x1={t.x}
-							y1={t.y}
-							x2={t.x2}
-							y2={t.y2}
-							stroke="url(#compass-gold)"
-							stroke-width={t.major ? 2 : 0.8}
-							opacity={t.major ? 1 : 0.55}
-						/>
+					<!-- 刻度：72 小刻度 + 24 大刻度（pathLength=360 圆周分段） -->
+					<circle
+						cx="400"
+						cy="400"
+						r="381"
+						fill="none"
+						pathLength="360"
+						stroke-dasharray="0.6 4.4"
+						class="tick-minor"
+						transform="rotate(-90 400 400)"
+					/>
+					<circle
+						cx="400"
+						cy="400"
+						r="381"
+						fill="none"
+						pathLength="360"
+						stroke-dasharray="1 14"
+						class="tick-major"
+						transform="rotate(-90 400 400)"
+					/>
+
+					<!-- 轨道虚线 -->
+					<circle cx="400" cy="400" r="370" class="orbit" />
+					<circle
+						cx="400"
+						cy="400"
+						r="328"
+						class="orbit orbit-anim"
+						stroke-dasharray="1.5 7"
+					/>
+					<circle cx="400" cy="400" r="286" class="orbit" />
+					<circle
+						cx="400"
+						cy="400"
+						r="240"
+						class="orbit orbit-anim rev"
+						stroke-dasharray="2 9"
+					/>
+					<circle cx="400" cy="400" r="210" class="orbit" />
+
+					<!-- 分隔线 -->
+					{#each div24 as d (d.x1 + "-" + d.y1)}
+						<line x1={d.x1} y1={d.y1} x2={d.x2} y2={d.y2} class="divider" />
+					{/each}
+					{#each div12 as d (d.x1 + "-" + d.y1)}
+						<line x1={d.x1} y1={d.y1} x2={d.x2} y2={d.y2} class="divider" />
+					{/each}
+					{#each div8 as d (d.x1 + "-" + d.y1)}
+						<line x1={d.x1} y1={d.y1} x2={d.x2} y2={d.y2} class="divider" />
 					{/each}
 
-					<g class="compass-pan">
-						<circle
-							cx="110"
-							cy="110"
-							r="79"
-							fill="none"
-							stroke="url(#compass-gold)"
-							stroke-width="1.4"
-							opacity="0.85"
-						/>
-						<circle
-							cx="110"
-							cy="110"
-							r="52"
-							fill="none"
-							stroke="rgba(246,226,122,0.35)"
-							stroke-width="1"
-							stroke-dasharray="3 5"
-						/>
-						{#each trigrams as tg (tg.char)}
-							<text
-								x={tg.x}
-								y={tg.y + 6}
-								text-anchor="middle"
-								font-size="15"
-								fill="#e8d48b"
-							>{tg.char}</text>
-						{/each}
-						{#each marks as mk (mk.char)}
-							<text
-								x={mk.x}
-								y={mk.y + 5}
-								text-anchor="middle"
-								font-size="11"
-								fill="#c9a227"
-								opacity="0.9"
-							>{mk.char}</text>
+					<!-- 二十四山环（金，7°/s） -->
+					<g class="compass-ring compass-ring--r24">
+						{#each r24Chars as c (c.ch)}
+							<g transform="rotate({c.angle})">
+								<text
+									y="-352"
+									text-anchor="middle"
+									dominant-baseline="central"
+									font-size="21"
+									font-weight="600"
+									class="ring-gold"
+								>{c.ch}</text>
+							</g>
 						{/each}
 					</g>
 
-					<polygon
-						points="110,38 116,108 110,114 104,108"
-						fill="url(#needle-red)"
-					/>
-					<polygon
-						points="110,114 116,108 110,182 104,108"
-						fill="rgba(233,236,239,0.85)"
-					/>
-					<circle
-						cx="110"
-						cy="110"
-						r="6"
-						fill="#f6e27a"
-						stroke="#7a5c10"
+					<!-- 十二地支环（玉，-11°/s） -->
+					<g class="compass-ring compass-ring--rbr">
+						{#each rBrChars as c (c.ch)}
+							<g transform="rotate({c.angle})">
+								<text
+									y="-306"
+									text-anchor="middle"
+									dominant-baseline="central"
+									font-size="19"
+									font-weight="600"
+									class="ring-jade"
+								>{c.ch}</text>
+							</g>
+						{/each}
+					</g>
+
+					<!-- 八卦环（卦爻线条 + 卦名，19°/s） -->
+					<g class="compass-ring compass-ring--rtr">
+						{#each trigrams as t (t.name)}
+							<g transform="rotate({t.angle})">
+								{#each t.lines as solid, i (i)}
+									{#if solid}
+										<line
+											x1={254 + i * 14}
+											y1="-22"
+											x2={254 + i * 14}
+											y2="22"
+											class="trigram-line"
+										/>
+									{:else}
+										<line
+											x1={254 + i * 14}
+											y1="-22"
+											x2={254 + i * 14}
+											y2="-3"
+											class="trigram-line"
+										/>
+										<line
+											x1={254 + i * 14}
+											y1="3"
+											x2={254 + i * 14}
+											y2="22"
+											class="trigram-line"
+										/>
+									{/if}
+								{/each}
+								<text
+									x="228"
+									y="0"
+									text-anchor="middle"
+									dominant-baseline="central"
+									font-size="15"
+									font-weight="600"
+									class="ring-gold-dim"
+								>{t.name}</text>
+							</g>
+						{/each}
+					</g>
+
+					<!-- 天干环（玫瑰，-29°/s） -->
+					<g class="compass-ring compass-ring--rst">
+						{#each rStChars as c (c.ch)}
+							<g transform="rotate({c.angle})">
+								<text
+									y="-196"
+									text-anchor="middle"
+									dominant-baseline="central"
+									font-size="17"
+									font-weight="600"
+									class="ring-rose"
+								>{c.ch}</text>
+							</g>
+						{/each}
+					</g>
+
+					<!-- 天池 -->
+					<g>
+						<circle
+							cx="400"
+							cy="400"
+							r="156"
+							fill="none"
+							stroke="#6b5a33"
+							stroke-width="1.5"
+						/>
+						<circle
+							cx="400"
+							cy="400"
+							r="150"
+							fill="url(#compass-dish)"
+							stroke="#8a6a30"
+							stroke-width="1"
+						/>
+						<line x1="400" y1="250" x2="400" y2="550" class="dish-line" />
+						<line x1="250" y1="400" x2="550" y2="400" class="dish-line" />
+						{#each dishChars as c (c.ch)}
+							<g transform="rotate({c.angle})">
+								<text
+									y="-118"
+									text-anchor="middle"
+									dominant-baseline="central"
+									font-size="20"
+									font-weight="600"
+									class="ring-gold-dim"
+								>{c.ch}</text>
+							</g>
+						{/each}
+					</g>
+
+					<!-- 指针（北白南红，微摆） -->
+					<g transform="translate(400 400)">
+						<g class="compass-needle">
+							<path d="M0,-92 L-11,-5 L0,0 L11,-5 Z" fill="#f3e3bd" />
+							<path d="M0,92 L-11,5 L0,0 L11,5 Z" fill="#c94b33" />
+							<circle r="8" fill="url(#compass-gold)" />
+							<circle r="3.2" fill="#241a10" />
+						</g>
+					</g>
+
+					<!-- 顶部标记 -->
+					<path
+						d="M400,6 L408,21 L392,21 Z"
+						fill="url(#compass-gold)"
+						stroke="#5c4717"
 						stroke-width="1"
 					/>
-
-					<g class="compass-taiji">
-						<circle cx="110" cy="110" r="15" fill="#fff" />
-						<path
-							d="M110 95 A15 15 0 0 0 110 125 A7.5 7.5 0 0 1 110 110 A7.5 7.5 0 0 1 110 95 Z"
-							fill="#1a1a1a"
-						/>
-						<circle cx="110" cy="103.5" r="2.3" fill="#1a1a1a" />
-						<circle cx="110" cy="116.5" r="2.3" fill="#fff" />
-					</g>
 				</svg>
 
 				{#each sparks as s (s.angle)}
@@ -422,7 +572,7 @@ async function interpret() {
 		word-break: break-word;
 	}
 
-	/* ── 罗盘 loading 覆盖层 ─────────────────────── */
+	/* ── 风水罗盘 loading 覆盖层 ──────────────────── */
 	.compass-overlay {
 		position: fixed;
 		inset: 0;
@@ -478,8 +628,8 @@ async function interpret() {
 		border-radius: 50%;
 		background: radial-gradient(
 			circle,
-			rgba(255, 215, 74, 0.22) 0%,
-			rgba(255, 215, 74, 0.06) 45%,
+			rgba(242, 207, 122, 0.2) 0%,
+			rgba(242, 207, 122, 0.05) 45%,
 			transparent 70%
 		);
 		animation: compass-glow 2.2s ease-in-out infinite alternate;
@@ -518,21 +668,111 @@ async function interpret() {
 	}
 
 	.compass-svg {
-		width: 232px;
-		height: 232px;
+		width: 264px;
+		height: 264px;
 	}
 
-	.compass-pan,
-	.compass-taiji {
-		transform-origin: 110px 110px;
+	/* ── 罗盘环配色 ────────────────────────────── */
+	.ring-gold {
+		fill: url(#compass-gold);
 	}
 
-	.compass-pan {
-		animation: compass-spin 18s linear infinite;
+	.ring-gold-dim {
+		fill: #d3ab5f;
+		opacity: 0.9;
 	}
 
-	.compass-taiji {
-		animation: compass-spin-rev 9s linear infinite;
+	.ring-jade {
+		fill: url(#compass-jade);
+	}
+
+	.ring-rose {
+		fill: #e3a06d;
+	}
+
+	.trigram-line {
+		stroke: #e8b85c;
+		stroke-width: 5;
+		stroke-linecap: round;
+	}
+
+	.tick-minor {
+		stroke: #6b5a33;
+		stroke-width: 5;
+		opacity: 0.5;
+	}
+
+	.tick-major {
+		stroke: url(#compass-gold);
+		stroke-width: 10;
+		opacity: 0.9;
+	}
+
+	.divider {
+		stroke: #453619;
+		stroke-width: 1;
+		opacity: 0.55;
+	}
+
+	.orbit {
+		fill: none;
+		stroke: rgba(217, 171, 82, 0.35);
+	}
+
+	.dish-line {
+		stroke: rgba(217, 171, 82, 0.28);
+		stroke-width: 1;
+	}
+
+	/* ── 多环异速旋转 ──────────────────────────── */
+	.compass-ring {
+		transform-box: view-box;
+		transform-origin: 400px 400px;
+	}
+
+	.compass-ring--r24 {
+		animation: compass-spin 51.4s linear infinite;
+	}
+
+	.compass-ring--rbr {
+		animation: compass-spin-rev 32.7s linear infinite;
+	}
+
+	.compass-ring--rtr {
+		animation: compass-spin 18.9s linear infinite;
+	}
+
+	.compass-ring--rst {
+		animation: compass-spin-rev 12.4s linear infinite;
+	}
+
+	.orbit-anim {
+		animation: compass-spin 38s linear infinite;
+		transform-box: fill-box;
+		transform-origin: center;
+	}
+
+	.orbit-anim.rev {
+		animation-direction: reverse;
+		animation-duration: 52s;
+	}
+
+	.compass-breath {
+		animation: compass-glow 4.5s ease-in-out infinite;
+	}
+
+	/* 指针微摆 */
+	.compass-needle {
+		animation: needle-sway 2.4s ease-in-out infinite alternate;
+	}
+
+	@keyframes needle-sway {
+		from {
+			transform: rotate(-7deg);
+		}
+		to {
+			transform: rotate(7deg);
+		}
 	}
 
 	@keyframes compass-spin {
@@ -609,8 +849,10 @@ async function interpret() {
 	}
 
 	@media (prefers-reduced-motion: reduce) {
-		.compass-pan,
-		.compass-taiji,
+		.compass-ring,
+		.orbit-anim,
+		.compass-breath,
+		.compass-needle,
 		.compass-spark {
 			animation: none;
 		}

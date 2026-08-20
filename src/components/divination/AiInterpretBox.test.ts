@@ -74,7 +74,8 @@ describe("AiInterpretBox 组件", () => {
 
 		// 请求未返回时，罗盘覆盖层可见
 		expect(container.querySelector(".compass-overlay")).toBeTruthy();
-		expect(container.querySelector(".compass-pan")).toBeTruthy();
+		expect(container.querySelector(".compass-ring")).toBeTruthy();
+		expect(container.querySelector(".trigram-line")).toBeTruthy();
 		expect(screen.getByText(/幽幽子正在推演天机/)).toBeTruthy();
 
 		// 请求返回后，覆盖层消失

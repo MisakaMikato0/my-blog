@@ -4,6 +4,7 @@ import { createXiaoliurenReading } from "@/utils/divination";
 import AiInterpretBox from "./AiInterpretBox.svelte";
 
 let customTime = $state("");
+let question = $state("");
 let result = $state<XiaoliurenResult | null>(null);
 
 function cast() {
@@ -27,6 +28,18 @@ function formatDate(ts: number): string {
 				class="field__input"
 			/>
 		</div>
+		<div class="field">
+			<label class="field__label" for="xlr-question">所问何事</label>
+			<input
+				id="xlr-question"
+				type="text"
+				bind:value={question}
+				class="field__input"
+				placeholder="如：今日出行吉凶如何？（留空则以心默问）"
+				maxlength="100"
+			/>
+			<span class="field__hint">先定所问，再行占课 —— 无疑不占</span>
+		</div>
 		<button type="button" class="panel__action" onclick={cast}>起课</button>
 	</div>
 
@@ -43,6 +56,9 @@ function formatDate(ts: number): string {
 					{result.data.ganzhi.day} {result.data.ganzhi.hour} · 占课时间
 					{formatDate(result.data.timestamp)}
 				</p>
+				{#if question.trim()}
+					<p class="panel__result-question">所问：{question.trim()}</p>
+				{/if}
 			</div>
 
 			<div class="xlr-flow">
@@ -80,7 +96,7 @@ function formatDate(ts: number): string {
 				</div>
 			</div>
 		</div>
-		<AiInterpretBox method="xiaoliuren" data={result.data} />
+		<AiInterpretBox method="xiaoliuren" data={result.data} question={question.trim()} />
 	{/if}
 </div>
 
@@ -121,6 +137,11 @@ function formatDate(ts: number): string {
 	.field__input:focus {
 		outline: none;
 		border-color: var(--deep-text);
+	}
+
+	.field__hint {
+		font-size: 0.75rem;
+		color: var(--content-meta);
 	}
 
 	.panel__action {
@@ -170,6 +191,15 @@ function formatDate(ts: number): string {
 		color: var(--content-meta);
 		font-size: 0.82rem;
 		line-height: 1.6;
+	}
+
+	.panel__result-question {
+		margin: 0;
+		padding: 0.4rem 0.6rem;
+		border-left: 3px solid var(--deep-text);
+		background: var(--btn-regular-bg-hover);
+		color: var(--deep-text);
+		font-size: 0.88rem;
 	}
 
 	.xlr-flow {

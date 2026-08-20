@@ -7,14 +7,22 @@ type SupportedMethod = Exclude<DivinationMethodId, "random">;
 interface Props {
 	method: SupportedMethod;
 	data: DivinationData;
+	/** 起卦前定的"所问之事"，作为解卦输入框的初始值 */
+	question?: string;
 }
 
-let { method, data }: Props = $props();
+let { method, data, question: initialQuestion = "" }: Props = $props();
 
-let question = $state("");
+let question = $state(initialQuestion);
 let status: "idle" | "loading" | "done" | "error" = $state("idle");
 let resultText = $state("");
 let errorText = $state("");
+
+// 面板重新起卦（prop 变化）时，用新的"所问之事"重置解卦输入框
+$effect(() => {
+	question = initialQuestion;
+});
+
 
 async function interpret() {
 	if (status === "loading") return;

@@ -14,6 +14,7 @@ const spreadOptions: { id: TarotSpreadType; label: string }[] = [
 ];
 
 let spreadType = $state<TarotSpreadType>("three");
+let question = $state("");
 let result = $state<TarotResult | null>(null);
 
 function cast() {
@@ -39,6 +40,18 @@ function formatDate(ts: number): string {
 				{/each}
 			</select>
 		</div>
+		<div class="field">
+			<label class="field__label" for="tarot-question">所问何事</label>
+			<input
+				id="tarot-question"
+				type="text"
+				bind:value={question}
+				class="field__input"
+				placeholder="如：这段感情该如何经营？（留空则以心默问）"
+				maxlength="100"
+			/>
+			<span class="field__hint">先定所问，再行抽牌 —— 无疑不占</span>
+		</div>
 		<button type="button" class="panel__action" onclick={cast}>抽牌</button>
 	</div>
 
@@ -52,6 +65,9 @@ function formatDate(ts: number): string {
 						· {result.data.draw.method}
 					{/if}
 				</p>
+				{#if question.trim()}
+					<p class="panel__result-question">所问：{question.trim()}</p>
+				{/if}
 			</div>
 
 			<div class="tarot-grid">
@@ -87,7 +103,7 @@ function formatDate(ts: number): string {
 				{/each}
 			</div>
 			</div>
-			<AiInterpretBox method="tarot" data={result.data} />
+			<AiInterpretBox method="tarot" data={result.data} question={question.trim()} />
 			{/if}
 			</div>
 
@@ -128,6 +144,11 @@ function formatDate(ts: number): string {
 	.field__input:focus {
 		outline: none;
 		border-color: var(--deep-text);
+	}
+
+	.field__hint {
+		font-size: 0.75rem;
+		color: var(--content-meta);
 	}
 
 	.field__input--select {
@@ -183,6 +204,15 @@ function formatDate(ts: number): string {
 		color: var(--content-meta);
 		font-size: 0.82rem;
 		line-height: 1.6;
+	}
+
+	.panel__result-question {
+		margin: 0;
+		padding: 0.4rem 0.6rem;
+		border-left: 3px solid var(--deep-text);
+		background: var(--btn-regular-bg-hover);
+		color: var(--deep-text);
+		font-size: 0.88rem;
 	}
 
 	.tarot-grid {

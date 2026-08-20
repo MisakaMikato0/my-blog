@@ -8,6 +8,7 @@ type Mode = "random" | "number";
 let mode = $state<Mode>("random");
 let customTime = $state("");
 let numberInput = $state("1");
+let question = $state("");
 let result = $state<LotteryResult | null>(null);
 let error = $state("");
 
@@ -79,6 +80,19 @@ function formatDate(ts: number): string {
 			/>
 		</div>
 
+		<div class="field">
+			<label class="field__label" for="lottery-question">所问何事</label>
+			<input
+				id="lottery-question"
+				type="text"
+				bind:value={question}
+				class="field__input"
+				placeholder="如：姻缘何时可成？（留空则以心默问）"
+				maxlength="100"
+			/>
+			<span class="field__hint">先定所问，再行求签 —— 无疑不占</span>
+		</div>
+
 		<button type="button" class="panel__action" onclick={cast}>
 			{mode === "random" ? "求签" : "查签"}
 		</button>
@@ -96,6 +110,9 @@ function formatDate(ts: number): string {
 					（干支 {result.data.ganzhi.year} {result.data.ganzhi.month}
 					{result.data.ganzhi.day} {result.data.ganzhi.hour}）
 				</p>
+				{#if question.trim()}
+					<p class="panel__result-question">所问：{question.trim()}</p>
+				{/if}
 			</div>
 
 			<div class="panel__block panel__block--poem">
@@ -123,7 +140,7 @@ function formatDate(ts: number): string {
 				</div>
 			{/if}
 			</div>
-			<AiInterpretBox method="ssgw" data={result.data} />
+			<AiInterpretBox method="ssgw" data={result.data} question={question.trim()} />
 			{/if}
 			</div>
 
@@ -164,6 +181,11 @@ function formatDate(ts: number): string {
 	.field__input:focus {
 		outline: none;
 		border-color: var(--deep-text);
+	}
+
+	.field__hint {
+		font-size: 0.75rem;
+		color: var(--content-meta);
 	}
 
 	.field__seg {
@@ -247,6 +269,15 @@ function formatDate(ts: number): string {
 		color: var(--content-meta);
 		font-size: 0.82rem;
 		line-height: 1.6;
+	}
+
+	.panel__result-question {
+		margin: 0;
+		padding: 0.4rem 0.6rem;
+		border-left: 3px solid var(--deep-text);
+		background: var(--btn-regular-bg-hover);
+		color: var(--deep-text);
+		font-size: 0.88rem;
 	}
 
 	.panel__block {

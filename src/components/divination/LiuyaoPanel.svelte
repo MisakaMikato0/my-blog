@@ -15,6 +15,7 @@ type Method = "time" | "manual";
 let method = $state<Method>("time");
 let customTime = $state("");
 let manualYaos = $state("7,8,7,8,7,8");
+let question = $state("");
 let result = $state<LiuyaoResult | null>(null);
 let error = $state("");
 
@@ -120,6 +121,19 @@ function buildHexagramItems(data: LiuyaoResult["data"]): HexagramDiagramItem[] {
 			</div>
 		{/if}
 
+		<div class="field">
+			<label class="field__label" for="liuyao-question">所问何事</label>
+			<input
+				id="liuyao-question"
+				type="text"
+				bind:value={question}
+				class="field__input"
+				placeholder="如：近期事业是否顺利？（留空则以心默问）"
+				maxlength="100"
+			/>
+			<span class="field__hint">先定所问，再行起卦 —— 无疑不占</span>
+		</div>
+
 		<button type="button" class="panel__action" onclick={cast}>起卦</button>
 		{#if error}
 			<p class="panel__error">{error}</p>
@@ -141,6 +155,9 @@ function buildHexagramItems(data: LiuyaoResult["data"]): HexagramDiagramItem[] {
 					{formatDate(result.data.timestamp)} · {result.data.palace.name}宫
 					{result.data.palace.wuxing} · {result.data.palaceStage ?? ""}
 				</p>
+				{#if question.trim()}
+					<p class="panel__result-question">所问：{question.trim()}</p>
+				{/if}
 			</div>
 
 			<HexagramDiagram hexagrams={buildHexagramItems(result.data)} />
@@ -261,7 +278,7 @@ function buildHexagramItems(data: LiuyaoResult["data"]): HexagramDiagramItem[] {
 				{/if}
 			</div>
 		</div>
-		<AiInterpretBox method="liuyao" data={result.data} />
+		<AiInterpretBox method="liuyao" data={result.data} question={question.trim()} />
 	{/if}
 </div>
 
@@ -302,6 +319,11 @@ function buildHexagramItems(data: LiuyaoResult["data"]): HexagramDiagramItem[] {
 	.field__input:focus {
 		outline: none;
 		border-color: var(--deep-text);
+	}
+
+	.field__hint {
+		font-size: 0.75rem;
+		color: var(--content-meta);
 	}
 
 	.field__seg {
@@ -390,6 +412,15 @@ function buildHexagramItems(data: LiuyaoResult["data"]): HexagramDiagramItem[] {
 		color: var(--content-meta);
 		font-size: 0.82rem;
 		line-height: 1.6;
+	}
+
+	.panel__result-question {
+		margin: 0;
+		padding: 0.4rem 0.6rem;
+		border-left: 3px solid var(--deep-text);
+		background: var(--btn-regular-bg-hover);
+		color: var(--deep-text);
+		font-size: 0.88rem;
 	}
 
 	.panel__callout {

@@ -1,5 +1,5 @@
 ---
-import ArchivePanel from "@components/controls/ArchivePanel.svelte";
+import ArchivePanel from "@components/controls/ArchivePanel.astro";
 import ArchiveStats from "@components/widget/ArchiveStats.svelte";
 import I18nKey from "@i18n/i18nKey";
 import { i18n } from "@i18n/translation";
@@ -61,7 +61,7 @@ const githubConfig = archiveStatsConfig?.github;
         unavailableLabel={i18n(I18nKey.archiveStatsUnavailable)}
         client:load
       />
-      <ArchivePanel sortedPosts={sortedPostsList} client:load />
+      <ArchivePanel sortedPosts={sortedPostsList} />
     </div>
   </div>
 </MainGridLayout>

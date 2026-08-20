@@ -1,6 +1,7 @@
 <script lang="ts">
 import LiuyaoPanel from "./LiuyaoPanel.svelte";
 import LotteryPanel from "./LotteryPanel.svelte";
+import Luopan from "./Luopan.svelte";
 import MeihuaPanel from "./MeihuaPanel.svelte";
 import TarotPanel from "./TarotPanel.svelte";
 import XiaoliurenPanel from "./XiaoliurenPanel.svelte";
@@ -19,6 +20,10 @@ let active = $state<MethodId>("liuyao");
 </script>
 
 <div class="divination-app">
+	<div class="divination-app__luopan">
+		<Luopan size={230} />
+	</div>
+
 	<div class="divination-app__tabs" role="tablist" aria-label="占卜方法">
 		{#each methods as m (m.id)}
 			<button
@@ -51,6 +56,12 @@ let active = $state<MethodId>("liuyao");
 </div>
 
 <style>
+	.divination-app__luopan {
+		display: flex;
+		justify-content: center;
+		padding: 0.75rem 0 1rem;
+	}
+
 	.divination-app__tabs {
 		display: flex;
 		flex-wrap: wrap;

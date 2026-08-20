@@ -151,4 +151,52 @@ describe("handleDivinationInterpret", () => {
 		);
 		expect(response.status).toBe(413);
 	});
+	it("上游空响应时自动重试并成功", async () => {
+		const liuyao = createLiuyaoReading({ customDate: FIXED_DATE });
+		// 第一次空 choices，第二次成功
+		const fetchMock = vi
+			.fn()
+			.mockResolvedValueOnce(
+				new Response(JSON.stringify({ choices: null }), { status: 200 }),
+			)
+			.mockResolvedValueOnce(
+				new Response(
+					JSON.stringify({
+						choices: [{ message: { content: "重试后解卦成功" } }],
+					}),
+					{ status: 200 },
+				),
+			);
+		vi.stubGlobal("fetch", fetchMock);
+
+		const response = await handleDivinationInterpret(
+			jsonRequest({ method: "liuyao", data: liuyao.data }),
+			buildEnv({ DEEPSEEK_API_KEY: "test-key" }),
+		);
+		expect(response.status).toBe(200);
+		const payload = (await response.json()) as { text: string };
+		expect(payload.text).toContain("重试后解卦成功");
+		expect(fetchMock).toHaveBeenCalledTimes(2);
+	});
+
+	it("上游持续空响应时最终报错", async () => {
+		const liuyao = createLiuyaoReading({ customDate: FIXED_DATE });
+		// 每次调用返回新的空响应实例（Response body 只能消费一次）
+		const fetchMock = vi.fn().mockImplementation(() =>
+			Promise.resolve(
+				new Response(JSON.stringify({ choices: null }), { status: 200 }),
+			),
+		);
+		vi.stubGlobal("fetch", fetchMock);
+
+		const response = await handleDivinationInterpret(
+			jsonRequest({ method: "liuyao", data: liuyao.data }),
+			buildEnv({ DEEPSEEK_API_KEY: "test-key" }),
+		);
+		expect(response.status).toBe(500);
+		const payload = (await response.json()) as { error: string };
+		expect(payload.error).toBe("EMPTY_UPSTREAM_RESPONSE");
+		expect(fetchMock).toHaveBeenCalledTimes(3);
+	});
+
 });

@@ -88,7 +88,12 @@ async function parseBody(request: Request): Promise<InterpretRequest> {
 	return { method: body.method, data: body.data, question };
 }
 
-async function callChatApi(
+/** ModelScope 偶发返回空 choices，重试可显著提升成功率 */
+const EMPTY_UPSTREAM_RESPONSE = "EMPTY_UPSTREAM_RESPONSE";
+const MAX_CHAT_ATTEMPTS = 3;
+const RETRY_DELAY_MS = 400;
+
+async function callChatApiOnce(
 	apiUrl: string,
 	apiKey: string,
 	chatModel: string,
@@ -129,12 +134,35 @@ async function callChatApi(
 		};
 		const content = payload.choices?.[0]?.message?.content;
 		if (!content) {
-			throw new Error("EMPTY_UPSTREAM_RESPONSE");
+			throw new Error(EMPTY_UPSTREAM_RESPONSE);
 		}
 		return content.trim();
 	} finally {
 		clearTimeout(timer);
 	}
+}
+
+async function callChatApi(
+	apiUrl: string,
+	apiKey: string,
+	chatModel: string,
+	prompt: string,
+): Promise<string> {
+	let lastError: unknown;
+	for (let attempt = 1; attempt <= MAX_CHAT_ATTEMPTS; attempt++) {
+		try {
+			return await callChatApiOnce(apiUrl, apiKey, chatModel, prompt);
+		} catch (error) {
+			const message = error instanceof Error ? error.message : String(error);
+			// 仅对空响应重试；其余错误（鉴权、限流、超时等）直接抛出
+			if (message !== EMPTY_UPSTREAM_RESPONSE || attempt === MAX_CHAT_ATTEMPTS) {
+				throw error;
+			}
+			lastError = error;
+			await new Promise((resolve) => setTimeout(resolve, RETRY_DELAY_MS * attempt));
+		}
+	}
+	throw lastError;
 }
 
 export async function handleDivinationInterpret(

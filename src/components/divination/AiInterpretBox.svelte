@@ -1,7 +1,7 @@
 <script lang="ts">
-import { fade } from "svelte/transition";
 import type { DivinationData } from "mingyu-core/divination";
 import type { DivinationMethodId } from "mingyu-core/divination/config";
+import { fade } from "svelte/transition";
 
 type SupportedMethod = Exclude<DivinationMethodId, "random">;
 

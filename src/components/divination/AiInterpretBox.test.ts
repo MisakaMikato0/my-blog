@@ -78,7 +78,9 @@ describe("AiInterpretBox 组件", () => {
 		expect(screen.getByText(/幽幽子正在推演天机/)).toBeTruthy();
 
 		// 请求返回后，覆盖层消失
-		resolveFetch!(new Response(JSON.stringify({ text: "卦象已明" }), { status: 200 }));
+		resolveFetch!(
+			new Response(JSON.stringify({ text: "卦象已明" }), { status: 200 }),
+		);
 		await screen.findByText(/卦象已明/);
 		await vi.waitFor(() =>
 			expect(container.querySelector(".compass-overlay")).toBeNull(),

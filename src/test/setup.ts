@@ -31,14 +31,14 @@ if (!window.requestAnimationFrame) {
 // 最小 polyfill：立即完成动画，并在 onfinish 赋值后自动触发回调，
 // 这样 fade-out 结束能正常移除元素。
 if (typeof Element.prototype.animate !== "function") {
-	Element.prototype.animate = function (
+	Element.prototype.animate = (
 		_keyframes: Keyframe[] | PropertyIndexedKeyframes | null,
 		options?: number | KeyframeAnimationOptions,
-	) {
+	) => {
 		const duration =
 			typeof options === "number"
 				? options
-				: (options as KeyframeAnimationOptions | undefined)?.duration ?? 0;
+				: ((options as KeyframeAnimationOptions | undefined)?.duration ?? 0);
 		const anim: Record<string, unknown> = {
 			finished: Promise.resolve(),
 			play: () => {},

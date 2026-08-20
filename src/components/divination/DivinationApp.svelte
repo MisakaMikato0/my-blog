@@ -21,7 +21,7 @@ let active = $state<MethodId>("liuyao");
 
 <div class="divination-app">
 	<div class="divination-app__luopan">
-		<Luopan size={230} />
+		<Luopan size={400} />
 	</div>
 
 	<div class="divination-app__tabs" role="tablist" aria-label="占卜方法">

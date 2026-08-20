@@ -3,7 +3,7 @@ interface Props {
 	/** 罗盘显示尺寸（px） */
 	size?: number;
 }
-let { size = 220 }: Props = $props();
+let { size = 400 }: Props = $props();
 
 const CX = 400;
 const CY = 400;
@@ -206,7 +206,7 @@ $effect(() => {
 						y="-352"
 						text-anchor="middle"
 						dominant-baseline="central"
-						font-size="21"
+						font-size="27"
 						font-weight="600"
 						class="luopan-gold"
 					>{c.ch}</text>
@@ -222,7 +222,7 @@ $effect(() => {
 						y="-306"
 						text-anchor="middle"
 						dominant-baseline="central"
-						font-size="19"
+						font-size="25"
 						font-weight="600"
 						class="luopan-jade"
 					>{c.ch}</text>
@@ -265,7 +265,7 @@ $effect(() => {
 						y="0"
 						text-anchor="middle"
 						dominant-baseline="central"
-						font-size="15"
+						font-size="20"
 						font-weight="600"
 						class="luopan-gold-dim"
 					>{t.name}</text>
@@ -281,7 +281,7 @@ $effect(() => {
 						y="-196"
 						text-anchor="middle"
 						dominant-baseline="central"
-						font-size="17"
+						font-size="23"
 						font-weight="600"
 						class="luopan-rose"
 					>{c.ch}</text>
@@ -301,7 +301,7 @@ $effect(() => {
 						y="-118"
 						text-anchor="middle"
 						dominant-baseline="central"
-						font-size="20"
+						font-size="26"
 						font-weight="600"
 						class="luopan-gold-dim"
 					>{c.ch}</text>
@@ -336,10 +336,12 @@ $effect(() => {
 		flex-direction: column;
 		align-items: center;
 		gap: 0.5rem;
-		--luopan-size: 220px;
+		--luopan-size: 400px;
 	}
 
 	.luopan__svg {
+		max-width: 100%;
+		height: auto;
 		width: var(--luopan-size);
 		height: var(--luopan-size);
 		display: block;
@@ -378,7 +380,7 @@ $effect(() => {
 
 	.luopan-trigram {
 		stroke: #e8b85c;
-		stroke-width: 5;
+		stroke-width: 7;
 		stroke-linecap: round;
 	}
 

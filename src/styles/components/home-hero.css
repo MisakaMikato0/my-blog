@@ -122,7 +122,18 @@ html:has(.home-hero) #top-row {
 .home-hero__shade {
 	z-index: 1;
 	pointer-events: none;
-	background: var(--home-hero-overlay);
+	/* 柔和暗角：上下渐暗保护标题/联系区，中间透亮让图片清晰露出 */
+	background:
+		linear-gradient(
+			to bottom,
+			var(--home-hero-overlay),
+			transparent 30%
+		),
+		linear-gradient(
+			to top,
+			var(--home-hero-overlay),
+			transparent 26%
+		);
 }
 
 .home-hero__rain {
@@ -169,22 +180,11 @@ html:has(.home-hero) #top-row {
 }
 
 .home-hero__title > span:first-child {
-	--home-hero-melt-size: 1.35rem;
-	--home-hero-melt-width: 0.72rem;
-	--home-hero-melt-gap: 0.34rem;
 	display: inline-block;
 	padding: 0.08em 0.18em 0.18em;
 	margin: -0.08em -0.18em -0.18em;
-	color: transparent;
-	background-image: repeating-linear-gradient(
-		45deg,
-		var(--home-hero-ink) 0 var(--home-hero-melt-width),
-		transparent var(--home-hero-melt-width) calc(var(--home-hero-melt-width) + var(--home-hero-melt-gap))
-	);
-	background-clip: text;
-	background-size: var(--home-hero-melt-size) var(--home-hero-melt-size);
-	filter: url("#home-hero-gooey");
-	animation: home-hero-melt 1.25s linear infinite;
+	color: #ffb3c6;
+	text-shadow: 0 0 22px rgba(255, 179, 198, 0.45);
 }
 
 .home-hero__occupation {
@@ -332,26 +332,10 @@ html:has(.home-hero) #top-row {
 
 .home-hero__fly-char {
 	position: absolute;
-	color: transparent;
+	color: #ffb3c6;
+	text-shadow: 0 0 22px rgba(255, 179, 198, 0.45);
 	white-space: nowrap;
-	background-image: repeating-linear-gradient(
-		45deg,
-		var(--home-hero-ink) 0 var(--home-hero-melt-width),
-		transparent var(--home-hero-melt-width) calc(var(--home-hero-melt-width) + var(--home-hero-melt-gap))
-	);
-	background-clip: text;
-	background-size: var(--home-hero-melt-size) var(--home-hero-melt-size);
-	background-position: var(--home-hero-fly-bg-x, 0px) var(--home-hero-fly-bg-y, 0px);
-	filter: url("#home-hero-gooey");
-	animation: home-hero-melt-fly 1.25s linear infinite;
 	will-change: transform, opacity;
-}
-
-@keyframes home-hero-melt-fly {
-	to {
-		background-position: calc(var(--home-hero-fly-bg-x, 0px) + var(--home-hero-melt-size))
-			var(--home-hero-fly-bg-y, 0px);
-	}
 }
 
 @media (max-width: 768px) {
@@ -372,10 +356,6 @@ html:has(.home-hero) #top-row {
 		/* 移动端保持原拉伸铺满行为，不受桌面 cover 变量影响 */
 		background-size: calc(var(--home-hero-mosaic-columns) * 100%)
 			calc(var(--home-hero-mosaic-rows) * 100%);
-	}
-
-	.home-hero__shade {
-		background: var(--home-hero-overlay);
 	}
 
 	.home-hero__identity {
@@ -432,7 +412,8 @@ html:has(.home-hero) #top-row {
 		animation: none;
 		filter: none;
 		background-image: none;
-		color: var(--home-hero-ink);
+		color: #ffb3c6;
+		text-shadow: 0 0 22px rgba(255, 179, 198, 0.45);
 	}
 
 	.home-hero__identity {

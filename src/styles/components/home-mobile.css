@@ -67,7 +67,8 @@
 	font-size: 2rem;
 	font-weight: 900;
 	letter-spacing: 0.1em;
-	color: var(--deep-text);
+	color: #ffb3c6;
+	text-shadow: 0 0 22px rgba(255, 179, 198, 0.45);
 	line-height: 1.2;
 }
 
@@ -453,6 +454,8 @@
 
 .home-mobile-hero__name-char {
 	display: inline-block;
+	color: #ffb3c6;
+	text-shadow: 0 0 22px rgba(255, 179, 198, 0.45);
 }
 
 /* —— 入场初始态（GSAP 接管后动画归位） —— */

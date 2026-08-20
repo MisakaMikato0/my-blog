@@ -183,9 +183,6 @@ export function createFlyText(
 			element.style.top = `${y.toFixed(2)}px`;
 			element.style.width = `${rect.width.toFixed(2)}px`;
 			element.style.height = `${rect.height.toFixed(2)}px`;
-			// 条纹渐变相位补偿：让字符内的图案与整段渲染时对齐
-			element.style.setProperty("--home-hero-fly-bg-x", `${(-x).toFixed(2)}px`);
-			element.style.setProperty("--home-hero-fly-bg-y", `${(-y).toFixed(2)}px`);
 			overlay.appendChild(element);
 
 			const angle = random() * Math.PI * 2;

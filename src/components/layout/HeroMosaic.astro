@@ -81,30 +81,65 @@ const mosaicStyle = [
 				".home-hero__mosaic-complete img",
 			);
 			if (completeImage) completeImage.src = picked;
-			// 按图片实际宽高比铺满拼图框（cover）：宽图裁左右、窄图裁上下，
-			// 避免拼接/完成图被拉伸变形（原 background-size 600% 400% 会强制拉满 2:1 框）
-			const applyCoverSize = () => {
+			// 居中 cover 分块：按图片实际宽高比铺满拼图框（宽图裁左右、窄图裁上下），
+			// 每个碎片用像素级 background-position 显示 cover 整图的对应网格区域，
+			// 保证碎片拼接结果 = 完成图（object-fit: cover）与兜底大图完全一致。
+			const applyCoverTiles = () => {
 				const frame = visual.querySelector(".home-hero__mosaic-frame");
 				const naturalWidth = backdropImage?.naturalWidth ?? 0;
 				const naturalHeight = backdropImage?.naturalHeight ?? 0;
 				if (!frame || !naturalWidth || !naturalHeight) return;
-				const frameAspect =
-					frame.getBoundingClientRect().width /
-					Math.max(1, frame.getBoundingClientRect().height);
-				const imageAspect = naturalWidth / naturalHeight;
-				const size =
-					imageAspect >= frameAspect
-						? `auto ${rows * 100}%`
-						: `${columns * 100}% auto`;
-				visual.style.setProperty("--home-hero-mosaic-bg-size", size);
+				const frameRect = frame.getBoundingClientRect();
+				const frameWidth = frameRect.width;
+				const frameHeight = frameRect.height;
+				if (!frameWidth || !frameHeight) return;
+				const scale = Math.max(
+					frameWidth / naturalWidth,
+					frameHeight / naturalHeight,
+				);
+				const imageWidth = naturalWidth * scale;
+				const imageHeight = naturalHeight * scale;
+				// 居中 cover：图片左上角相对拼图框的偏移（负值）
+				const baseX = (imageWidth - frameWidth) / 2;
+				const baseY = (imageHeight - frameHeight) / 2;
+				visual
+					.querySelectorAll("[data-hero-tile]")
+					.forEach((tile) => {
+						const image = tile.querySelector(
+							".home-hero__mosaic-tile-image",
+						);
+						if (!image) return;
+						const col = Number(tile.dataset.column ?? 0);
+						const row = Number(tile.dataset.row ?? 0);
+						image.style.backgroundSize = `${imageWidth.toFixed(
+							2,
+						)}px ${imageHeight.toFixed(2)}px`;
+						image.style.backgroundPosition = `${(
+							baseX +
+							(col * frameWidth) / columns
+						).toFixed(2)}px ${(
+							baseY +
+							(row * frameHeight) / rows
+						).toFixed(2)}px`;
+					});
 			};
 			if (backdropImage?.complete && backdropImage.naturalWidth > 0) {
-				applyCoverSize();
+				applyCoverTiles();
 			} else {
-				backdropImage?.addEventListener("load", applyCoverSize, {
+				backdropImage?.addEventListener("load", applyCoverTiles, {
 					once: true,
 				});
 			}
+			// 窗口尺寸变化后重算分块（拼图框宽度随 vw 变化）
+			let resizeTimer = 0;
+			window.addEventListener(
+				"resize",
+				() => {
+					window.clearTimeout(resizeTimer);
+					resizeTimer = window.setTimeout(applyCoverTiles, 120);
+				},
+				{ passive: true },
+			);
 		})();
 	</script>
 </div>

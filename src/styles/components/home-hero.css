@@ -358,6 +358,11 @@ html:has(.home-hero) #top-row {
 			calc(var(--home-hero-mosaic-rows) * 100%);
 	}
 
+	/* 移动端完成图与碎片（fill 网格）保持一致 */
+	.home-hero__mosaic-complete img {
+		object-fit: fill;
+	}
+
 	.home-hero__identity {
 		left: var(--space-5);
 	}

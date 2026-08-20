@@ -501,86 +501,52 @@
 }
 
 .guide-tag-list {
-	display: flex;
-	flex-wrap: wrap;
-	gap: 0.4rem;
+	display: grid;
+	grid-template-columns: repeat(3, minmax(0, 1fr));
+	gap: 0.5rem;
 	margin-top: 0.75rem;
 }
 
 .guide-tag-list a {
-	display: inline-flex;
+	display: flex;
+	flex-direction: column;
 	align-items: center;
+	justify-content: center;
 	gap: 0.3rem;
-	padding: 0.32rem 0.5rem;
-	border: 1px solid color-mix(in srgb, var(--guide-fg) 42%, transparent);
-	border-radius: 999px;
+	min-height: 3.1rem;
+	padding: 0.45rem 0.35rem;
+	border: 2px solid var(--guide-fg);
+	border-radius: 0.8rem;
+	background: var(--guide-bg);
 	color: inherit;
-	font-size: 0.72rem;
+	font-size: 0.78rem;
 	font-weight: 800;
-	line-height: 1;
+	line-height: 1.2;
 	text-decoration: none;
-	transition: background-color 200ms ease, color 200ms ease, border-color 200ms ease, transform 280ms cubic-bezier(0.16, 1, 0.3, 1);
+	box-shadow: 0 0.4rem 0.9rem color-mix(in srgb, var(--guide-fg) 16%, transparent);
+	transition: background-color 280ms ease, color 280ms ease, border-color 280ms ease;
 }
 
 .guide-tag-list a:hover {
+	border-color: var(--guide-fg);
 	background: var(--guide-fg);
 	color: var(--guide-bg);
 }
 
-.guide-tag-list span {
-	opacity: 0.62;
+/* 计数徽章 */
+.guide-tag-list a span {
+	padding: 0.06rem 0.5rem;
+	border: 1px solid color-mix(in srgb, var(--guide-fg) 28%, transparent);
+	border-radius: 999px;
+	background: transparent;
+	font-size: 0.66rem;
+	font-weight: 900;
+	transition: background-color 200ms ease, border-color 200ms ease;
 }
 
-.guide-tag-list__all {
-	display: none !important;
-}
-
-.guide-card--tags:hover .guide-tag-list a,
-.guide-card--tags:focus-within .guide-tag-list a {
-	border-color: var(--guide-bg);
-	color: var(--guide-bg);
-}
-
-.guide-card--tags:hover .guide-tag-list a:nth-child(1),
-.guide-card--tags:focus-within .guide-tag-list a:nth-child(1) {
-	background: var(--guide-bg);
-	color: var(--guide-fg);
-	transform: rotate(-6deg) translateY(-0.1rem);
-}
-
-.guide-card--tags:hover .guide-tag-list a:nth-child(2),
-.guide-card--tags:focus-within .guide-tag-list a:nth-child(2) {
-	transform: rotate(5deg) translateY(0.15rem);
-}
-
-.guide-card--tags:hover .guide-tag-list a:nth-child(3),
-.guide-card--tags:focus-within .guide-tag-list a:nth-child(3) {
-	border-color: var(--guide-accent);
-	background: var(--guide-accent);
-	color: var(--guide-fg);
-	transform: rotate(-4deg) translateY(-0.16rem);
-}
-
-.guide-card--tags:hover .guide-tag-list a:nth-child(4),
-.guide-card--tags:focus-within .guide-tag-list a:nth-child(4) {
-	background: var(--guide-bg);
-	color: var(--guide-fg);
-	transform: rotate(8deg) translateY(0.1rem);
-}
-
-.guide-card--tags:hover .guide-tag-list a:nth-child(5),
-.guide-card--tags:focus-within .guide-tag-list a:nth-child(5) {
-	transform: rotate(-3deg) translateY(-0.08rem);
-}
-
-.guide-card--tags:hover .guide-tag-list__all,
-.guide-card--tags:focus-within .guide-tag-list__all {
-	display: inline-flex !important;
-	border-color: var(--guide-accent);
-	background: var(--guide-accent);
-	color: var(--guide-fg);
-	transform: rotate(4deg) translateY(0.15rem);
-	animation: guide-tag-all-in 260ms cubic-bezier(0.16, 1, 0.3, 1) both;
+.guide-tag-list a:hover span {
+	border-color: transparent;
+	background: color-mix(in srgb, var(--guide-bg) 24%, transparent);
 }
 
 .guide-tag-list__all svg {
@@ -691,38 +657,20 @@
 	margin-top: 0.9rem;
 }
 
-.guide-tag-list a,
-.guide-tag-list__all {
-	padding: 0.45rem 0.72rem;
-	font-size: 0.88rem;
-	transition: color 180ms ease, border-color 180ms ease;
+.guide-tag-list a.guide-tag-list__all {
+	flex-direction: row;
+	justify-content: center;
+	gap: 0.3rem;
+	min-height: 3.1rem;
+	padding: 0.5rem 0.72rem;
+	font-size: 0.82rem;
 }
 
-.guide-tag-list__all,
-.guide-card--tags:hover .guide-tag-list__all,
-.guide-card--tags:focus-within .guide-tag-list__all {
-	display: inline-flex !important;
-	border-color: color-mix(in srgb, var(--guide-fg) 42%, transparent);
-	background: transparent;
-	color: inherit;
-	transform: none;
-	animation: none;
+.guide-tag-list__all svg {
+	font-size: 0.9rem;
 }
 
-.guide-card--tags:hover .guide-tag-list a,
-.guide-card--tags:focus-within .guide-tag-list a,
-.guide-card--tags:hover .guide-tag-list a:nth-child(n),
-.guide-card--tags:focus-within .guide-tag-list a:nth-child(n) {
-	border-color: color-mix(in srgb, var(--guide-fg) 42%, transparent);
-	background: transparent;
-	color: var(--guide-fg);
-	transform: none;
-	animation: none;
-}
-
-.guide-card--tags:hover .guide-tag-list a:hover,
-.guide-card--tags:focus-within .guide-tag-list a:hover,
-.guide-card--tags .guide-tag-list a:focus-visible {
+.guide-tag-list a:focus-visible {
 	border-color: var(--guide-fg);
 	background: var(--guide-fg);
 	color: var(--guide-bg);
@@ -855,11 +803,6 @@
 @keyframes guide-slide-in {
 	from { opacity: 0; transform: translateY(0.6rem); }
 	to { opacity: 1; transform: translateY(0); }
-}
-
-@keyframes guide-tag-all-in {
-	from { opacity: 0; transform: rotate(4deg) translateY(0.7rem) scale(0.82); }
-	to { opacity: 1; transform: rotate(4deg) translateY(0.15rem) scale(1); }
 }
 
 @media (max-width: 900px) {

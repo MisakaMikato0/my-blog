@@ -788,19 +788,6 @@ html:has(.guestbook-page) #category-bar-wrapper {
 	opacity: 0.78;
 }
 
-.guestbook-message__quote-jump {
-	position: absolute;
-	top: var(--space-2);
-	right: var(--space-2);
-	opacity: 0;
-	transition: opacity 160ms ease;
-}
-
-.guestbook-message__quote:hover .guestbook-message__quote-jump,
-.guestbook-message__quote:focus-visible .guestbook-message__quote-jump {
-	opacity: 1;
-}
-
 .guestbook-message__quote span,
 .guestbook-message__quote small {
 	display: block;
@@ -1695,10 +1682,6 @@ html:has(.guestbook-page) #category-bar-wrapper {
 	}
 
 	.guestbook-message__tools {
-		opacity: 1;
-	}
-
-	.guestbook-message__quote-jump {
 		opacity: 1;
 	}
 

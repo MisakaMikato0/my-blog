@@ -1,6 +1,5 @@
 <script lang="ts">
 import {
-	ArrowUpToLine,
 	Check,
 	Copy,
 	Laptop,
@@ -141,11 +140,6 @@ async function copyMessage() {
 						onclick={() => onJump(message)}
 						title="跳转到原消息"
 					>
-						<ArrowUpToLine
-							class="guestbook-message__quote-jump"
-							size={15}
-							aria-hidden="true"
-						/>
 						<span>@{message.replyToNick || "访客"}</span>
 						<small>{quotePreview}</small>
 					</button>

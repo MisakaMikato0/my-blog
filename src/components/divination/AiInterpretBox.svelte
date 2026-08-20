@@ -23,7 +23,6 @@ $effect(() => {
 	question = initialQuestion;
 });
 
-
 async function interpret() {
 	if (status === "loading") return;
 	status = "loading";

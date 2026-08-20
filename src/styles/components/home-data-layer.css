@@ -213,6 +213,12 @@
 	opacity: 0.7;
 }
 
+/* 订阅与联系卡片背景图悬停时不缩放 */
+.guide-card--contact:hover .guide-card__visual img,
+.guide-card--contact:focus-within .guide-card__visual img {
+	transform: none;
+}
+
 .guide-card__icon {
 	display: grid;
 	place-items: center;
@@ -677,7 +683,102 @@
 }
 
 .guide-card--contact {
+	position: relative;
 	cursor: default;
+}
+
+/* 标题等文字浮于覆盖层之上，且不拦截区域点击 */
+.guide-card--contact > .guide-card__eyebrow,
+.guide-card--contact > h3 {
+	position: relative;
+	z-index: 4;
+	pointer-events: none;
+}
+
+/* 覆盖层激活时标题与眉标让位给左上区域图标 */
+.guide-card--contact > h3,
+.guide-card--contact > .guide-card__eyebrow {
+	transition: opacity 200ms ease;
+}
+
+.guide-card--contact.has-overlay > h3,
+.guide-card--contact.has-overlay > .guide-card__eyebrow {
+	opacity: 0;
+}
+
+/* 悬停展开的四角飞线 + 五区分割覆盖层（JS 生成，仅精确指针设备启用） */
+.guide-contact__overlay {
+	position: absolute;
+	inset: 0;
+	z-index: 3;
+	border-radius: inherit;
+	overflow: hidden;
+}
+
+.guide-contact__overlay-svg {
+	position: absolute;
+	inset: 0;
+	z-index: 1;
+	width: 100%;
+	height: 100%;
+	pointer-events: none;
+}
+
+.guide-contact__overlay-line {
+	fill: none;
+	stroke: var(--guide-fg);
+	stroke-width: 2px;
+	stroke-linecap: round;
+}
+
+.guide-contact__region {
+	position: absolute;
+	inset: 0;
+	color: var(--guide-fg);
+	font-size: 1.9rem;
+	text-decoration: none;
+	background: var(--guide-bg);
+	transition: background-color 180ms ease, color 180ms ease;
+}
+
+.guide-contact__region--top-left { --region-x: 22%; --region-y: 22%; clip-path: polygon(0% 0%, 50% 0%, 50% 26%, 32% 26%, 32% 50%, 0% 50%); }
+.guide-contact__region--top-right { --region-x: 78%; --region-y: 22%; clip-path: polygon(50% 0%, 100% 0%, 100% 50%, 68% 50%, 68% 26%, 50% 26%); }
+.guide-contact__region--bottom-left { --region-x: 22%; --region-y: 78%; clip-path: polygon(0% 50%, 32% 50%, 32% 74%, 50% 74%, 50% 100%, 0% 100%); }
+.guide-contact__region--bottom-right { --region-x: 78%; --region-y: 78%; clip-path: polygon(100% 50%, 100% 100%, 50% 100%, 50% 74%, 68% 74%, 68% 50%); }
+.guide-contact__region--center {
+	--region-x: 50%;
+	--region-y: 50%;
+	inset: auto;
+	left: 32%;
+	top: 26%;
+	width: 36%;
+	height: 48%;
+	clip-path: none;
+	border: 2px solid currentColor;
+}
+
+/* 图标定位到所在区域重心 */
+.guide-contact__region svg {
+	position: absolute;
+	left: var(--region-x, 50%);
+	top: var(--region-y, 50%);
+	transform: translate(-50%, -50%);
+}
+
+/* 选中反馈：浅色主题区域变黑图标变白，暗色反之（变量自动互换） */
+.guide-contact__region:hover,
+.guide-contact__region:focus-visible {
+	background: var(--guide-fg);
+	color: var(--guide-bg);
+}
+
+/* 覆盖层激活后隐藏原有底部图标行 */
+.guide-card--contact.has-overlay .guide-contact__primary,
+.guide-card--contact.has-overlay:hover .guide-contact__all,
+.guide-card--contact.has-overlay:focus-within .guide-contact__all,
+.guide-card--contact.has-overlay.is-open .guide-contact__all {
+	opacity: 0;
+	pointer-events: none;
 }
 
 .guide-contact__primary,

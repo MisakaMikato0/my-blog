@@ -1,6 +1,7 @@
 <script lang="ts">
 import type { TarotResult, TarotSpreadType } from "@/utils/divination";
 import { createTarotReading } from "@/utils/divination";
+import AiInterpretBox from "./AiInterpretBox.svelte";
 
 const spreadOptions: { id: TarotSpreadType; label: string }[] = [
 	{ id: "single", label: "单牌指引" },
@@ -74,9 +75,10 @@ function formatDate(ts: number): string {
 					</div>
 				{/each}
 			</div>
-		</div>
-	{/if}
-</div>
+			</div>
+			<AiInterpretBox method="tarot" data={result.data} />
+			{/if}
+			</div>
 
 <style>
 	.panel {

@@ -1,4 +1,5 @@
 import { handleCloudflareAiSearch } from "../src/workers/cloudflare/ai-search/runtime";
+import { handleDivinationInterpret } from "../src/workers/cloudflare/divination-ai/handler";
 import { handleDynamic } from "../src/workers/cloudflare/dynamic/handler";
 import { handleGithubContributions } from "../src/workers/cloudflare/github-contributions/handler";
 import { handleGallery } from "../src/workers/cloudflare/gallery/handler";
@@ -45,6 +46,9 @@ export default {
 
 		if (url.pathname === "/api/ai-chat") {
 			return handleCloudflareAiSearch(request, env);
+		}
+		if (url.pathname === "/api/divination/interpret") {
+			return handleDivinationInterpret(request, env);
 		}
 		if (url.pathname === "/api/github-contributions") {
 			return handleGithubContributions(request, env, ctx);

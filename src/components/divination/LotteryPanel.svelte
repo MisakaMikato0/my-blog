@@ -1,6 +1,7 @@
 <script lang="ts">
 import type { LotteryResult } from "@/utils/divination";
 import { createLotteryReading } from "@/utils/divination";
+import AiInterpretBox from "./AiInterpretBox.svelte";
 
 type Mode = "random" | "number";
 
@@ -121,9 +122,10 @@ function formatDate(ts: number): string {
 					</ul>
 				</div>
 			{/if}
-		</div>
-	{/if}
-</div>
+			</div>
+			<AiInterpretBox method="ssgw" data={result.data} />
+			{/if}
+			</div>
 
 <style>
 	.panel {

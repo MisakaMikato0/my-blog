@@ -1,6 +1,7 @@
 <script lang="ts">
 import type { XiaoliurenResult } from "@/utils/divination";
 import { createXiaoliurenReading } from "@/utils/divination";
+import AiInterpretBox from "./AiInterpretBox.svelte";
 
 let customTime = $state("");
 let result = $state<XiaoliurenResult | null>(null);
@@ -79,6 +80,7 @@ function formatDate(ts: number): string {
 				</div>
 			</div>
 		</div>
+		<AiInterpretBox method="xiaoliuren" data={result.data} />
 	{/if}
 </div>
 

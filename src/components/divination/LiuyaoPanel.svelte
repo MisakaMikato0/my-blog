@@ -1,6 +1,7 @@
 <script lang="ts">
 import type { LiuyaoResult } from "@/utils/divination";
 import { createLiuyaoReading } from "@/utils/divination";
+import AiInterpretBox from "./AiInterpretBox.svelte";
 
 type Method = "time" | "manual";
 
@@ -229,6 +230,7 @@ function formatDate(ts: number): string {
 				{/if}
 			</div>
 		</div>
+		<AiInterpretBox method="liuyao" data={result.data} />
 	{/if}
 </div>
 

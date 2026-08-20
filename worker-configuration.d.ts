@@ -16,6 +16,9 @@ declare global {
 		UPYUN_OPERATOR_PASSWORD?: string;
 		UPYUN_FORM_API_SECRET?: string;
 		UPYUN_CDN_HOST?: string;
+		DEEPSEEK_API_KEY?: string;
+		DEEPSEEK_API_URL?: string;
+		DEEPSEEK_CHAT_MODEL?: string;
 	}
 }
 

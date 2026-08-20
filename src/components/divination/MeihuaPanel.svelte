@@ -1,6 +1,7 @@
 <script lang="ts">
 import type { MeihuaResult } from "@/utils/divination";
 import { createMeihuaReading } from "@/utils/divination";
+import AiInterpretBox from "./AiInterpretBox.svelte";
 
 type Method = "time" | "number";
 
@@ -156,10 +157,11 @@ function formatDate(ts: number): string {
 						</p>
 					{/if}
 				</div>
-			{/if}
-		</div>
-	{/if}
-</div>
+				{/if}
+				<AiInterpretBox method="meihua" data={result.data} />
+				</div>
+				{/if}
+				</div>
 
 <style>
 	.panel {

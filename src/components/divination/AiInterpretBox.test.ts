@@ -1,0 +1,85 @@
+import { fireEvent, render, screen } from "@testing-library/svelte";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { createLiuyaoReading } from "@/utils/divination";
+import AiInterpretBox from "./AiInterpretBox.svelte";
+
+const FIXED_DATE = new Date("2026-08-20T13:30:00+08:00");
+
+describe("AiInterpretBox 组件", () => {
+	beforeEach(() => {
+		vi.stubGlobal("fetch", vi.fn());
+	});
+
+	afterEach(() => {
+		vi.unstubAllGlobals();
+	});
+
+	it("渲染标题、输入框与解卦按钮", () => {
+		const liuyao = createLiuyaoReading({ customDate: FIXED_DATE });
+		render(AiInterpretBox, { props: { method: "liuyao", data: liuyao.data } });
+		expect(screen.getByText("AI 解卦")).toBeTruthy();
+		expect(screen.getByPlaceholderText(/所问何事/)).toBeTruthy();
+		expect(screen.getByRole("button", { name: "解卦" })).toBeTruthy();
+	});
+
+	it("点击解卦后调用后端并展示结果", async () => {
+		const liuyao = createLiuyaoReading({ customDate: FIXED_DATE });
+		vi.mocked(fetch).mockResolvedValue(
+			new Response(JSON.stringify({ text: "此卦宜守不宜进……" }), {
+				status: 200,
+			}),
+		);
+		render(AiInterpretBox, { props: { method: "liuyao", data: liuyao.data } });
+
+		await fireEvent.click(screen.getByRole("button", { name: "解卦" }));
+		expect(await screen.findByText(/此卦宜守不宜进/)).toBeTruthy();
+
+		// 验证请求体
+		const [url, init] = vi.mocked(fetch).mock.calls[0] as [string, RequestInit];
+		expect(url).toBe("/api/divination/interpret");
+		const body = JSON.parse(String(init.body)) as { method: string };
+		expect(body.method).toBe("liuyao");
+	});
+
+	it("携带问题输入发送请求", async () => {
+		const liuyao = createLiuyaoReading({ customDate: FIXED_DATE });
+		vi.mocked(fetch).mockResolvedValue(
+			new Response(JSON.stringify({ text: "分析如下" }), { status: 200 }),
+		);
+		render(AiInterpretBox, { props: { method: "liuyao", data: liuyao.data } });
+
+		const input = screen.getByPlaceholderText(/所问何事/);
+		await fireEvent.input(input, { target: { value: "最近换工作合适吗" } });
+		await fireEvent.click(screen.getByRole("button", { name: "解卦" }));
+		await screen.findByText(/分析如下/);
+
+		const [, init] = vi.mocked(fetch).mock.calls[0] as [string, RequestInit];
+		const body = JSON.parse(String(init.body)) as { question: string };
+		expect(body.question).toBe("最近换工作合适吗");
+	});
+
+	it("后端未配置 Key 时展示友好提示", async () => {
+		const liuyao = createLiuyaoReading({ customDate: FIXED_DATE });
+		vi.mocked(fetch).mockResolvedValue(
+			new Response(JSON.stringify({ error: "AI_KEY_NOT_CONFIGURED" }), {
+				status: 503,
+			}),
+		);
+		render(AiInterpretBox, { props: { method: "liuyao", data: liuyao.data } });
+
+		await fireEvent.click(screen.getByRole("button", { name: "解卦" }));
+		expect(
+			await screen.findByText(/站长尚未配置 AI 解卦 API Key/),
+		).toBeTruthy();
+	});
+
+	it("网络失败时展示错误信息", async () => {
+		const liuyao = createLiuyaoReading({ customDate: FIXED_DATE });
+		// 真实浏览器网络失败抛 TypeError（"Failed to fetch"）
+		vi.mocked(fetch).mockRejectedValue(new TypeError("Failed to fetch"));
+		render(AiInterpretBox, { props: { method: "liuyao", data: liuyao.data } });
+
+		await fireEvent.click(screen.getByRole("button", { name: "解卦" }));
+		expect(await screen.findByText(/网络异常/)).toBeTruthy();
+	});
+});

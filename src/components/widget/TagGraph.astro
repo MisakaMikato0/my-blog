@@ -11,18 +11,15 @@ const initialStatus =
 	graph.nodes.length === 0 ? "暂无标签关系" : "正在准备图谱…";
 ---
 
-<div
+  <div
 	id="tag-graph-container"
 	class="tag-graph"
 	data-graph={JSON.stringify(graph)}
 >
-  <div class="tag-graph__header">
-    <p class="tag-graph__description">
-      本关系图谱基于
-      <a href="https://d3js.org/" target="_blank" rel="noopener noreferrer">D3.js</a>
-      进行绘制。
-    </p>
-  </div>
+  <h2 class="category-section-title">
+    <span class="category-section-title__bar" aria-hidden="true"></span>
+    标签关系图谱
+  </h2>
 
   <div
     id="tag-graph-chart"

@@ -1,5 +1,5 @@
 ---
-import CategoryFolders from "@components/widget/CategoryFolders.astro";
+import CategoryExplorer from "@components/widget/CategoryExplorer.astro";
 import TagGraph from "@components/widget/TagGraph.astro";
 import MainGridLayout from "@layouts/MainGridLayout.astro";
 import PageTitle from "@/components/common/PageTitle.astro";
@@ -23,8 +23,8 @@ const title = "标签图谱";
       <TagGraph graph={tagGraph} />
     </section>
 
-    <section class="categories-page__folders" aria-label="分类文件夹">
-      <CategoryFolders groups={categoryGroups} />
+    <section class="categories-page__folders" aria-label="分类与标签浏览">
+      <CategoryExplorer groups={categoryGroups} />
     </section>
   </div>
 </MainGridLayout>

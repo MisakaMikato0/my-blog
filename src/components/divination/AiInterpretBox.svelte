@@ -69,7 +69,7 @@ async function interpret() {
 
 <div class="ai-box">
 	<div class="ai-box__header">
-		<span class="ai-box__title">AI 解卦</span>
+		<span class="ai-box__title"> 解卦（偷偷发给幽幽子）</span>
 		<span class="ai-box__badge">Beta</span>
 	</div>
 	<div class="ai-box__question">
@@ -93,7 +93,7 @@ async function interpret() {
 			disabled={status === "loading"}
 			onclick={interpret}
 		>
-			{status === "loading" ? "解卦中…" : "解卦"}
+			{status === "loading" ? "幽幽子解卦中…" : "解卦"}
 		</button>
 	</div>
 
@@ -107,7 +107,7 @@ async function interpret() {
 
 	{#if status === "idle"}
 		<p class="ai-box__hint">
-			由 AI 基于传统法理生成白话解读，结果仅供参考，不构成决策建议。
+			由 幽幽子 基于传统法理生成白话解读，结果仅供参考，不构成决策建议。
 		</p>
 	{/if}
 </div>

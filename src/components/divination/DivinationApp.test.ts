@@ -41,5 +41,12 @@ describe("DivinationApp 组件", () => {
 		const btn = screen.getByRole("button", { name: "抽牌" });
 		await fireEvent.click(btn);
 		await screen.findByText(/时间流牌阵/);
+		// 牌面图片必须引用有效的 tarot 图片（无 NaN、无 number 缺失导致的坏路径）
+		const imgs = Array.from(document.querySelectorAll<HTMLImageElement>("img"));
+		expect(imgs.length).toBeGreaterThan(0);
+		for (const img of imgs) {
+			expect(img.src).toMatch(/\/images\/tarot\/\d+\.webp$/);
+			expect(img.src).not.toContain("NaN");
+		}
 	});
 });

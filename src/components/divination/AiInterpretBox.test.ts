@@ -17,7 +17,7 @@ describe("AiInterpretBox 组件", () => {
 	it("渲染标题、输入框与解卦按钮", () => {
 		const liuyao = createLiuyaoReading({ customDate: FIXED_DATE });
 		render(AiInterpretBox, { props: { method: "liuyao", data: liuyao.data } });
-		expect(screen.getByText("AI 解卦")).toBeTruthy();
+		expect(screen.getByText(/解卦（偷偷发给幽幽子）/)).toBeTruthy();
 		expect(screen.getByPlaceholderText(/所问何事/)).toBeTruthy();
 		expect(screen.getByRole("button", { name: "解卦" })).toBeTruthy();
 	});
@@ -56,6 +56,33 @@ describe("AiInterpretBox 组件", () => {
 		const [, init] = vi.mocked(fetch).mock.calls[0] as [string, RequestInit];
 		const body = JSON.parse(String(init.body)) as { question: string };
 		expect(body.question).toBe("最近换工作合适吗");
+	});
+
+	it("解卦期间显示罗盘 loading 覆盖层，结束后消失", async () => {
+		const liuyao = createLiuyaoReading({ customDate: FIXED_DATE });
+		let resolveFetch: (value: Response) => void;
+		vi.mocked(fetch).mockReturnValue(
+			new Promise<Response>((resolve) => {
+				resolveFetch = resolve;
+			}),
+		);
+		const { container } = render(AiInterpretBox, {
+			props: { method: "liuyao", data: liuyao.data },
+		});
+
+		await fireEvent.click(screen.getByRole("button", { name: "解卦" }));
+
+		// 请求未返回时，罗盘覆盖层可见
+		expect(container.querySelector(".compass-overlay")).toBeTruthy();
+		expect(container.querySelector(".compass-pan")).toBeTruthy();
+		expect(screen.getByText(/幽幽子正在推演天机/)).toBeTruthy();
+
+		// 请求返回后，覆盖层消失
+		resolveFetch!(new Response(JSON.stringify({ text: "卦象已明" }), { status: 200 }));
+		await screen.findByText(/卦象已明/);
+		await vi.waitFor(() =>
+			expect(container.querySelector(".compass-overlay")).toBeNull(),
+		);
 	});
 
 	it("起卦前已定所问时只读展示所问，不再显示输入框", async () => {

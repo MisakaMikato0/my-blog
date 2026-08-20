@@ -110,13 +110,9 @@ html:has(.home-hero) #top-row {
 	opacity: 0;
 	visibility: hidden;
 	pointer-events: none;
-}
-
-.home-hero__mosaic-complete img {
-	display: block;
-	width: 100%;
-	height: 100%;
-	object-fit: cover;
+	background-image: var(--home-hero-mosaic-image);
+	background-repeat: no-repeat;
+	/* background-size/position 由脚本按 hero cover 分块实时设置 */
 }
 
 .home-hero__shade {
@@ -359,8 +355,11 @@ html:has(.home-hero) #top-row {
 	}
 
 	/* 移动端完成图与碎片（fill 网格）保持一致 */
-	.home-hero__mosaic-complete img {
-		object-fit: fill;
+	.home-hero__mosaic-complete {
+		background-image: var(--home-hero-mosaic-image-mobile);
+		background-size: calc(var(--home-hero-mosaic-columns) * 100%)
+			calc(var(--home-hero-mosaic-rows) * 100%);
+		background-position: 0 0;
 	}
 
 	.home-hero__identity {

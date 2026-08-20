@@ -57,10 +57,11 @@ const mosaicStyle = [
 				</span>
 			))}
 		</div>
-		<picture class="home-hero__mosaic-complete" data-hero-mosaic-complete>
-			<source media="(max-width: 768px)" srcset={mobileImage} />
-			<img alt="" width="3000" height="1500" decoding="async" />
-		</picture>
+		<div
+			class="home-hero__mosaic-complete"
+			data-hero-mosaic-complete
+			aria-hidden="true"
+		></div>
 	</div>
 
 	<script is:inline define:vars={{ images: candidates, columns: config.columns, rows: config.rows }}>
@@ -77,31 +78,32 @@ const mosaicStyle = [
 				".home-hero__backdrop-image",
 			);
 			if (backdropImage) backdropImage.src = picked;
-			const completeImage = visual.querySelector(
-				".home-hero__mosaic-complete img",
-			);
-			if (completeImage) completeImage.src = picked;
-			// 居中 cover 分块：按图片实际宽高比铺满拼图框（宽图裁左右、窄图裁上下），
-			// 每个碎片用像素级 background-position 显示 cover 整图的对应网格区域，
-			// 保证碎片拼接结果 = 完成图（object-fit: cover）与兜底大图完全一致。
+			// 统一渲染：碎片/完成图都按 hero 全屏的居中 cover 分块（与兜底 backdrop 完全一致）。
+			// 每块碎片显示 hero cover 整图在拼图框区域内的对应网格子块，
+			// 拼图完成后 frame 放大/淡出、backdrop 淡入时画面无缝衔接，不再跳变。
 			const applyCoverTiles = () => {
 				const frame = visual.querySelector(".home-hero__mosaic-frame");
+				const hero = visual.closest("[data-home-hero]");
 				const naturalWidth = backdropImage?.naturalWidth ?? 0;
 				const naturalHeight = backdropImage?.naturalHeight ?? 0;
-				if (!frame || !naturalWidth || !naturalHeight) return;
+				if (!frame || !hero || !naturalWidth || !naturalHeight) return;
+				const heroRect = hero.getBoundingClientRect();
 				const frameRect = frame.getBoundingClientRect();
 				const frameWidth = frameRect.width;
 				const frameHeight = frameRect.height;
 				if (!frameWidth || !frameHeight) return;
+				// hero 全屏 cover：图片铺满 hero，多出部分居中裁切
 				const scale = Math.max(
-					frameWidth / naturalWidth,
-					frameHeight / naturalHeight,
+					heroRect.width / naturalWidth,
+					heroRect.height / naturalHeight,
 				);
 				const imageWidth = naturalWidth * scale;
 				const imageHeight = naturalHeight * scale;
-				// 居中 cover：图片左上角相对拼图框的偏移（负值）
-				const baseX = (imageWidth - frameWidth) / 2;
-				const baseY = (imageHeight - frameHeight) / 2;
+				const baseX = (imageWidth - heroRect.width) / 2;
+				const baseY = (imageHeight - heroRect.height) / 2;
+				// 拼图框在 hero 内的位置（左上角）
+				const frameLeft = frameRect.left - heroRect.left;
+				const frameTop = frameRect.top - heroRect.top;
 				visual
 					.querySelectorAll("[data-hero-tile]")
 					.forEach((tile) => {
@@ -116,12 +118,26 @@ const mosaicStyle = [
 						)}px ${imageHeight.toFixed(2)}px`;
 						image.style.backgroundPosition = `${(
 							baseX +
+							frameLeft +
 							(col * frameWidth) / columns
 						).toFixed(2)}px ${(
 							baseY +
+							frameTop +
 							(row * frameHeight) / rows
 						).toFixed(2)}px`;
 					});
+				// 完成图整块 = hero cover 在拼图框区域的完整画面
+				const complete = visual.querySelector(
+					".home-hero__mosaic-complete",
+				);
+				if (complete) {
+					complete.style.backgroundSize = `${imageWidth.toFixed(
+						2,
+					)}px ${imageHeight.toFixed(2)}px`;
+					complete.style.backgroundPosition = `${(
+						baseX + frameLeft
+					).toFixed(2)}px ${(baseY + frameTop).toFixed(2)}px`;
+				}
 			};
 			if (backdropImage?.complete && backdropImage.naturalWidth > 0) {
 				applyCoverTiles();

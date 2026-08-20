@@ -62,7 +62,7 @@ function formatDate(ts: number): string {
 							<img
 								class="tarot-card__image"
 								class:is-reversed={card.reversed}
-								src="/images/tarot/{card.number - 1}.jpg"
+								src="/images/tarot/{card.number - 1}.webp"
 								alt="{card.name}{card.reversed ? "（逆位）" : ""}"
 								loading="lazy"
 								width="180"

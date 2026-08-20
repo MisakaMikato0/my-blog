@@ -94,11 +94,7 @@ html:has(.home-hero) #top-row {
 	height: 100%;
 	background-image: var(--home-hero-mosaic-image);
 	background-repeat: no-repeat;
-	background-size: var(
-		--home-hero-mosaic-bg-size,
-		calc(var(--home-hero-mosaic-columns) * 100%)
-			calc(var(--home-hero-mosaic-rows) * 100%)
-	);
+	background-size: calc(var(--home-hero-mosaic-columns) * 100%) calc(var(--home-hero-mosaic-rows) * 100%);
 	background-position: var(--home-hero-tile-bg-x) var(--home-hero-tile-bg-y);
 }
 
@@ -110,9 +106,15 @@ html:has(.home-hero) #top-row {
 	opacity: 0;
 	visibility: hidden;
 	pointer-events: none;
-	background-image: var(--home-hero-mosaic-image);
-	background-repeat: no-repeat;
-	/* background-size/position 由脚本按 hero cover 分块实时设置 */
+}
+
+.home-hero__mosaic-complete img {
+	display: block;
+	width: 100%;
+	height: 100%;
+	/* cover：居中裁切保持图片比例，避免非 2:1 图片被拉伸变形 */
+	object-fit: cover;
+	object-position: center;
 }
 
 .home-hero__shade {
@@ -349,17 +351,6 @@ html:has(.home-hero) #top-row {
 
 	.home-hero__mosaic-tile-image {
 		background-image: var(--home-hero-mosaic-image-mobile);
-		/* 移动端保持原拉伸铺满行为，不受桌面 cover 变量影响 */
-		background-size: calc(var(--home-hero-mosaic-columns) * 100%)
-			calc(var(--home-hero-mosaic-rows) * 100%);
-	}
-
-	/* 移动端完成图与碎片（fill 网格）保持一致 */
-	.home-hero__mosaic-complete {
-		background-image: var(--home-hero-mosaic-image-mobile);
-		background-size: calc(var(--home-hero-mosaic-columns) * 100%)
-			calc(var(--home-hero-mosaic-rows) * 100%);
-		background-position: 0 0;
 	}
 
 	.home-hero__identity {

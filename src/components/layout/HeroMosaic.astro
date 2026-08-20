@@ -13,6 +13,7 @@ const { desktopImage, mobileImage, images, config } = Astro.props;
 const candidates = images && images.length > 0 ? images : [desktopImage];
 const tiles = createHeroTileLayout(config);
 const mosaicStyle = [
+	`--home-hero-mosaic-image: url("${desktopImage}")`,
 	`--home-hero-mosaic-image-mobile: url("${mobileImage}")`,
 	`--home-hero-mosaic-columns: ${config.columns}`,
 	`--home-hero-mosaic-rows: ${config.rows}`,
@@ -24,6 +25,7 @@ const mosaicStyle = [
 		<source media="(max-width: 768px)" srcset={mobileImage} />
 		<img
 			class="home-hero__backdrop-image"
+			src={desktopImage}
 			alt=""
 			width="3000"
 			height="1500"
@@ -57,19 +59,18 @@ const mosaicStyle = [
 				</span>
 			))}
 		</div>
-		<div
-			class="home-hero__mosaic-complete"
-			data-hero-mosaic-complete
-			aria-hidden="true"
-		></div>
+		<picture class="home-hero__mosaic-complete" data-hero-mosaic-complete>
+			<source media="(max-width: 768px)" srcset={mobileImage} />
+			<img src={desktopImage} alt="" width="3000" height="1500" decoding="async" />
+		</picture>
 	</div>
 
-	<script is:inline define:vars={{ images: candidates, columns: config.columns, rows: config.rows }}>
+	<script is:inline define:vars={{ images: candidates }}>
 		(function () {
 			const picked = images[Math.floor(Math.random() * images.length)];
 			const visual = document.currentScript?.parentElement;
 			if (!visual || !picked) return;
-			// 马赛克碎片背景 + 完成图 + 兜底大图统一换成随机选中的图
+			// 每次刷新随机换一张：马赛克碎片背景 + 完成图 + 兜底大图统一替换
 			visual.style.setProperty(
 				"--home-hero-mosaic-image",
 				`url("${picked}")`,
@@ -78,84 +79,10 @@ const mosaicStyle = [
 				".home-hero__backdrop-image",
 			);
 			if (backdropImage) backdropImage.src = picked;
-			// 统一渲染：碎片/完成图都按 hero 全屏的居中 cover 分块（与兜底 backdrop 完全一致）。
-			// 每块碎片显示 hero cover 整图在拼图框区域内的对应网格子块，
-			// 拼图完成后 frame 放大/淡出、backdrop 淡入时画面无缝衔接，不再跳变。
-			const applyCoverTiles = () => {
-				const frame = visual.querySelector(".home-hero__mosaic-frame");
-				const hero = visual.closest("[data-home-hero]");
-				const naturalWidth = backdropImage?.naturalWidth ?? 0;
-				const naturalHeight = backdropImage?.naturalHeight ?? 0;
-				if (!frame || !hero || !naturalWidth || !naturalHeight) return;
-				const heroRect = hero.getBoundingClientRect();
-				const frameRect = frame.getBoundingClientRect();
-				const frameWidth = frameRect.width;
-				const frameHeight = frameRect.height;
-				if (!frameWidth || !frameHeight) return;
-				// hero 全屏 cover：图片铺满 hero，多出部分居中裁切
-				const scale = Math.max(
-					heroRect.width / naturalWidth,
-					heroRect.height / naturalHeight,
-				);
-				const imageWidth = naturalWidth * scale;
-				const imageHeight = naturalHeight * scale;
-				const baseX = (imageWidth - heroRect.width) / 2;
-				const baseY = (imageHeight - heroRect.height) / 2;
-				// 拼图框在 hero 内的位置（左上角）
-				const frameLeft = frameRect.left - heroRect.left;
-				const frameTop = frameRect.top - heroRect.top;
-				visual
-					.querySelectorAll("[data-hero-tile]")
-					.forEach((tile) => {
-						const image = tile.querySelector(
-							".home-hero__mosaic-tile-image",
-						);
-						if (!image) return;
-						const col = Number(tile.dataset.column ?? 0);
-						const row = Number(tile.dataset.row ?? 0);
-						image.style.backgroundSize = `${imageWidth.toFixed(
-							2,
-						)}px ${imageHeight.toFixed(2)}px`;
-						image.style.backgroundPosition = `${(
-							baseX +
-							frameLeft +
-							(col * frameWidth) / columns
-						).toFixed(2)}px ${(
-							baseY +
-							frameTop +
-							(row * frameHeight) / rows
-						).toFixed(2)}px`;
-					});
-				// 完成图整块 = hero cover 在拼图框区域的完整画面
-				const complete = visual.querySelector(
-					".home-hero__mosaic-complete",
-				);
-				if (complete) {
-					complete.style.backgroundSize = `${imageWidth.toFixed(
-						2,
-					)}px ${imageHeight.toFixed(2)}px`;
-					complete.style.backgroundPosition = `${(
-						baseX + frameLeft
-					).toFixed(2)}px ${(baseY + frameTop).toFixed(2)}px`;
-				}
-			};
-			if (backdropImage?.complete && backdropImage.naturalWidth > 0) {
-				applyCoverTiles();
-			} else {
-				backdropImage?.addEventListener("load", applyCoverTiles, {
-					once: true,
-				});
-			}
-			// 窗口尺寸变化后重算分块（拼图框宽度随 vw 变化）
-			let resizeTimer = 0;
-			window.addEventListener(
-				"resize",
-				() => {
-					window.clearTimeout(resizeTimer);
-					resizeTimer = window.setTimeout(applyCoverTiles, 120);
-				},
-				{ passive: true },
+			const completeImage = visual.querySelector(
+				".home-hero__mosaic-complete img",
 			);
+			if (completeImage) completeImage.src = picked;
 		})();
 	</script>
 </div>

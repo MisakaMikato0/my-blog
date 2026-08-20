@@ -4,12 +4,72 @@ import { getApiUrlList } from "@/utils/image-utils";
 
 // 文章封面 API：随机图做背景，客户端按顺序重试，全部失败隐藏背景
 const coverApis = getApiUrlList("api", "weather-widget");
+
+// ===== 图标与数据配置（数据驱动渲染，避免重复模板） =====
+
+// 主天气图标：meteocons 彩色天气图标（自带动画），构建期内联 SVG，
+// 运行时按 weather_icon 代码 + 昼夜 切换显隐（data-icon 与脚本返回值一致）
+const heroWeatherIcons = [
+	"clear-day-fill",
+	"clear-night-fill",
+	"partly-cloudy-day-fill",
+	"partly-cloudy-night-fill",
+	"overcast-fill",
+	"overcast-night-fill",
+	"wind-fill",
+	"hurricane-fill",
+	"tornado-fill",
+	"rain-fill",
+	"thunderstorms-fill",
+	"extreme-rain-fill",
+	"drizzle-fill",
+	"sleet-fill",
+	"snow-fill",
+	"fog-fill",
+	"haze-fill",
+	"dust-fill",
+] as const;
+
+interface ExtendedItem {
+	/** 展示标签 */
+	label: string;
+	/** 数据回填用的 data-* 属性名（与脚本 setData 选择器保持一致） */
+	attr: string;
+	/** 加载前的占位文本 */
+	placeholder: string;
+	/** iconify 图标名：天气指标用 meteocons 彩色图标，通用项保留 lucide */
+	icon: string;
+	/** 空气质量卡片：数值 + 等级标签的特殊布局 */
+	aqi?: boolean;
+}
+
+// 扩展数据卡片配置
+const extendedItems: ExtendedItem[] = [
+	{ label: "体感", attr: "data-feels-like", placeholder: "--°C", icon: "meteocons:thermometer-fill" },
+	{ label: "湿度", attr: "data-humidity", placeholder: "--%", icon: "meteocons:humidity-fill" },
+	{ label: "风力", attr: "data-wind", placeholder: "--", icon: "meteocons:wind-fill" },
+	{ label: "降水概率", attr: "data-pop", placeholder: "--%", icon: "meteocons:umbrella-fill" },
+	{ label: "日出", attr: "data-sunrise", placeholder: "--:--", icon: "meteocons:sunrise-fill" },
+	{ label: "日落", attr: "data-sunset", placeholder: "--:--", icon: "meteocons:sunset-fill" },
+	{ label: "能见度", attr: "data-visibility", placeholder: "--km", icon: "lucide:eye" },
+	{ label: "气压", attr: "data-pressure", placeholder: "--hPa", icon: "meteocons:barometer-fill" },
+	{ label: "紫外线", attr: "data-uv", placeholder: "--", icon: "meteocons:uv-index-fill" },
+	{ label: "降水量", attr: "data-precipitation", placeholder: "--mm", icon: "meteocons:rain-fill" },
+	{ label: "云量", attr: "data-cloud", placeholder: "--%", icon: "meteocons:cloudy-fill" },
+	{ label: "空气质量", attr: "data-aqi", placeholder: "--", icon: "lucide:leaf", aqi: true },
+	{ label: "PM2.5", attr: "data-pm25", placeholder: "--", icon: "lucide:activity" },
+	{ label: "PM10", attr: "data-pm10", placeholder: "--", icon: "lucide:activity" },
+	{ label: "O₃", attr: "data-o3", placeholder: "--", icon: "lucide:flask-conical" },
+	{ label: "NO₂", attr: "data-no2", placeholder: "--", icon: "lucide:flask-conical" },
+	{ label: "SO₂", attr: "data-so2", placeholder: "--", icon: "lucide:flask-conical" },
+	{ label: "CO", attr: "data-co", placeholder: "--", icon: "lucide:flask-conical" },
+];
 ---
 
 <!--
 	天气组件：基于 uapis.cn 天气接口（IP 自动定位）
-	数据填充脚本与 weather-widget-script.js 逻辑保持一致，
-	图标使用 lucide（轻量线性图标库），构建期内联 SVG，运行时按 weather_icon 切换显示。
+	主图标使用 meteocons 彩色天气图标（自带动画），扩展指标中天气相关项也使用 meteocons，
+	通用 UI 图标保留 lucide；构建期内联 SVG，运行时按 weather_icon 代码 + 昼夜切换显示。
 -->
 <section class="weather-widget" data-weather-init aria-label="天气预报">
 	<!-- 背景图：文章封面 API（与 guide-card 视觉一致，低透明度 + hover 放大） -->
@@ -51,16 +111,11 @@ const coverApis = getApiUrlList("api", "weather-widget");
 				<span class="weather-widget__district" data-district>--</span>
 			</div>
 			<div class="weather-widget__big-icon" aria-hidden="true">
-				<span class="weather-widget__icon-item weather-hidden" data-weather-icon data-icon="sun"><Icon name="lucide:sun" is:inline /></span>
-				<span class="weather-widget__icon-item weather-hidden" data-weather-icon data-icon="cloud"><Icon name="lucide:cloud" is:inline /></span>
-				<span class="weather-widget__icon-item weather-hidden" data-weather-icon data-icon="cloud-sun"><Icon name="lucide:cloud-sun" is:inline /></span>
-				<span class="weather-widget__icon-item weather-hidden" data-weather-icon data-icon="wind"><Icon name="lucide:wind" is:inline /></span>
-				<span class="weather-widget__icon-item weather-hidden" data-weather-icon data-icon="cloud-rain"><Icon name="lucide:cloud-rain" is:inline /></span>
-				<span class="weather-widget__icon-item weather-hidden" data-weather-icon data-icon="cloud-lightning"><Icon name="lucide:cloud-lightning" is:inline /></span>
-				<span class="weather-widget__icon-item weather-hidden" data-weather-icon data-icon="cloud-hail"><Icon name="lucide:cloud-hail" is:inline /></span>
-				<span class="weather-widget__icon-item weather-hidden" data-weather-icon data-icon="cloud-drizzle"><Icon name="lucide:cloud-drizzle" is:inline /></span>
-				<span class="weather-widget__icon-item weather-hidden" data-weather-icon data-icon="cloud-snow"><Icon name="lucide:cloud-snow" is:inline /></span>
-				<span class="weather-widget__icon-item weather-hidden" data-weather-icon data-icon="snowflake"><Icon name="lucide:snowflake" is:inline /></span>
+				{heroWeatherIcons.map((icon) => (
+					<span class="weather-widget__icon-item weather-hidden" data-weather-icon data-icon={icon}>
+						<Icon name={`meteocons:${icon}`} is:inline />
+					</span>
+				))}
 			</div>
 		</div>
 
@@ -84,99 +139,20 @@ const coverApis = getApiUrlList("api", "weather-widget");
 		</div>
 
 		<div class="weather-widget__extended" data-weather-extended>
-			<div class="weather-widget__item">
-				<Icon name="lucide:thermometer" is:inline />
-				<span class="weather-widget__item-label">体感</span>
-				<span class="weather-widget__item-value" data-feels-like>--°C</span>
-			</div>
-			<div class="weather-widget__item">
-				<Icon name="lucide:droplet" is:inline />
-				<span class="weather-widget__item-label">湿度</span>
-				<span class="weather-widget__item-value" data-humidity>--%</span>
-			</div>
-			<div class="weather-widget__item">
-				<Icon name="lucide:wind" is:inline />
-				<span class="weather-widget__item-label">风力</span>
-				<span class="weather-widget__item-value" data-wind>--</span>
-			</div>
-			<div class="weather-widget__item">
-				<Icon name="lucide:umbrella" is:inline />
-				<span class="weather-widget__item-label">降水概率</span>
-				<span class="weather-widget__item-value" data-pop>--%</span>
-			</div>
-			<div class="weather-widget__item">
-				<Icon name="lucide:sunrise" is:inline />
-				<span class="weather-widget__item-label">日出</span>
-				<span class="weather-widget__item-value" data-sunrise>--:--</span>
-			</div>
-			<div class="weather-widget__item">
-				<Icon name="lucide:sunset" is:inline />
-				<span class="weather-widget__item-label">日落</span>
-				<span class="weather-widget__item-value" data-sunset>--:--</span>
-			</div>
-			<div class="weather-widget__item">
-				<Icon name="lucide:eye" is:inline />
-				<span class="weather-widget__item-label">能见度</span>
-				<span class="weather-widget__item-value" data-visibility>--km</span>
-			</div>
-			<div class="weather-widget__item">
-				<Icon name="lucide:gauge" is:inline />
-				<span class="weather-widget__item-label">气压</span>
-				<span class="weather-widget__item-value" data-pressure>--hPa</span>
-			</div>
-			<div class="weather-widget__item">
-				<Icon name="lucide:sun-medium" is:inline />
-				<span class="weather-widget__item-label">紫外线</span>
-				<span class="weather-widget__item-value" data-uv>--</span>
-			</div>
-			<div class="weather-widget__item">
-				<Icon name="lucide:cloud-rain" is:inline />
-				<span class="weather-widget__item-label">降水量</span>
-				<span class="weather-widget__item-value" data-precipitation>--mm</span>
-			</div>
-			<div class="weather-widget__item">
-				<Icon name="lucide:cloud" is:inline />
-				<span class="weather-widget__item-label">云量</span>
-				<span class="weather-widget__item-value" data-cloud>--%</span>
-			</div>
-			<div class="weather-widget__item weather-widget__item--aqi">
-				<Icon name="lucide:leaf" is:inline />
-				<span class="weather-widget__item-label">空气质量</span>
-				<span class="weather-widget__item-value">
-					<span data-aqi>--</span>
-					<span class="aqi-tag" data-aqi-category>--</span>
-				</span>
-			</div>
-			<div class="weather-widget__item">
-				<Icon name="lucide:activity" is:inline />
-				<span class="weather-widget__item-label">PM2.5</span>
-				<span class="weather-widget__item-value" data-pm25>--</span>
-			</div>
-			<div class="weather-widget__item">
-				<Icon name="lucide:activity" is:inline />
-				<span class="weather-widget__item-label">PM10</span>
-				<span class="weather-widget__item-value" data-pm10>--</span>
-			</div>
-			<div class="weather-widget__item">
-				<Icon name="lucide:flask-conical" is:inline />
-				<span class="weather-widget__item-label">O₃</span>
-				<span class="weather-widget__item-value" data-o3>--</span>
-			</div>
-			<div class="weather-widget__item">
-				<Icon name="lucide:flask-conical" is:inline />
-				<span class="weather-widget__item-label">NO₂</span>
-				<span class="weather-widget__item-value" data-no2>--</span>
-			</div>
-			<div class="weather-widget__item">
-				<Icon name="lucide:flask-conical" is:inline />
-				<span class="weather-widget__item-label">SO₂</span>
-				<span class="weather-widget__item-value" data-so2>--</span>
-			</div>
-			<div class="weather-widget__item">
-				<Icon name="lucide:flask-conical" is:inline />
-				<span class="weather-widget__item-label">CO</span>
-				<span class="weather-widget__item-value" data-co>--</span>
-			</div>
+			{extendedItems.map((item) => (
+				<div class:list={["weather-widget__item", item.aqi && "weather-widget__item--aqi"]}>
+					<Icon name={item.icon} is:inline />
+					<span class="weather-widget__item-label">{item.label}</span>
+					{item.aqi ? (
+						<span class="weather-widget__item-value">
+							<span data-aqi>--</span>
+							<span class="aqi-tag" data-aqi-category>--</span>
+						</span>
+					) : (
+						<span class="weather-widget__item-value" {...{ [item.attr]: "" }}>{item.placeholder}</span>
+					)}
+				</div>
+			))}
 		</div>
 	</div>
 </section>
@@ -360,9 +336,16 @@ const coverApis = getApiUrlList("api", "weather-widget");
 	.weather-widget__big-icon {
 		flex: none;
 		font-size: clamp(2.4rem, 3.4vw, 3.2rem);
-		color: var(--weather-accent);
 		line-height: 1;
 		animation: weather-widget-float 3s ease-in-out infinite;
+	}
+
+	/* meteocons 图标自带配色与动画；512 画布内含留白，用 1.65em 补偿实际可见尺寸 */
+	.weather-widget__big-icon svg {
+		width: auto;
+		height: 1.65em;
+		display: block;
+		filter: drop-shadow(0 8px 18px rgb(0 0 0 / 0.2));
 	}
 
 	@keyframes weather-widget-float {
@@ -490,9 +473,14 @@ const coverApis = getApiUrlList("api", "weather-widget");
 	}
 
 	.weather-widget__item > svg {
-		width: 1.1em;
-		height: 1.1em;
+		width: auto;
+		height: 1.15em;
 		color: var(--weather-accent);
+	}
+
+	/* meteocons 小图标同样有画布留白，放大以与 lucide 视觉一致 */
+	.weather-widget__item > svg[data-icon^="meteocons:"] {
+		height: 1.5em;
 	}
 
 	.weather-widget__item-label {
@@ -622,28 +610,145 @@ const coverApis = getApiUrlList("api", "weather-widget");
 
 	const API_URL = "https://uapis.cn/api/v1/misc/weather?";
 
-	// 天气图标映射（weather_icon 代码 → lucide 图标名，组件内已预渲染）
-	const weatherIcons = {
-		"100": "sun",
-		"101": "cloud",
-		"102": "cloud",
-		"103": "cloud-sun",
-		"104": "cloud",
+	// 天气图标映射：和风天气标准编码 → meteocons 基础形态（组件内已预渲染，
+	// 运行时再根据昼夜取具体的 day/night 图标）
+	const WEATHER_ICON_MAP: Record<string, string> = {
+		// 晴
+		"100": "clear",
+		// 多云 / 少云 / 晴间多云
+		"101": "partly-cloudy",
+		"102": "partly-cloudy",
+		"103": "partly-cloudy",
+		// 阴
+		"104": "overcast",
+		// 风（200-209 风力等级，210-212 飓风，213 龙卷风）
 		"200": "wind",
-		"201": "cloud-rain",
-		"202": "cloud-lightning",
-		"203": "cloud-rain",
-		"204": "cloud-hail",
-		"205": "cloud-drizzle",
-		"206": "cloud-lightning",
-		"207": "cloud-snow",
-		"208": "cloud-rain",
-		"209": "cloud-rain",
-		"210": "cloud-lightning",
+		"201": "wind",
+		"202": "wind",
+		"203": "wind",
+		"204": "wind",
+		"205": "wind",
+		"206": "wind",
+		"207": "wind",
+		"208": "wind",
+		"209": "wind",
+		"210": "hurricane",
+		"211": "hurricane",
+		"212": "hurricane",
+		"213": "tornado",
+		// 雨
+		"300": "rain",
+		"301": "rain",
+		"302": "thunderstorms",
+		"303": "thunderstorms",
+		"304": "thunderstorms",
+		"305": "rain",
+		"306": "rain",
+		"307": "rain",
+		"308": "extreme-rain",
+		"309": "drizzle",
+		"310": "extreme-rain",
+		"311": "extreme-rain",
+		"312": "extreme-rain",
+		"313": "sleet",
+		"314": "rain",
+		"315": "rain",
+		"316": "extreme-rain",
+		"317": "extreme-rain",
+		"318": "extreme-rain",
+		"319": "rain",
+		"320": "rain",
+		"321": "rain",
+		"322": "rain",
+		"323": "extreme-rain",
+		"324": "extreme-rain",
+		"325": "sleet",
+		"326": "sleet",
+		"399": "rain",
+		// 雪
+		"400": "snow",
+		"401": "snow",
+		"402": "snow",
+		"403": "snow",
+		"404": "sleet",
+		"405": "sleet",
+		"406": "sleet",
+		"407": "snow",
+		"408": "snow",
+		"409": "snow",
+		"410": "snow",
+		"499": "snow",
+		// 雾 / 霾 / 沙尘
+		"500": "fog",
+		"501": "fog",
+		"502": "haze",
+		"503": "dust",
+		"504": "dust",
+		"507": "dust",
+		"508": "dust",
+		"509": "fog",
+		"510": "fog",
+		"511": "haze",
+		"512": "haze",
+		"513": "haze",
+		"514": "fog",
+		"515": "fog",
+		// 热 / 冷
+		"900": "clear",
+		"901": "snow",
 	};
 
-	function getWeatherIcon(weatherIcon: string) {
-		return weatherIcons[weatherIcon] || "sun";
+	// 白天图标（通用形态）
+	const DAY_ICON_NAMES: Record<string, string> = {
+		clear: "clear-day-fill",
+		"partly-cloudy": "partly-cloudy-day-fill",
+		overcast: "overcast-fill",
+		wind: "wind-fill",
+		hurricane: "hurricane-fill",
+		tornado: "tornado-fill",
+		rain: "rain-fill",
+		thunderstorms: "thunderstorms-fill",
+		"extreme-rain": "extreme-rain-fill",
+		drizzle: "drizzle-fill",
+		sleet: "sleet-fill",
+		snow: "snow-fill",
+		fog: "fog-fill",
+		haze: "haze-fill",
+		dust: "dust-fill",
+	};
+
+	// 夜间图标（仅昼夜差异明显的形态；雨/雪/雷等夜间样式与白天近似，复用白天图标）
+	const NIGHT_ICON_NAMES: Record<string, string> = {
+		clear: "clear-night-fill",
+		"partly-cloudy": "partly-cloudy-night-fill",
+		overcast: "overcast-night-fill",
+	};
+
+	function getWeatherIcon(weatherIcon: string, isNight: boolean): string {
+		const base = WEATHER_ICON_MAP[weatherIcon] || "overcast";
+		if (isNight && NIGHT_ICON_NAMES[base]) return NIGHT_ICON_NAMES[base];
+		return DAY_ICON_NAMES[base] || "overcast-fill";
+	}
+
+	// 根据日出/日落时间判断昼夜；数据缺失时按本地时间兜底
+	function isNightTime(data: WeatherData): boolean {
+		const now = new Date();
+		const nowMinutes = now.getHours() * 60 + now.getMinutes();
+		const today = data.forecast?.[0];
+		if (today?.sunrise && today?.sunset) {
+			const toMinutes = (time: string): number => {
+				const [h, m] = time.split(":").map(Number);
+				if (!Number.isFinite(h) || !Number.isFinite(m)) return NaN;
+				return h * 60 + m;
+			};
+			const sunrise = toMinutes(today.sunrise);
+			const sunset = toMinutes(today.sunset);
+			if (Number.isFinite(sunrise) && Number.isFinite(sunset)) {
+				return nowMinutes < sunrise || nowMinutes >= sunset;
+			}
+		}
+		const hour = now.getHours();
+		return hour < 6 || hour >= 19;
 	}
 
 	function readCache(key: string): WeatherData | null {
@@ -706,10 +811,22 @@ const coverApis = getApiUrlList("api", "weather-widget");
 	}
 
 	// 图标组件为构建期内联 SVG，无法运行时改 name，改为按代码切换显示
-	function setWeatherIcon(container: HTMLElement, weatherIcon: string) {
-		const iconName = getWeatherIcon(weatherIcon);
+	function setWeatherIcon(container: HTMLElement, weatherIcon: string, isNight: boolean) {
+		const iconName = getWeatherIcon(weatherIcon, isNight);
 		container.querySelectorAll<HTMLElement>("[data-weather-icon]").forEach((el) => {
 			el.classList.toggle("weather-hidden", el.dataset.icon !== iconName);
+		});
+	}
+
+	// 用户偏好减少动态效果时，暂停 meteocons 自带的 SMIL 动画
+	function respectReducedMotion(container: HTMLElement) {
+		if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+		container.querySelectorAll<SVGSVGElement>("svg").forEach((svg) => {
+			try {
+				svg.pauseAnimations();
+			} catch {
+				// 忽略不支持 pauseAnimations 的环境
+			}
 		});
 	}
 
@@ -787,8 +904,8 @@ const coverApis = getApiUrlList("api", "weather-widget");
 		setData("[data-temp-max]", data.temp_max != null ? String(data.temp_max) : "--");
 		setData("[data-temp-min]", data.temp_min != null ? String(data.temp_min) : "--");
 
-		// 更新天气图标
-		setWeatherIcon(container, data.weather_icon ?? "");
+		// 更新天气图标（按天气代码 + 昼夜）
+		setWeatherIcon(container, data.weather_icon ?? "", isNightTime(data));
 
 		// 更新扩展数据
 		const extendedSection = container.querySelector("[data-weather-extended]");
@@ -837,6 +954,7 @@ const coverApis = getApiUrlList("api", "weather-widget");
 
 		// 显示内容
 		content?.classList.remove("weather-hidden");
+		respectReducedMotion(container);
 	}
 
 	// 初始化组件

@@ -27,6 +27,7 @@ const ICON_SETS = {
 	ri: "@iconify-json/ri",
 	"simple-icons": "@iconify-json/simple-icons",
 	"svg-spinners": "@iconify-json/svg-spinners",
+	meteocons: "@iconify-json/meteocons",
 };
 
 // 图标集数据缓存

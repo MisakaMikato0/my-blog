@@ -201,7 +201,7 @@ $effect(() => {
 		<!-- 二十四山环（金，7°/s） -->
 		<g class="luopan-ring luopan-ring--r24">
 			{#each r24Chars as c (c.ch)}
-				<g transform="rotate({c.angle})">
+				<g transform="translate(400 400) rotate({c.angle})">
 					<text
 						y="-352"
 						text-anchor="middle"
@@ -217,7 +217,7 @@ $effect(() => {
 		<!-- 十二地支环（玉，-11°/s） -->
 		<g class="luopan-ring luopan-ring--rbr">
 			{#each rBrChars as c (c.ch)}
-				<g transform="rotate({c.angle})">
+				<g transform="translate(400 400) rotate({c.angle})">
 					<text
 						y="-306"
 						text-anchor="middle"
@@ -233,36 +233,36 @@ $effect(() => {
 		<!-- 八卦环（卦爻线条 + 卦名，19°/s） -->
 		<g class="luopan-ring luopan-ring--rtr">
 			{#each trigrams as t (t.name)}
-				<g transform="rotate({t.angle})">
+				<g transform="translate(400 400) rotate({t.angle})">
 					{#each t.lines as solid, i (i)}
 						{#if solid}
 							<line
-								x1={254 + i * 14}
-								y1="-22"
-								x2={254 + i * 14}
-								y2="22"
+								x1="-22"
+								y1={-254 - i * 14}
+								x2="22"
+								y2={-254 - i * 14}
 								class="luopan-trigram"
 							/>
 						{:else}
 							<line
-								x1={254 + i * 14}
-								y1="-22"
-								x2={254 + i * 14}
-								y2="-3"
+								x1="-22"
+								y1={-254 - i * 14}
+								x2="-3"
+								y2={-254 - i * 14}
 								class="luopan-trigram"
 							/>
 							<line
-								x1={254 + i * 14}
-								y1="3"
-								x2={254 + i * 14}
-								y2="22"
+								x1="3"
+								y1={-254 - i * 14}
+								x2="22"
+								y2={-254 - i * 14}
 								class="luopan-trigram"
 							/>
 						{/if}
 					{/each}
 					<text
-						x="228"
-						y="0"
+						x="0"
+						y="-228"
 						text-anchor="middle"
 						dominant-baseline="central"
 						font-size="20"
@@ -276,7 +276,7 @@ $effect(() => {
 		<!-- 天干环（玫瑰，-29°/s） -->
 		<g class="luopan-ring luopan-ring--rst">
 			{#each rStChars as c (c.ch)}
-				<g transform="rotate({c.angle})">
+				<g transform="translate(400 400) rotate({c.angle})">
 					<text
 						y="-196"
 						text-anchor="middle"
@@ -296,7 +296,7 @@ $effect(() => {
 			<line x1="400" y1="250" x2="400" y2="550" class="luopan-dish-line" />
 			<line x1="250" y1="400" x2="550" y2="400" class="luopan-dish-line" />
 			{#each dishChars as c (c.ch)}
-				<g transform="rotate({c.angle})">
+				<g transform="translate(400 400) rotate({c.angle})">
 					<text
 						y="-118"
 						text-anchor="middle"

@@ -43,3 +43,6 @@ package/
 .obsidian/
 
 CLAUDE.md
+
+# local tool caches
+.fetch/

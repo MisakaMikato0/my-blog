@@ -1,7 +1,14 @@
 <script lang="ts">
 import type { LiuyaoResult } from "@/utils/divination";
 import { createLiuyaoReading } from "@/utils/divination";
+import {
+	deriveChangedLines,
+	deriveInterLines,
+	type HexagramDiagramItem,
+	linesFromYaosDetail,
+} from "@/utils/divination/hexagram-diagram";
 import AiInterpretBox from "./AiInterpretBox.svelte";
+import HexagramDiagram from "./HexagramDiagram.svelte";
 
 type Method = "time" | "manual";
 
@@ -39,6 +46,28 @@ function cast() {
 
 function formatDate(ts: number): string {
 	return new Date(ts).toLocaleString("zh-CN", { hour12: false });
+}
+
+function buildHexagramItems(data: LiuyaoResult["data"]): HexagramDiagramItem[] {
+	const original = linesFromYaosDetail(data.yaosDetail);
+	const items: HexagramDiagramItem[] = [
+		{ name: data.originalName, note: "本卦", lines: original },
+	];
+	if (data.changedName) {
+		items.push({
+			name: data.changedName,
+			note: "变卦",
+			lines: deriveChangedLines(original),
+		});
+	}
+	if (data.interName) {
+		items.push({
+			name: data.interName,
+			note: "互卦",
+			lines: deriveInterLines(original),
+		});
+	}
+	return items;
 }
 </script>
 
@@ -113,6 +142,8 @@ function formatDate(ts: number): string {
 					{result.data.palace.wuxing} · {result.data.palaceStage ?? ""}
 				</p>
 			</div>
+
+			<HexagramDiagram hexagrams={buildHexagramItems(result.data)} />
 
 			{#if result.data.specialPattern || result.data.specialAdvice}
 				<div class="panel__callout">

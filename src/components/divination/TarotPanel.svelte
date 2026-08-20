@@ -58,6 +58,17 @@ function formatDate(ts: number): string {
 				{#each result.data.cards as card, i (i)}
 					<div class="tarot-card" class:tarot-card--reversed={card.reversed}>
 						<span class="tarot-card__position">{card.position}</span>
+						<div class="tarot-card__image-wrap">
+							<img
+								class="tarot-card__image"
+								class:is-reversed={card.reversed}
+								src="/images/tarot/{card.number - 1}.jpg"
+								alt="{card.name}{card.reversed ? "（逆位）" : ""}"
+								loading="lazy"
+								width="180"
+								height="315"
+							/>
+						</div>
 						<span class="tarot-card__name">
 							{card.name}
 							<span class="tarot-card__orientation">
@@ -190,6 +201,28 @@ function formatDate(ts: number): string {
 
 	.tarot-card--reversed {
 		border-style: dashed;
+	}
+
+	.tarot-card__image-wrap {
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		aspect-ratio: 180 / 315;
+		overflow: hidden;
+		border-radius: 6px;
+		background: color-mix(in srgb, var(--line-divider) 30%, transparent);
+	}
+
+	.tarot-card__image {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+		display: block;
+		transition: transform 0.2s ease;
+	}
+
+	.tarot-card__image.is-reversed {
+		transform: rotate(180deg);
 	}
 
 	.tarot-card__position {

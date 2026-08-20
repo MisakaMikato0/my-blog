@@ -37,6 +37,7 @@ Firefly-Mod 是个性化魔改版本，已独立演进。
 - 删除动漫这些影响构建速度的功能。
 - 分类页使用 D3.js 力导向布局与 Canvas 绘制标签关系图谱：构建时根据文章标签生成节点与共现边，客户端支持缩放、拖拽、悬停和键盘跳转。
 - 新增卜筮页面（/divination/）：六爻、梅花易数、小六壬、观音灵签、塔罗一站式排盘，纯前端确定性计算、无后端依赖，算法与古籍文本基于 [Brhiza/mingyu](https://github.com/Brhiza/mingyu)（MIT 许可）的 `mingyu-core` 包。
+- 卦象可视化：六爻/梅花以 SVG 爻线图展示本卦/互卦/变卦（动爻标注老阳○/老阴×）；塔罗牌面配 Rider-Waite 牌图（公有领域，78 张本地化），逆位自动旋转 180°。
 - 卜筮页面可选 AI 解卦：排盘后由 Worker 端 `/api/divination/interpret` 用 mingyu 官方提示词构建器生成解卦提示词，调用 OpenAI 兼容 Chat API（默认 ModelScope，可切 DeepSeek）返回白话解读；API Key 仅存服务端，不暴露到前端。
 
 ## 常用命令

@@ -143,7 +143,7 @@ describe("handleDivinationInterpret", () => {
 	it("请求体过大返回 413", async () => {
 		const bigBody = JSON.stringify({
 			method: "liuyao",
-			data: { x: "a".repeat(70 * 1024) },
+			data: { x: "a".repeat(600 * 1024) },
 		});
 		const response = await handleDivinationInterpret(
 			jsonRequest(bigBody),

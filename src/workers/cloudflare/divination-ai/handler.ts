@@ -15,7 +15,9 @@ import type { DivinationData } from "mingyu-core/divination";
 import { buildDivinationPrompt } from "mingyu-core/divination";
 import type { DivinationMethodId } from "mingyu-core/divination/config";
 
-const MAX_BODY_BYTES = 64 * 1024;
+// 塔罗大牌阵（凯尔特十字 10 张 / 年运 12 张）请求体可达 ~150KB，
+// 故放宽到 512KB 以覆盖所有牌阵，同时保留防滥用上限。
+const MAX_BODY_BYTES = 512 * 1024;
 const MAX_QUESTION_CHARS = 200;
 const REQUEST_TIMEOUT_MS = 30_000;
 

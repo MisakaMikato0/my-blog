@@ -50,6 +50,9 @@ export const ru: Translation = {
 	[Key.hobby]: "Хобби",
 	[Key.books]: "Книги",
 	[Key.booksSubtitle]: "Записи о моём чтении",
+	[Key.divination]: "Гадание",
+	[Key.divinationSubtitle]:
+		"Люяо · Мэйхуа · Сяолюжэнь · Гадательные палочки · Таро",
 	[Key.musicNoPlaying]: "Ничего не воспроизводится",
 	[Key.musicLyrics]: "Текст песни",
 	[Key.musicVolume]: "Громкость",

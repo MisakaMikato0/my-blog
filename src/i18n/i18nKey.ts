@@ -22,6 +22,8 @@ enum I18nKey {
 	hobby = "hobby",
 	books = "books",
 	booksSubtitle = "booksSubtitle",
+	divination = "divination",
+	divinationSubtitle = "divinationSubtitle",
 
 	// 公告栏
 	announcement = "announcement",

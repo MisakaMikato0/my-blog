@@ -85,6 +85,7 @@ const buildNavBarConfig = (): NavBarConfig => {
 		LinkPreset.Home,
 		LinkPreset.Feibichi,
 		...(siteConfig.pages.collections ? [LinkPreset.Collections] : []),
+		...(siteConfig.pages.divination ? [LinkPreset.Divination] : []),
 		postsNav,
 		hobbyNav,
 		...(contactNav ? [contactNav] : []),

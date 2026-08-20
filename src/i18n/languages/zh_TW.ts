@@ -50,6 +50,8 @@ export const zh_TW: Translation = {
 	[Key.hobby]: "愛好",
 	[Key.books]: "書籍",
 	[Key.booksSubtitle]: "記錄我的閱讀旅程",
+	[Key.divination]: "卜筮",
+	[Key.divinationSubtitle]: "六爻 · 梅花易數 · 小六壬 · 靈籤 · 塔羅",
 	[Key.musicNoPlaying]: "暫未播放",
 	[Key.musicLyrics]: "歌詞",
 	[Key.musicVolume]: "音量",

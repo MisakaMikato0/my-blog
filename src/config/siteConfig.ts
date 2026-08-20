@@ -7,10 +7,10 @@ const SITE_LANG = "zh_CN";
 
 export const siteConfig: SiteConfig = {
 	// 站点标题
-	title: "幽幽子的博客",
+	title: "白玉楼",
 
 	// 站点副标题
-	subtitle: "幽幽子",
+	subtitle: "白玉楼",
 
 	// 站点 URL
 	site_url: "https://hakugyokurou.fun/",
@@ -107,7 +107,7 @@ export const siteConfig: SiteConfig = {
 			alt: "logo",
 		},
 		// 导航栏标题
-		title: "幽幽子的博客",
+		title: "白玉楼",
 		// 全宽导航栏，导航栏是否占满屏幕宽度
 		widthFull: false,
 	},
@@ -167,6 +167,8 @@ export const siteConfig: SiteConfig = {
 		bangumi: true,
 		// 书籍页面开关
 		books: true,
+		// 卜筮页面开关
+		divination: true,
 	},
 
 	// bangumi配置

@@ -76,6 +76,7 @@ export type SiteConfig = {
 		dynamic: boolean; // 动态页面开关
 		bangumi: boolean; // 追番页面开关
 		books: boolean; // 书籍页面开关
+		divination: boolean; // 卜筮页面开关
 	};
 
 	// 分类导航栏开关
@@ -202,6 +203,7 @@ export enum LinkPreset {
 	Dynamic = 21,
 	Hobby = 22,
 	Books = 23,
+	Divination = 24,
 }
 
 export type NavBarLink = {

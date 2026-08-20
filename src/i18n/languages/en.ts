@@ -50,6 +50,9 @@ export const en: Translation = {
 	[Key.hobby]: "Hobby",
 	[Key.books]: "Books",
 	[Key.booksSubtitle]: "Record my reading journey",
+	[Key.divination]: "Divination",
+	[Key.divinationSubtitle]:
+		"Liuyao · Meihua · Xiaoliuren · Fortune Sticks · Tarot",
 	[Key.musicNoPlaying]: "No playing",
 	[Key.musicLyrics]: "Lyrics",
 	[Key.musicVolume]: "Volume",

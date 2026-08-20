@@ -125,4 +125,9 @@ export const LinkPresets: { [key in LinkPreset]: NavBarLink } = {
 		url: "/books/",
 		icon: "material-symbols:book-2-rounded",
 	},
+	[LinkPreset.Divination]: {
+		name: i18n(I18nKey.divination),
+		url: "/divination/",
+		icon: "material-symbols:auto-awesome",
+	},
 };

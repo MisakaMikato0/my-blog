@@ -50,6 +50,8 @@ export const ja: Translation = {
 	[Key.hobby]: "趣味",
 	[Key.books]: "本",
 	[Key.booksSubtitle]: "私の読書の旅を記録する",
+	[Key.divination]: "占い",
+	[Key.divinationSubtitle]: "六爻・梅花易数・小六壬・おみくじ・タロット",
 	[Key.musicNoPlaying]: "再生中なし",
 	[Key.musicLyrics]: "歌詞",
 	[Key.musicVolume]: "音量",

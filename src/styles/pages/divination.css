@@ -1,0 +1,33 @@
+/* ============================================
+   卜筮页面
+   ============================================ */
+
+.divination-page {
+	width: min(100%, 960px);
+	margin-inline: auto;
+	padding-block: 1.5rem 0.5rem;
+}
+
+.divination-page__header {
+	margin: 0 0 1.25rem;
+}
+
+.divination-page__subtitle {
+	margin: 0.5rem 0 0;
+	color: var(--content-meta);
+	font-size: 0.95rem;
+}
+
+.divination-page__disclaimer {
+	margin: 0.75rem 0 0;
+	padding: 0.6rem 0.9rem;
+	border: 1px dashed var(--line-divider);
+	border-radius: var(--radius-medium, 0.5rem);
+	color: var(--content-meta);
+	font-size: 0.85rem;
+	line-height: 1.6;
+}
+
+.divination-page__main {
+	margin-top: 1.25rem;
+}

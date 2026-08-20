@@ -65,6 +65,7 @@
 		"lunar-typescript": "^1.8.6",
 		"marked": "^16.4.2",
 		"mdast-util-to-string": "^4.0.0",
+		"mingyu-core": "0.1.30",
 		"pagefind": "^1.5.2",
 		"pako": "^2.1.0",
 		"qrcode": "^1.5.4",

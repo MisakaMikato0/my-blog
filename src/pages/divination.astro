@@ -1,0 +1,32 @@
+---
+import DivinationApp from "@components/divination/DivinationApp.svelte";
+import PageTitle from "@/components/common/PageTitle.astro";
+import { siteConfig } from "@/config";
+import I18nKey from "@/i18n/i18nKey";
+import { i18n } from "@/i18n/translation";
+import MainGridLayout from "@/layouts/MainGridLayout.astro";
+import "@/styles/pages/divination.css";
+
+if (!siteConfig.pages.divination) {
+	return Astro.redirect("/404/");
+}
+
+const title = i18n(I18nKey.divination);
+const description = i18n(I18nKey.divinationSubtitle);
+---
+
+<MainGridLayout title={title} description={description} hasOwnH1>
+	<div class="divination-page">
+		<header class="divination-page__header">
+			<PageTitle title={title} eyebrow="Divination" variant="stacked" />
+			<p class="divination-page__subtitle">{description}</p>
+			<p class="divination-page__disclaimer">
+				本站卜筮功能仅供传统文化研究与娱乐参考，不构成任何决策建议，请理性看待结果。
+			</p>
+		</header>
+
+		<main class="divination-page__main">
+			<DivinationApp client:load />
+		</main>
+	</div>
+</MainGridLayout>

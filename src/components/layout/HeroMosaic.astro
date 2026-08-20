@@ -5,13 +5,14 @@ import { createHeroTileLayout } from "@/utils/home-hero-motion";
 interface Props {
 	desktopImage: string;
 	mobileImage: string;
+	images?: string[];
 	config: HeroMosaicConfig;
 }
 
-const { desktopImage, mobileImage, config } = Astro.props;
+const { desktopImage, mobileImage, images, config } = Astro.props;
+const candidates = images && images.length > 0 ? images : [desktopImage];
 const tiles = createHeroTileLayout(config);
 const mosaicStyle = [
-	`--home-hero-mosaic-image: url("${desktopImage}")`,
 	`--home-hero-mosaic-image-mobile: url("${mobileImage}")`,
 	`--home-hero-mosaic-columns: ${config.columns}`,
 	`--home-hero-mosaic-rows: ${config.rows}`,
@@ -23,7 +24,6 @@ const mosaicStyle = [
 		<source media="(max-width: 768px)" srcset={mobileImage} />
 		<img
 			class="home-hero__backdrop-image"
-			src={desktopImage}
 			alt=""
 			width="3000"
 			height="1500"
@@ -59,7 +59,28 @@ const mosaicStyle = [
 		</div>
 		<picture class="home-hero__mosaic-complete" data-hero-mosaic-complete>
 			<source media="(max-width: 768px)" srcset={mobileImage} />
-			<img src={desktopImage} alt="" width="3000" height="1500" decoding="async" />
+			<img alt="" width="3000" height="1500" decoding="async" />
 		</picture>
 	</div>
+
+	<script is:inline define:vars={{ images: candidates }}>
+		(function () {
+			const picked = images[Math.floor(Math.random() * images.length)];
+			const visual = document.currentScript?.parentElement;
+			if (!visual || !picked) return;
+			// 马赛克碎片背景 + 完成图 + 兜底大图统一换成随机选中的图
+			visual.style.setProperty(
+				"--home-hero-mosaic-image",
+				`url("${picked}")`,
+			);
+			const backdropImage = visual.querySelector(
+				".home-hero__backdrop-image",
+			);
+			if (backdropImage) backdropImage.src = picked;
+			const completeImage = visual.querySelector(
+				".home-hero__mosaic-complete img",
+			);
+			if (completeImage) completeImage.src = picked;
+		})();
+	</script>
 </div>

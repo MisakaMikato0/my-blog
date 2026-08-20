@@ -61,7 +61,7 @@ function resolveAiConfig(env: Env) {
 	const apiKey = env.DEEPSEEK_API_KEY ?? env.AI_API_KEY;
 	const apiUrl =
 		env.DEEPSEEK_API_URL ?? "https://api-inference.modelscope.cn/v1";
-	const chatModel = env.DEEPSEEK_CHAT_MODEL ?? "deepseek-ai/DeepSeek-V4-Pro";
+	const chatModel = env.DEEPSEEK_CHAT_MODEL ?? "Qwen/Qwen3.5-122B-A10B";
 	return { apiKey, apiUrl, chatModel };
 }
 

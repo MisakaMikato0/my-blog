@@ -90,7 +90,7 @@ describe("handleDivinationInterpret", () => {
 			model: string;
 			messages: Array<{ role: string; content: string }>;
 		};
-		expect(body.model).toBe("deepseek-ai/DeepSeek-V4-Pro");
+		expect(body.model).toBe("Qwen/Qwen3.5-122B-A10B");
 		// 提示词包含排盘信息与问题
 		const userContent = body.messages.at(-1)?.content ?? "";
 		expect(userContent).toContain("风泽中孚");

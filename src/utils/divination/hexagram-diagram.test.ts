@@ -11,14 +11,18 @@ const yin = (changing = false): HexagramLine => ({ type: "阴", changing });
 
 describe("linesFromYaosDetail", () => {
 	it("按 position 自下而上排序", () => {
-		const yaos = [
+		const yaos: Array<{
+			position: number;
+			yaoType: "阳" | "阴";
+			isChanging: boolean;
+		}> = [
 			{ position: 6, yaoType: "阳", isChanging: true },
 			{ position: 1, yaoType: "阴", isChanging: false },
 			{ position: 3, yaoType: "阳", isChanging: false },
 			{ position: 2, yaoType: "阴", isChanging: false },
 			{ position: 5, yaoType: "阴", isChanging: false },
 			{ position: 4, yaoType: "阳", isChanging: false },
-		] as const;
+		];
 		expect(linesFromYaosDetail(yaos)).toEqual([
 			yin(),
 			yin(),

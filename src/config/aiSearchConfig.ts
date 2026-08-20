@@ -7,7 +7,7 @@ export const aiSearchConfig = {
 		// 第三方 API 地址（当前使用魔搭社区 ModelScope）
 		apiUrl: "https://api-inference.modelscope.cn/v1",
 		// 第三方对话模型
-		chatModel: "deepseek-ai/DeepSeek-V4-Flash",
+		chatModel: "deepseek-ai/DeepSeek-V4-Pro",
 		// 第三方 Embedding 模型
 		embeddingModel: "Qwen/Qwen3-Embedding-8B",
 		// Embedding 向量维度（必须与 Vectorize 索引维度一致）

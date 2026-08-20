@@ -4,7 +4,6 @@
  * 职责：接收前端已算好的排盘数据，用 mingyu-core 官方提示词构建器
  * （buildDivinationPrompt）生成解卦提示词，调用 OpenAI 兼容的 Chat API
  * （默认 ModelScope / 可配 DeepSeek），返回白话解卦文本。
- *
  * 安全设计：
  * - API Key 仅存于服务端环境变量（DEEPSEEK_API_KEY 或复用 AI_API_KEY），
  *   绝不下发到前端。
@@ -60,7 +59,7 @@ function resolveAiConfig(env: Env) {
 	const apiKey = env.DEEPSEEK_API_KEY ?? env.AI_API_KEY;
 	const apiUrl =
 		env.DEEPSEEK_API_URL ?? "https://api-inference.modelscope.cn/v1";
-	const chatModel = env.DEEPSEEK_CHAT_MODEL ?? "deepseek-ai/DeepSeek-V4-Flash";
+	const chatModel = env.DEEPSEEK_CHAT_MODEL ?? "deepseek-ai/DeepSeek-V4-Pro";
 	return { apiKey, apiUrl, chatModel };
 }
 

@@ -1,9 +1,5 @@
 ---
 import Icon from "@components/common/Icon.astro";
-import { getApiUrlList } from "@/utils/image-utils";
-
-// 文章封面 API：随机图做背景，客户端按顺序重试，全部失败隐藏背景
-const coverApis = getApiUrlList("api", "weather-widget");
 
 // ===== 图标与数据配置（数据驱动渲染，避免重复模板） =====
 
@@ -69,23 +65,10 @@ const extendedItems: ExtendedItem[] = [
 <!--
 	天气组件：基于 uapis.cn 天气接口（IP 自动定位）
 	主图标使用 meteocons 彩色天气图标（自带动画），扩展指标中天气相关项也使用 meteocons，
-	通用 UI 图标保留 lucide；构建期内联 SVG，运行时按 weather_icon 代码 + 昼夜切换显示。
+	通用 UI 图标保留 lucide；背景按天气类型切换彩色渐变（深色高对比），
+	构建期内联 SVG，运行时按 weather_icon 代码 + 昼夜切换显示。
 -->
-<section class="weather-widget" data-weather-init aria-label="天气预报">
-	<!-- 背景图：文章封面 API（与 guide-card 视觉一致，低透明度 + hover 放大） -->
-	{coverApis.length > 0 && (
-		<div class="weather-widget__visual" aria-hidden="true">
-			<img
-				src={coverApis[0]}
-				data-weather-cover
-				data-api-urls={JSON.stringify(coverApis)}
-				alt=""
-				loading="lazy"
-				decoding="async"
-				referrerpolicy="no-referrer"
-			/>
-		</div>
-	)}
+<section class="weather-widget" data-weather-init data-weather-theme="overcast" aria-label="天气预报">
 
 	<!-- 加载状态 -->
 	<div class="weather-widget__status weather-widget__status--loading" data-weather-loading>
@@ -158,59 +141,110 @@ const extendedItems: ExtendedItem[] = [
 </section>
 
 <style>
+	/* ===== 天气主题渐变：深色高对比背景，任何站点主题下都清晰 ===== */
 	.weather-widget {
-		--weather-fg: var(--guide-fg);
-		--weather-bg: var(--guide-bg);
-		--weather-border: var(--guide-border);
-		--weather-accent: var(--guide-accent);
-		--weather-muted: color-mix(in srgb, var(--weather-fg) 62%, transparent);
-		--weather-line: color-mix(in srgb, var(--weather-fg) 18%, transparent);
+		/* 默认主题：阴天（蓝灰） */
+		--wt-top: #64748b;
+		--wt-bottom: #2d3646;
+		--wt-glow: rgb(180 195 220 / 0.32);
+		--wt-text: #fff;
+		--wt-text-dim: rgb(255 255 255 / 0.74);
+		--wt-panel: rgb(255 255 255 / 0.1);
+		--wt-panel-border: rgb(255 255 255 / 0.18);
 		position: relative;
 		margin-top: var(--guide-gap);
-		border: 2px solid var(--weather-border);
+		border: 1px solid rgb(255 255 255 / 0.22);
 		border-radius: var(--guide-radius);
-		background: var(--weather-bg);
-		color: var(--weather-fg);
+		background: linear-gradient(155deg, var(--wt-top), var(--wt-bottom) 72%);
+		color: var(--wt-text);
 		padding: clamp(1rem, 1.8vw, 1.6rem);
 		overflow: hidden;
 		isolation: isolate;
+		transition: background 400ms ease;
+	}
+
+	/* 各天气主题配色 */
+	.weather-widget[data-weather-theme="sunny"] {
+		--wt-top: #d67c12;
+		--wt-bottom: #b3550c;
+		--wt-glow: rgb(255 214 120 / 0.5);
+	}
+	.weather-widget[data-weather-theme="partly"] {
+		--wt-top: #4e7fc9;
+		--wt-bottom: #27406f;
+		--wt-glow: rgb(146 194 255 / 0.42);
+	}
+	.weather-widget[data-weather-theme="windy"] {
+		--wt-top: #56989a;
+		--wt-bottom: #28505a;
+		--wt-glow: rgb(160 230 230 / 0.38);
+	}
+	.weather-widget[data-weather-theme="rainy"] {
+		--wt-top: #4a78c9;
+		--wt-bottom: #1c3355;
+		--wt-glow: rgb(130 175 255 / 0.42);
+	}
+	.weather-widget[data-weather-theme="stormy"] {
+		--wt-top: #5b4bb0;
+		--wt-bottom: #221a4a;
+		--wt-glow: rgb(170 140 255 / 0.42);
+	}
+	.weather-widget[data-weather-theme="snowy"] {
+		--wt-top: #6593bd;
+		--wt-bottom: #33506b;
+		--wt-glow: rgb(220 240 255 / 0.48);
+	}
+	.weather-widget[data-weather-theme="sleety"] {
+		--wt-top: #6f87ae;
+		--wt-bottom: #2d4058;
+		--wt-glow: rgb(200 220 250 / 0.42);
+	}
+	.weather-widget[data-weather-theme="foggy"] {
+		--wt-top: #6f7780;
+		--wt-bottom: #343940;
+		--wt-glow: rgb(210 215 225 / 0.32);
+	}
+	.weather-widget[data-weather-theme="hazy"] {
+		--wt-top: #a37e5e;
+		--wt-bottom: #4e3827;
+		--wt-glow: rgb(240 200 160 / 0.38);
+	}
+	.weather-widget[data-weather-theme="dusty"] {
+		--wt-top: #b3924e;
+		--wt-bottom: #5d481f;
+		--wt-glow: rgb(240 215 150 / 0.38);
+	}
+
+	/* 夜间：压暗冷调，突出月亮/星空图标 */
+	.weather-widget[data-weather-night="true"] {
+		background: linear-gradient(155deg, color-mix(in srgb, var(--wt-top) 42%, #141b2b), var(--wt-bottom));
+	}
+
+	/* 顶部光晕装饰 */
+	.weather-widget::before {
+		content: "";
+		position: absolute;
+		top: -32%;
+		right: -12%;
+		width: 72%;
+		aspect-ratio: 1;
+		border-radius: 50%;
+		background: radial-gradient(circle, var(--wt-glow), transparent 66%);
+		pointer-events: none;
+		z-index: 0;
 	}
 
 	.weather-hidden {
 		display: none !important;
 	}
 
-	/* ===== 背景图：文章封面 API（与 guide-card__visual 一致） ===== */
-	.weather-widget__visual {
-		position: absolute;
-		inset: 0;
-		z-index: -2;
-		opacity: 0.16;
-		pointer-events: none;
-		overflow: hidden;
-	}
-
-	.weather-widget__visual img {
-		width: 100%;
-		height: 100%;
-		object-fit: cover;
-		object-position: center;
-		transition: transform 240ms ease, opacity 240ms ease;
-	}
-
-	.weather-widget:hover .weather-widget__visual img,
-	.weather-widget:focus-within .weather-widget__visual img {
-		transform: scale(1.06) translateX(1.5%);
-		opacity: 0.55;
-	}
-
+	/* ===== 状态：加载 / 错误 ===== */
 	.weather-widget__status,
 	.weather-widget__content {
 		position: relative;
 		z-index: 1;
 	}
 
-	/* ===== 状态：加载 / 错误 ===== */
 	.weather-widget__status {
 		display: flex;
 		flex-direction: column;
@@ -220,14 +254,14 @@ const extendedItems: ExtendedItem[] = [
 		min-height: 6rem;
 		font-size: 0.88rem;
 		font-weight: 750;
-		color: var(--weather-muted);
+		color: var(--wt-text-dim);
 	}
 
 	.weather-widget__spinner {
 		width: 2rem;
 		height: 2rem;
-		border: 2px solid var(--weather-line);
-		border-top-color: var(--weather-accent);
+		border: 2px solid rgb(255 255 255 / 0.28);
+		border-top-color: #fff;
 		border-radius: 50%;
 		animation: weather-widget-spin 0.8s linear infinite;
 	}
@@ -239,7 +273,7 @@ const extendedItems: ExtendedItem[] = [
 	}
 
 	.weather-widget__error-icon {
-		color: #ef4444;
+		color: #ff9d9d;
 		font-size: 2rem;
 	}
 
@@ -256,23 +290,21 @@ const extendedItems: ExtendedItem[] = [
 		gap: 0.35rem;
 		margin-top: 0.4rem;
 		padding: 0.375rem 0.85rem;
-		border: 1px solid var(--weather-border);
+		border: 1px solid rgb(255 255 255 / 0.36);
 		border-radius: 0.5rem;
-		background: var(--weather-bg);
-		color: var(--weather-fg);
+		background: rgb(255 255 255 / 0.12);
+		color: #fff;
 		font-size: 0.78rem;
 		font-weight: 850;
 		cursor: pointer;
 		transition:
 			transform 160ms ease,
-			background-color 160ms ease,
-			color 160ms ease;
+			background-color 160ms ease;
 	}
 
 	.weather-widget__retry:hover {
 		transform: translateY(-1px);
-		background: var(--weather-fg);
-		color: var(--weather-bg);
+		background: rgb(255 255 255 / 0.24);
 	}
 
 	.weather-widget__retry svg {
@@ -285,6 +317,7 @@ const extendedItems: ExtendedItem[] = [
 		display: flex;
 		flex-direction: column;
 		gap: clamp(0.9rem, 1.6vw, 1.3rem);
+		text-shadow: 0 1px 10px rgb(0 0 0 / 0.2);
 		animation: weather-widget-fade-in 0.5s ease both;
 	}
 
@@ -316,7 +349,7 @@ const extendedItems: ExtendedItem[] = [
 	}
 
 	.weather-widget__loc-icon {
-		color: var(--weather-accent);
+		color: var(--wt-text-dim);
 		font-size: 1rem;
 		flex: none;
 	}
@@ -329,23 +362,33 @@ const extendedItems: ExtendedItem[] = [
 	}
 
 	.weather-widget__district {
-		color: var(--weather-muted);
+		color: var(--wt-text-dim);
 		font-weight: 650;
 	}
 
+	/* 大图标：玻璃拟态圆形托盘 + 浮动动画 */
 	.weather-widget__big-icon {
 		flex: none;
-		font-size: clamp(2.4rem, 3.4vw, 3.2rem);
-		line-height: 1;
+		display: grid;
+		place-items: center;
+		width: clamp(4.6rem, 6.5vw, 6.2rem);
+		height: clamp(4.6rem, 6.5vw, 6.2rem);
+		border-radius: 50%;
+		background: radial-gradient(circle at 32% 28%, rgb(255 255 255 / 0.3), rgb(255 255 255 / 0.07) 70%);
+		border: 1px solid rgb(255 255 255 / 0.4);
+		box-shadow:
+			inset 0 1px 0 rgb(255 255 255 / 0.45),
+			0 12px 28px rgb(0 0 0 / 0.28);
+		backdrop-filter: blur(6px);
 		animation: weather-widget-float 3s ease-in-out infinite;
 	}
 
-	/* meteocons 图标自带配色与动画；512 画布内含留白，用 1.65em 补偿实际可见尺寸 */
+	/* meteocons 图标自带配色；512 画布含留白，放大补偿实际可见尺寸 */
 	.weather-widget__big-icon svg {
 		width: auto;
-		height: 1.65em;
+		height: clamp(2.6rem, 3.8vw, 3.4rem);
 		display: block;
-		filter: drop-shadow(0 8px 18px rgb(0 0 0 / 0.2));
+		filter: drop-shadow(0 6px 14px rgb(0 0 0 / 0.3));
 	}
 
 	@keyframes weather-widget-float {
@@ -372,7 +415,7 @@ const extendedItems: ExtendedItem[] = [
 	}
 
 	.weather-widget__temp {
-		font-size: clamp(2.4rem, 4vw, 3.4rem);
+		font-size: clamp(2.6rem, 4.2vw, 3.6rem);
 		font-weight: 950;
 		line-height: 1;
 	}
@@ -380,7 +423,7 @@ const extendedItems: ExtendedItem[] = [
 	.weather-widget__unit {
 		font-size: clamp(0.9rem, 1.3vw, 1.1rem);
 		font-weight: 750;
-		color: var(--weather-muted);
+		color: var(--wt-text-dim);
 		position: relative;
 		top: -0.8rem;
 	}
@@ -401,15 +444,15 @@ const extendedItems: ExtendedItem[] = [
 	}
 
 	.weather-widget__range-min {
-		color: #3b82f6;
+		color: #a6ccff;
 	}
 
 	.weather-widget__range-max {
-		color: #ef4444;
+		color: #ffb8a6;
 	}
 
 	.weather-widget__range-divider {
-		color: var(--weather-muted);
+		color: var(--wt-text-dim);
 	}
 
 	.weather-widget__update {
@@ -419,8 +462,8 @@ const extendedItems: ExtendedItem[] = [
 		margin-left: auto;
 		font-size: 0.72rem;
 		font-weight: 700;
-		color: var(--weather-muted);
-		opacity: 0.8;
+		color: var(--wt-text-dim);
+		opacity: 0.85;
 	}
 
 	.weather-widget__update svg {
@@ -434,9 +477,14 @@ const extendedItems: ExtendedItem[] = [
 		margin-top: 0;
 		padding: 0.28rem;
 		border-radius: 50%;
-		border: 1px solid var(--weather-line);
+		border: 1px solid rgb(255 255 255 / 0.32);
+		background: rgb(255 255 255 / 0.1);
 		font-size: 0.85rem;
 		line-height: 1;
+	}
+
+	.weather-widget__retry--refresh:hover {
+		background: rgb(255 255 255 / 0.22);
 	}
 
 	.weather-widget__retry--refresh svg {
@@ -444,12 +492,12 @@ const extendedItems: ExtendedItem[] = [
 		height: 0.9em;
 	}
 
-	/* 扩展数据网格 */
+	/* 扩展数据网格：玻璃拟态面板 */
 	.weather-widget__extended {
 		display: grid;
 		grid-template-columns: repeat(6, minmax(0, 1fr));
 		gap: 0.55rem;
-		border-top: 1px dashed var(--weather-line);
+		border-top: 1px solid rgb(255 255 255 / 0.18);
 		padding-top: 0.9rem;
 	}
 
@@ -459,23 +507,26 @@ const extendedItems: ExtendedItem[] = [
 		gap: 0.3rem;
 		min-width: 0;
 		padding: 0.55rem 0.7rem;
-		border: 1px solid var(--weather-line);
+		border: 1px solid var(--wt-panel-border);
 		border-radius: 0.6rem;
-		background: color-mix(in srgb, var(--weather-fg) 4%, transparent);
+		background: var(--wt-panel);
+		backdrop-filter: blur(6px);
 		transition:
 			border-color 160ms ease,
+			background-color 160ms ease,
 			transform 160ms ease;
 	}
 
 	.weather-widget__item:hover {
-		border-color: color-mix(in srgb, var(--weather-accent) 55%, var(--weather-line));
+		border-color: rgb(255 255 255 / 0.42);
+		background: rgb(255 255 255 / 0.17);
 		transform: translateY(-1px);
 	}
 
 	.weather-widget__item > svg {
 		width: auto;
 		height: 1.15em;
-		color: var(--weather-accent);
+		color: #fff;
 	}
 
 	/* meteocons 小图标同样有画布留白，放大以与 lucide 视觉一致 */
@@ -487,7 +538,7 @@ const extendedItems: ExtendedItem[] = [
 		font-size: 0.66rem;
 		font-weight: 850;
 		letter-spacing: 0.08em;
-		color: var(--weather-muted);
+		color: var(--wt-text-dim);
 	}
 
 	.weather-widget__item-value {
@@ -553,7 +604,7 @@ const extendedItems: ExtendedItem[] = [
 
 		.weather-widget__big-icon {
 			align-self: flex-end;
-			margin-top: -3.4rem;
+			margin-top: -3.2rem;
 		}
 
 		.weather-widget__update {
@@ -751,6 +802,30 @@ const extendedItems: ExtendedItem[] = [
 		return hour < 6 || hour >= 19;
 	}
 
+	// 天气主题：背景渐变配色（base 与 WEATHER_ICON_MAP 的基础形态一致）
+	const WEATHER_THEME_MAP: Record<string, string> = {
+		clear: "sunny",
+		"partly-cloudy": "partly",
+		overcast: "overcast",
+		wind: "windy",
+		hurricane: "windy",
+		tornado: "windy",
+		rain: "rainy",
+		thunderstorms: "stormy",
+		"extreme-rain": "rainy",
+		drizzle: "rainy",
+		sleet: "sleety",
+		snow: "snowy",
+		fog: "foggy",
+		haze: "hazy",
+		dust: "dusty",
+	};
+
+	function getWeatherTheme(weatherIcon: string): string {
+		const base = WEATHER_ICON_MAP[weatherIcon] || "overcast";
+		return WEATHER_THEME_MAP[base] || "overcast";
+	}
+
 	function readCache(key: string): WeatherData | null {
 		try {
 			const raw = localStorage.getItem(key);
@@ -830,36 +905,6 @@ const extendedItems: ExtendedItem[] = [
 		});
 	}
 
-	// 封面背景图：按顺序重试 API，全部失败则隐藏背景层（天气数据不受影响）
-	function initWeatherCover(container: HTMLElement) {
-		const img = container.querySelector<HTMLImageElement>("[data-weather-cover]");
-		if (!img) return;
-
-		let urls: string[] = [];
-		try {
-			urls = JSON.parse(img.dataset.apiUrls || "[]");
-		} catch {
-			urls = [];
-		}
-
-		let index = 1; // 0 号已由服务端设为 src
-		const onError = () => {
-			if (index < urls.length) {
-				img.addEventListener("error", onError, { once: true });
-				img.src = urls[index];
-				index += 1;
-			} else {
-				img.closest(".weather-widget__visual")?.classList.add("weather-hidden");
-			}
-		};
-
-		if (img.complete) {
-			if (img.naturalWidth === 0) onError();
-		} else {
-			img.addEventListener("error", onError, { once: true });
-		}
-	}
-
 	// 更新 UI
 	function updateUI(container: HTMLElement, data: WeatherData | null, error: string | null = null) {
 		const loading = container.querySelector("[data-weather-loading]");
@@ -904,8 +949,15 @@ const extendedItems: ExtendedItem[] = [
 		setData("[data-temp-max]", data.temp_max != null ? String(data.temp_max) : "--");
 		setData("[data-temp-min]", data.temp_min != null ? String(data.temp_min) : "--");
 
+		// 昼夜判断（图标与背景主题共用）
+		const isNight = isNightTime(data);
+
 		// 更新天气图标（按天气代码 + 昼夜）
-		setWeatherIcon(container, data.weather_icon ?? "", isNightTime(data));
+		setWeatherIcon(container, data.weather_icon ?? "", isNight);
+
+		// 更新背景主题：天气类型 → 彩色渐变，夜间额外压暗
+		container.dataset.weatherTheme = getWeatherTheme(data.weather_icon ?? "");
+		container.dataset.weatherNight = isNight ? "true" : "";
 
 		// 更新扩展数据
 		const extendedSection = container.querySelector("[data-weather-extended]");
@@ -961,8 +1013,6 @@ const extendedItems: ExtendedItem[] = [
 	function initWidget(container: HTMLElement): (() => void) | undefined {
 		if (container.dataset.weatherReady === "true") return;
 		container.dataset.weatherReady = "true";
-
-		initWeatherCover(container);
 
 		const retryBtns = Array.from(container.querySelectorAll("[data-retry-btn]"));
 		const content = container.querySelector("[data-weather-content]");

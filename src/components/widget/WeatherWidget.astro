@@ -1,5 +1,9 @@
 ---
 import Icon from "@components/common/Icon.astro";
+import { getApiUrlList } from "@/utils/image-utils";
+
+// 文章封面 API：作为氛围背景层，overlay 混合进天气主题渐变（恢复背景图且不发灰）
+const coverApis = getApiUrlList("api", "weather-widget");
 
 // ===== 图标与数据配置（数据驱动渲染，避免重复模板） =====
 
@@ -35,6 +39,8 @@ interface ExtendedItem {
 	placeholder: string;
 	/** iconify 图标名：天气指标用 meteocons 彩色图标，通用项保留 lucide */
 	icon: string;
+	/** 图标颜色（仅对 currentColor 图标生效，meteocons 自带配色） */
+	iconColor?: string;
 	/** 空气质量卡片：数值 + 等级标签的特殊布局 */
 	aqi?: boolean;
 }
@@ -47,18 +53,19 @@ const extendedItems: ExtendedItem[] = [
 	{ label: "降水概率", attr: "data-pop", placeholder: "--%", icon: "meteocons:umbrella-fill" },
 	{ label: "日出", attr: "data-sunrise", placeholder: "--:--", icon: "meteocons:sunrise-fill" },
 	{ label: "日落", attr: "data-sunset", placeholder: "--:--", icon: "meteocons:sunset-fill" },
-	{ label: "能见度", attr: "data-visibility", placeholder: "--km", icon: "lucide:eye" },
+	{ label: "能见度", attr: "data-visibility", placeholder: "--km", icon: "lucide:eye", iconColor: "#cbd5e1" },
 	{ label: "气压", attr: "data-pressure", placeholder: "--hPa", icon: "meteocons:barometer-fill" },
 	{ label: "紫外线", attr: "data-uv", placeholder: "--", icon: "meteocons:uv-index-fill" },
 	{ label: "降水量", attr: "data-precipitation", placeholder: "--mm", icon: "meteocons:rain-fill" },
 	{ label: "云量", attr: "data-cloud", placeholder: "--%", icon: "meteocons:cloudy-fill" },
-	{ label: "空气质量", attr: "data-aqi", placeholder: "--", icon: "lucide:leaf", aqi: true },
-	{ label: "PM2.5", attr: "data-pm25", placeholder: "--", icon: "lucide:activity" },
-	{ label: "PM10", attr: "data-pm10", placeholder: "--", icon: "lucide:activity" },
-	{ label: "O₃", attr: "data-o3", placeholder: "--", icon: "lucide:flask-conical" },
-	{ label: "NO₂", attr: "data-no2", placeholder: "--", icon: "lucide:flask-conical" },
-	{ label: "SO₂", attr: "data-so2", placeholder: "--", icon: "lucide:flask-conical" },
-	{ label: "CO", attr: "data-co", placeholder: "--", icon: "lucide:flask-conical" },
+	{ label: "空气质量", attr: "data-aqi", placeholder: "--", icon: "material-symbols:eco", iconColor: "#86efac", aqi: true },
+	// 污染物：颗粒物用 mdi 圆点/原子，气体用 mdi 分子，各配专属颜色
+	{ label: "PM2.5", attr: "data-pm25", placeholder: "--", icon: "mdi:blur", iconColor: "#7dd3fc" },
+	{ label: "PM10", attr: "data-pm10", placeholder: "--", icon: "mdi:atom", iconColor: "#5eead4" },
+	{ label: "O₃", attr: "data-o3", placeholder: "--", icon: "mdi:molecule", iconColor: "#86efac" },
+	{ label: "NO₂", attr: "data-no2", placeholder: "--", icon: "mdi:molecule", iconColor: "#fdba74" },
+	{ label: "SO₂", attr: "data-so2", placeholder: "--", icon: "mdi:molecule", iconColor: "#fde047" },
+	{ label: "CO", attr: "data-co", placeholder: "--", icon: "mdi:molecule", iconColor: "#fca5a5" },
 ];
 ---
 
@@ -69,6 +76,20 @@ const extendedItems: ExtendedItem[] = [
 	构建期内联 SVG，运行时按 weather_icon 代码 + 昼夜切换显示。
 -->
 <section class="weather-widget" data-weather-init data-weather-theme="overcast" aria-label="天气预报">
+	<!-- 背景图：封面 API 作为氛围层，overlay 混合进渐变背景（不影响可读性） -->
+	{coverApis.length > 0 && (
+		<div class="weather-widget__visual" aria-hidden="true">
+			<img
+				src={coverApis[0]}
+				data-weather-cover
+				data-api-urls={JSON.stringify(coverApis)}
+				alt=""
+				loading="lazy"
+				decoding="async"
+				referrerpolicy="no-referrer"
+			/>
+		</div>
+	)}
 
 	<!-- 加载状态 -->
 	<div class="weather-widget__status weather-widget__status--loading" data-weather-loading>
@@ -124,7 +145,9 @@ const extendedItems: ExtendedItem[] = [
 		<div class="weather-widget__extended" data-weather-extended>
 			{extendedItems.map((item) => (
 				<div class:list={["weather-widget__item", item.aqi && "weather-widget__item--aqi"]}>
-					<Icon name={item.icon} is:inline />
+					<span class="weather-widget__item-icon" style={item.iconColor ? `color: ${item.iconColor}` : undefined}>
+						<Icon name={item.icon} is:inline />
+					</span>
 					<span class="weather-widget__item-label">{item.label}</span>
 					{item.aqi ? (
 						<span class="weather-widget__item-value">
@@ -232,6 +255,34 @@ const extendedItems: ExtendedItem[] = [
 		background: radial-gradient(circle, var(--wt-glow), transparent 66%);
 		pointer-events: none;
 		z-index: 0;
+	}
+
+	/* ===== 背景图：封面 API 氛围层 =====
+		overlay 混合模式把图片色彩"烧进"渐变背景：既有背景图质感又不会发灰，
+		深色渐变仍保证文字对比度；hover 时轻微放大提亮 */
+	.weather-widget__visual {
+		position: absolute;
+		inset: 0;
+		z-index: 0;
+		opacity: 0.34;
+		pointer-events: none;
+		overflow: hidden;
+		mix-blend-mode: overlay;
+	}
+
+	.weather-widget__visual img {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+		object-position: center;
+		filter: brightness(0.86) saturate(1.15);
+		transition: transform 240ms ease, opacity 240ms ease;
+	}
+
+	.weather-widget:hover .weather-widget__visual img,
+	.weather-widget:focus-within .weather-widget__visual img {
+		transform: scale(1.06) translateX(1.5%);
+		opacity: 0.85;
 	}
 
 	.weather-hidden {
@@ -377,7 +428,7 @@ const extendedItems: ExtendedItem[] = [
 		background: radial-gradient(circle at 32% 28%, rgb(255 255 255 / 0.3), rgb(255 255 255 / 0.07) 70%);
 		border: 1px solid rgb(255 255 255 / 0.4);
 		box-shadow:
-			inset 0 1px 0 rgb(255 255 255 / 0.45),
+			inset 0 1px 0 rgb(255 255 255 / 0.28),
 			0 12px 28px rgb(0 0 0 / 0.28);
 		backdrop-filter: blur(6px);
 		animation: weather-widget-float 3s ease-in-out infinite;
@@ -523,14 +574,26 @@ const extendedItems: ExtendedItem[] = [
 		transform: translateY(-1px);
 	}
 
-	.weather-widget__item > svg {
+	/* 扩展卡片图标：半透明圆底托盘，统一视觉（污染物/通用图标走 currentColor 上色） */
+	.weather-widget__item-icon {
+		display: inline-grid;
+		place-items: center;
+		width: 1.9em;
+		height: 1.9em;
+		border-radius: 0.55em;
+		background: rgb(255 255 255 / 0.14);
+		border: 1px solid rgb(255 255 255 / 0.22);
+		margin-bottom: 0.15rem;
+	}
+
+	.weather-widget__item-icon svg {
 		width: auto;
-		height: 1.15em;
+		height: 1.1em;
 		color: #fff;
 	}
 
 	/* meteocons 小图标同样有画布留白，放大以与 lucide 视觉一致 */
-	.weather-widget__item > svg[data-icon^="meteocons:"] {
+	.weather-widget__item-icon svg[data-icon^="meteocons:"] {
 		height: 1.5em;
 	}
 
@@ -905,6 +968,36 @@ const extendedItems: ExtendedItem[] = [
 		});
 	}
 
+	// 封面背景图：按顺序重试 API，全部失败则隐藏背景层（天气数据不受影响）
+	function initWeatherCover(container: HTMLElement) {
+		const img = container.querySelector<HTMLImageElement>("[data-weather-cover]");
+		if (!img) return;
+
+		let urls: string[] = [];
+		try {
+			urls = JSON.parse(img.dataset.apiUrls || "[]");
+		} catch {
+			urls = [];
+		}
+
+		let index = 1; // 0 号已由服务端设为 src
+		const onError = () => {
+			if (index < urls.length) {
+				img.addEventListener("error", onError, { once: true });
+				img.src = urls[index];
+				index += 1;
+			} else {
+				img.closest(".weather-widget__visual")?.classList.add("weather-hidden");
+			}
+		};
+
+		if (img.complete) {
+			if (img.naturalWidth === 0) onError();
+		} else {
+			img.addEventListener("error", onError, { once: true });
+		}
+	}
+
 	// 更新 UI
 	function updateUI(container: HTMLElement, data: WeatherData | null, error: string | null = null) {
 		const loading = container.querySelector("[data-weather-loading]");
@@ -1013,6 +1106,8 @@ const extendedItems: ExtendedItem[] = [
 	function initWidget(container: HTMLElement): (() => void) | undefined {
 		if (container.dataset.weatherReady === "true") return;
 		container.dataset.weatherReady = "true";
+
+		initWeatherCover(container);
 
 		const retryBtns = Array.from(container.querySelectorAll("[data-retry-btn]"));
 		const content = container.querySelector("[data-weather-content]");

@@ -118,7 +118,7 @@
 }
 
 .dropdown-content-wrapper .dropdown-item:active {
-	background-color: transparent !important;
+	background-color: color-mix(in oklch, var(--deep-text) 12%, transparent);
 }
 
 /* action 按钮：禁用 expand-animation 背景 */

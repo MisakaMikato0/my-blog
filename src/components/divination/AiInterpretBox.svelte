@@ -73,16 +73,20 @@ async function interpret() {
 		<span class="ai-box__badge">Beta</span>
 	</div>
 	<div class="ai-box__question">
-		<input
-			type="text"
-			bind:value={question}
-			placeholder="所问何事？（留空则由 AI 泛解）"
-			maxlength="200"
-			disabled={status === "loading"}
-			onkeydown={(e) => {
-				if (e.key === "Enter") interpret();
-			}}
-		/>
+		{#if question.trim()}
+			<span class="ai-box__question-text" title="起卦前所定之事">所问：{question.trim()}</span>
+		{:else}
+			<input
+				type="text"
+				bind:value={question}
+				placeholder="所问何事？（留空则由 AI 泛解）"
+				maxlength="200"
+				disabled={status === "loading"}
+				onkeydown={(e) => {
+					if (e.key === "Enter") interpret();
+				}}
+			/>
+		{/if}
 		<button
 			type="button"
 			class="ai-box__button"
@@ -154,6 +158,21 @@ async function interpret() {
 		font-size: 0.9rem;
 		outline: none;
 		transition: border-color 0.15s;
+	}
+
+	.ai-box__question-text {
+		flex: 1;
+		min-width: 0;
+		padding: 0.5rem 0.75rem;
+		border: 1px solid var(--line-divider);
+		border-radius: var(--radius-medium);
+		background: var(--btn-regular-bg-hover);
+		color: var(--deep-text);
+		font-size: 0.9rem;
+		line-height: 1.4;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
 	}
 
 	.ai-box__question input:focus {

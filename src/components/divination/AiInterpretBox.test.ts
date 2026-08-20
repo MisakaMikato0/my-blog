@@ -58,6 +58,33 @@ describe("AiInterpretBox 组件", () => {
 		expect(body.question).toBe("最近换工作合适吗");
 	});
 
+	it("起卦前已定所问时只读展示所问，不再显示输入框", async () => {
+		const liuyao = createLiuyaoReading({ customDate: FIXED_DATE });
+		vi.mocked(fetch).mockResolvedValue(
+			new Response(JSON.stringify({ text: "结合所问分析如下" }), {
+				status: 200,
+			}),
+		);
+		render(AiInterpretBox, {
+			props: {
+				method: "liuyao",
+				data: liuyao.data,
+				question: "这段感情该如何经营",
+			},
+		});
+
+		// 已定所问 → 只读展示，不再出现可编辑输入框
+		expect(screen.queryByPlaceholderText(/所问何事/)).toBeNull();
+		expect(screen.getByText(/所问：这段感情该如何经营/)).toBeTruthy();
+
+		// 解卦仍携带起卦前所定问题
+		await fireEvent.click(screen.getByRole("button", { name: "解卦" }));
+		await screen.findByText(/结合所问分析如下/);
+		const [, init] = vi.mocked(fetch).mock.calls[0] as [string, RequestInit];
+		const body = JSON.parse(String(init.body)) as { question: string };
+		expect(body.question).toBe("这段感情该如何经营");
+	});
+
 	it("后端未配置 Key 时展示友好提示", async () => {
 		const liuyao = createLiuyaoReading({ customDate: FIXED_DATE });
 		vi.mocked(fetch).mockResolvedValue(

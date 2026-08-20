@@ -60,7 +60,7 @@ describe("AiInterpretBox 组件", () => {
 
 	it("解卦期间显示罗盘 loading 覆盖层，结束后消失", async () => {
 		const liuyao = createLiuyaoReading({ customDate: FIXED_DATE });
-		let resolveFetch: (value: Response) => void;
+		let resolveFetch: ((value: Response) => void) | undefined;
 		vi.mocked(fetch).mockReturnValue(
 			new Promise<Response>((resolve) => {
 				resolveFetch = resolve;
@@ -79,7 +79,7 @@ describe("AiInterpretBox 组件", () => {
 		expect(screen.getByText(/幽幽子正在推演天机/)).toBeTruthy();
 
 		// 请求返回后，覆盖层消失
-		resolveFetch!(
+		resolveFetch?.(
 			new Response(JSON.stringify({ text: "卦象已明" }), { status: 200 }),
 		);
 		await screen.findByText(/卦象已明/);

@@ -155,11 +155,16 @@ async function callChatApi(
 		} catch (error) {
 			const message = error instanceof Error ? error.message : String(error);
 			// 仅对空响应重试；其余错误（鉴权、限流、超时等）直接抛出
-			if (message !== EMPTY_UPSTREAM_RESPONSE || attempt === MAX_CHAT_ATTEMPTS) {
+			if (
+				message !== EMPTY_UPSTREAM_RESPONSE ||
+				attempt === MAX_CHAT_ATTEMPTS
+			) {
 				throw error;
 			}
 			lastError = error;
-			await new Promise((resolve) => setTimeout(resolve, RETRY_DELAY_MS * attempt));
+			await new Promise((resolve) =>
+				setTimeout(resolve, RETRY_DELAY_MS * attempt),
+			);
 		}
 	}
 	throw lastError;

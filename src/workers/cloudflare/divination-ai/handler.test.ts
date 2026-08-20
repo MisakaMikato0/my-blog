@@ -182,11 +182,13 @@ describe("handleDivinationInterpret", () => {
 	it("上游持续空响应时最终报错", async () => {
 		const liuyao = createLiuyaoReading({ customDate: FIXED_DATE });
 		// 每次调用返回新的空响应实例（Response body 只能消费一次）
-		const fetchMock = vi.fn().mockImplementation(() =>
-			Promise.resolve(
-				new Response(JSON.stringify({ choices: null }), { status: 200 }),
-			),
-		);
+		const fetchMock = vi
+			.fn()
+			.mockImplementation(() =>
+				Promise.resolve(
+					new Response(JSON.stringify({ choices: null }), { status: 200 }),
+				),
+			);
 		vi.stubGlobal("fetch", fetchMock);
 
 		const response = await handleDivinationInterpret(
@@ -198,5 +200,4 @@ describe("handleDivinationInterpret", () => {
 		expect(payload.error).toBe("EMPTY_UPSTREAM_RESPONSE");
 		expect(fetchMock).toHaveBeenCalledTimes(3);
 	});
-
 });

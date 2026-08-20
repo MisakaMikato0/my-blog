@@ -1,135 +1,168 @@
 <script lang="ts">
-	import { fade } from "svelte/transition";
-	import type { DivinationData } from "mingyu-core/divination";
-	import type { DivinationMethodId } from "mingyu-core/divination/config";
+import type { DivinationData } from "mingyu-core/divination";
+import type { DivinationMethodId } from "mingyu-core/divination/config";
+import { fade } from "svelte/transition";
 
-	type SupportedMethod = Exclude<DivinationMethodId, "random">;
+type SupportedMethod = Exclude<DivinationMethodId, "random">;
 
-	interface Props {
-		method: SupportedMethod;
-		data: DivinationData;
-		/** 起卦前定的"所问之事"，作为解卦输入框的初始值 */
-		question?: string;
-	}
+interface Props {
+	method: SupportedMethod;
+	data: DivinationData;
+	/** 起卦前定的"所问之事"，作为解卦输入框的初始值 */
+	question?: string;
+}
 
-	let { method, data, question: initialQuestion = "" }: Props = $props();
+let { method, data, question: initialQuestion = "" }: Props = $props();
 
-	let question = $state(initialQuestion);
-	let status: "idle" | "loading" | "done" | "error" = $state("idle");
-	let resultText = $state("");
-	let errorText = $state("");
+let question = $state(initialQuestion);
+let status: "idle" | "loading" | "done" | "error" = $state("idle");
+let resultText = $state("");
+let errorText = $state("");
 
-	// ── 风水罗盘 loading 数据 ─────────────────────────
-	const CX = 400;
-	const CY = 400;
+// ── 风水罗盘 loading 数据 ─────────────────────────
+const CX = 400;
+const CY = 400;
 
-	// 环间分隔线
-	function dividers(count: number, r1: number, r2: number) {
-		return Array.from({ length: count }, (_, i) => {
-			const rad = ((i * 360) / count / 180) * Math.PI;
-			return {
-				x1: CX + r1 * Math.sin(rad),
-				y1: CY - r1 * Math.cos(rad),
-				x2: CX + r2 * Math.sin(rad),
-				y2: CY - r2 * Math.cos(rad),
-			};
-		});
-	}
-	const div24 = dividers(24, 330, 370);
-	const div12 = dividers(12, 288, 326);
-	const div8 = dividers(8, 184, 208);
-
-	// 二十四山（金环，每 15° 一山）
-	const m24 = [
-		"子", "癸", "丑", "艮", "寅", "甲",
-		"卯", "乙", "辰", "巽", "巳", "丙",
-		"午", "丁", "未", "坤", "申", "庚",
-		"酉", "辛", "戌", "乾", "亥", "壬",
-	];
-	const r24Chars = m24.map((ch, i) => ({ ch, angle: i * 15 }));
-
-	// 十二地支（玉环，每 30° 一字）
-	const branches = ["子", "丑", "寅", "卯", "辰", "巳", "午", "未", "申", "酉", "戌", "亥"];
-	const rBrChars = branches.map((ch, i) => ({ ch, angle: i * 30 }));
-
-	// 八卦（后天方位，卦爻线条：1 阳爻实线 / 0 阴爻断线）
-	const trigrams = [
-		{ angle: 0, name: "坎", lines: [0, 1, 0] },
-		{ angle: 45, name: "艮", lines: [1, 0, 0] },
-		{ angle: 90, name: "震", lines: [0, 0, 1] },
-		{ angle: 135, name: "巽", lines: [1, 1, 0] },
-		{ angle: 180, name: "离", lines: [1, 0, 1] },
-		{ angle: 225, name: "坤", lines: [0, 0, 0] },
-		{ angle: 270, name: "兑", lines: [0, 1, 1] },
-		{ angle: 315, name: "乾", lines: [1, 1, 1] },
-	];
-
-	// 天干（玫瑰环，每 45° 一字）
-	const stems = ["甲", "乙", "丙", "丁", "庚", "辛", "壬", "癸"];
-	const rStChars = stems.map((ch, i) => ({ ch, angle: i * 45 }));
-
-	// 天池四正
-	const dishChars = [
-		{ ch: "子", angle: 0 },
-		{ ch: "卯", angle: 90 },
-		{ ch: "午", angle: 180 },
-		{ ch: "酉", angle: 270 },
-	];
-
-	// 环绕光点
-	const sparks = Array.from({ length: 6 }, (_, i) => ({
-		angle: i * 60 + 20,
-		duration: 2.4 + (i % 3) * 0.5,
-		delay: i * 0.15,
-	}));
-
-	// 面板重新起卦（prop 变化）时，用新的"所问之事"重置解卦输入框
-	$effect(() => {
-		question = initialQuestion;
+// 环间分隔线
+function dividers(count: number, r1: number, r2: number) {
+	return Array.from({ length: count }, (_, i) => {
+		const rad = ((i * 360) / count / 180) * Math.PI;
+		return {
+			x1: CX + r1 * Math.sin(rad),
+			y1: CY - r1 * Math.cos(rad),
+			x2: CX + r2 * Math.sin(rad),
+			y2: CY - r2 * Math.cos(rad),
+		};
 	});
+}
+const div24 = dividers(24, 330, 370);
+const div12 = dividers(12, 288, 326);
+const div8 = dividers(8, 184, 208);
 
-	async function interpret() {
-		if (status === "loading") return;
-		status = "loading";
-		errorText = "";
-		resultText = "";
-		try {
-			const response = await fetch("/api/divination/interpret", {
-				method: "POST",
-				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify({
-					method,
-					data,
-					question: question.trim() || undefined,
-				}),
-			});
-			const payload = (await response.json()) as {
-				text?: string;
-				error?: string;
-			};
-			if (!response.ok || !payload.text) {
-				if (payload.error === "AI_KEY_NOT_CONFIGURED") {
-					throw new Error(
-						"站长尚未配置 AI 解卦 API Key，请联系管理员启用此功能。",
-					);
-				}
-				throw new Error(payload.error ?? `请求失败（${response.status}）`);
+// 二十四山（金环，每 15° 一山）
+const m24 = [
+	"子",
+	"癸",
+	"丑",
+	"艮",
+	"寅",
+	"甲",
+	"卯",
+	"乙",
+	"辰",
+	"巽",
+	"巳",
+	"丙",
+	"午",
+	"丁",
+	"未",
+	"坤",
+	"申",
+	"庚",
+	"酉",
+	"辛",
+	"戌",
+	"乾",
+	"亥",
+	"壬",
+];
+const r24Chars = m24.map((ch, i) => ({ ch, angle: i * 15 }));
+
+// 十二地支（玉环，每 30° 一字）
+const branches = [
+	"子",
+	"丑",
+	"寅",
+	"卯",
+	"辰",
+	"巳",
+	"午",
+	"未",
+	"申",
+	"酉",
+	"戌",
+	"亥",
+];
+const rBrChars = branches.map((ch, i) => ({ ch, angle: i * 30 }));
+
+// 八卦（后天方位，卦爻线条：1 阳爻实线 / 0 阴爻断线）
+const trigrams = [
+	{ angle: 0, name: "坎", lines: [0, 1, 0] },
+	{ angle: 45, name: "艮", lines: [1, 0, 0] },
+	{ angle: 90, name: "震", lines: [0, 0, 1] },
+	{ angle: 135, name: "巽", lines: [1, 1, 0] },
+	{ angle: 180, name: "离", lines: [1, 0, 1] },
+	{ angle: 225, name: "坤", lines: [0, 0, 0] },
+	{ angle: 270, name: "兑", lines: [0, 1, 1] },
+	{ angle: 315, name: "乾", lines: [1, 1, 1] },
+];
+
+// 天干（玫瑰环，每 45° 一字）
+const stems = ["甲", "乙", "丙", "丁", "庚", "辛", "壬", "癸"];
+const rStChars = stems.map((ch, i) => ({ ch, angle: i * 45 }));
+
+// 天池四正
+const dishChars = [
+	{ ch: "子", angle: 0 },
+	{ ch: "卯", angle: 90 },
+	{ ch: "午", angle: 180 },
+	{ ch: "酉", angle: 270 },
+];
+
+// 环绕光点
+const sparks = Array.from({ length: 6 }, (_, i) => ({
+	angle: i * 60 + 20,
+	duration: 2.4 + (i % 3) * 0.5,
+	delay: i * 0.15,
+}));
+
+// 面板重新起卦（prop 变化）时，用新的"所问之事"重置解卦输入框
+$effect(() => {
+	question = initialQuestion;
+});
+
+async function interpret() {
+	if (status === "loading") return;
+	status = "loading";
+	errorText = "";
+	resultText = "";
+	try {
+		const response = await fetch("/api/divination/interpret", {
+			method: "POST",
+			headers: { "Content-Type": "application/json" },
+			body: JSON.stringify({
+				method,
+				data,
+				question: question.trim() || undefined,
+			}),
+		});
+		const payload = (await response.json()) as {
+			text?: string;
+			error?: string;
+		};
+		if (!response.ok || !payload.text) {
+			if (payload.error === "AI_KEY_NOT_CONFIGURED") {
+				throw new Error(
+					"站长尚未配置 AI 解卦 API Key，请联系管理员启用此功能。",
+				);
 			}
-			resultText = payload.text;
-			status = "done";
-		} catch (error) {
-			const message =
-				error instanceof Error ? error.message : "未知错误，请稍后重试";
-			// fetch 网络层失败（断网/跨域/超时等）统一友好提示
-			errorText =
-				error instanceof TypeError ||
-				message === "Failed to fetch" ||
-				message === "Load failed"
-					? "网络异常，请稍后重试"
-					: message;
-			status = "error";
+			throw new Error(payload.error ?? `请求失败（${response.status}）`);
 		}
+		resultText = payload.text;
+		status = "done";
+	} catch (error) {
+		const message =
+			error instanceof Error ? error.message : "未知错误，请稍后重试";
+		// fetch 网络层失败（断网/跨域/超时等）统一友好提示
+		errorText =
+			error instanceof TypeError ||
+			message === "Failed to fetch" ||
+			message === "Load failed"
+				? "网络异常，请稍后重试"
+				: message;
+		status = "error";
 	}
+}
 </script>
 
 <div class="ai-box">

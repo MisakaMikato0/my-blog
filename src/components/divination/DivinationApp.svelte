@@ -100,4 +100,11 @@ let active = $state<MethodId>("liuyao");
 		color: var(--text-secondary);
 		line-height: 1.2;
 	}
+
+	/* ── 暗黑主题适配：active tab 白块 → 描边 + 微亮底 ── */
+	:global(:root.dark) .divination-app__tab--active {
+		background: color-mix(in oklch, var(--deep-text) 10%, transparent);
+		color: var(--deep-text);
+	}
+
 </style>

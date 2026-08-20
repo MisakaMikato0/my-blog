@@ -289,4 +289,24 @@ function formatDate(ts: number): string {
 		color: var(--content-meta);
 		opacity: 0.7;
 	}
+
+	/* ── 暗黑主题适配：实心白块 → 描边 + hover 反相（跟随站点 .btn-line 范式） ── */
+	:global(:root.dark) .panel__action {
+		background: transparent;
+		color: var(--deep-text);
+	}
+	:global(:root.dark) .panel__action:hover {
+		background: var(--deep-text);
+		color: var(--page-bg);
+		opacity: 1;
+	}
+	:global(:root.dark) .field__seg-item--active {
+		background: color-mix(in oklch, var(--deep-text) 10%, transparent);
+		color: var(--deep-text);
+	}
+	.field__input::placeholder {
+		color: var(--content-meta);
+		opacity: 1;
+	}
+
 </style>

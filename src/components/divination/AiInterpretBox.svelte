@@ -330,7 +330,7 @@ async function interpret() {
 					<!-- 二十四山环（金，7°/s） -->
 					<g class="compass-ring compass-ring--r24">
 						{#each r24Chars as c (c.ch)}
-							<g transform="rotate({c.angle})">
+							<g transform="translate(400 400) rotate({c.angle})">
 								<text
 									y="-352"
 									text-anchor="middle"
@@ -346,7 +346,7 @@ async function interpret() {
 					<!-- 十二地支环（玉，-11°/s） -->
 					<g class="compass-ring compass-ring--rbr">
 						{#each rBrChars as c (c.ch)}
-							<g transform="rotate({c.angle})">
+							<g transform="translate(400 400) rotate({c.angle})">
 								<text
 									y="-306"
 									text-anchor="middle"
@@ -362,36 +362,36 @@ async function interpret() {
 					<!-- 八卦环（卦爻线条 + 卦名，19°/s） -->
 					<g class="compass-ring compass-ring--rtr">
 						{#each trigrams as t (t.name)}
-							<g transform="rotate({t.angle})">
+							<g transform="translate(400 400) rotate({t.angle})">
 								{#each t.lines as solid, i (i)}
 									{#if solid}
 										<line
-											x1={254 + i * 14}
-											y1="-22"
-											x2={254 + i * 14}
-											y2="22"
+											x1="-22"
+											y1={-254 - i * 14}
+											x2="22"
+											y2={-254 - i * 14}
 											class="trigram-line"
 										/>
 									{:else}
 										<line
-											x1={254 + i * 14}
-											y1="-22"
-											x2={254 + i * 14}
-											y2="-3"
+											x1="-22"
+											y1={-254 - i * 14}
+											x2="-3"
+											y2={-254 - i * 14}
 											class="trigram-line"
 										/>
 										<line
-											x1={254 + i * 14}
-											y1="3"
-											x2={254 + i * 14}
-											y2="22"
+											x1="3"
+											y1={-254 - i * 14}
+											x2="22"
+											y2={-254 - i * 14}
 											class="trigram-line"
 										/>
 									{/if}
 								{/each}
 								<text
-									x="228"
-									y="0"
+									x="0"
+									y="-228"
 									text-anchor="middle"
 									dominant-baseline="central"
 									font-size="15"
@@ -405,7 +405,7 @@ async function interpret() {
 					<!-- 天干环（玫瑰，-29°/s） -->
 					<g class="compass-ring compass-ring--rst">
 						{#each rStChars as c (c.ch)}
-							<g transform="rotate({c.angle})">
+							<g transform="translate(400 400) rotate({c.angle})">
 								<text
 									y="-196"
 									text-anchor="middle"
@@ -439,7 +439,7 @@ async function interpret() {
 						<line x1="400" y1="250" x2="400" y2="550" class="dish-line" />
 						<line x1="250" y1="400" x2="550" y2="400" class="dish-line" />
 						{#each dishChars as c (c.ch)}
-							<g transform="rotate({c.angle})">
+							<g transform="translate(400 400) rotate({c.angle})">
 								<text
 									y="-118"
 									text-anchor="middle"

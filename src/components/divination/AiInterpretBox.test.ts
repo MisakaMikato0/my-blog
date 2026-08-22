@@ -88,6 +88,38 @@ describe("AiInterpretBox 组件", () => {
 		);
 	});
 
+	it("loading 罗盘所有环都围绕盘心 (400,400) 旋转", async () => {
+		const liuyao = createLiuyaoReading({ customDate: FIXED_DATE });
+		// 永不返回，保持 loading 覆盖层可见
+		vi.mocked(fetch).mockReturnValue(new Promise<Response>(() => {}));
+		const { container } = render(AiInterpretBox, {
+			props: { method: "liuyao", data: liuyao.data },
+		});
+
+		await fireEvent.click(screen.getByRole("button", { name: "解卦" }));
+
+		const transforms = Array.from(
+			container.querySelectorAll<SVGGElement>("svg g[transform]"),
+		).map((g) => g.getAttribute("transform") ?? "");
+		const rotating = transforms.filter((t) => t.includes("rotate("));
+
+		// 四层环 + 天池的 56 个字全部以盘心为旋转原点
+		expect(rotating).toHaveLength(56);
+		expect(rotating.every((t) => t.includes("translate(400 400)"))).toBe(true);
+
+		// 卦爻线条按径向横排（旧实现是绕左上角旋转的竖线）
+		const trigramLines = Array.from(
+			container.querySelectorAll<SVGLineElement>(".trigram-line"),
+		);
+		expect(trigramLines).toHaveLength(36);
+		expect(
+			trigramLines.every((l) => {
+				const y1 = Number(l.getAttribute("y1"));
+				return y1 < -200;
+			}),
+		).toBe(true);
+	});
+
 	it("起卦前已定所问时只读展示所问，不再显示输入框", async () => {
 		const liuyao = createLiuyaoReading({ customDate: FIXED_DATE });
 		vi.mocked(fetch).mockResolvedValue(

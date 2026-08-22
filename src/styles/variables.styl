@@ -16,6 +16,7 @@
    注: 保留 --hue 兼容性，但视觉调色板强制中性化以贯彻"无饱和色块"原则。
    仅 --primary 保留细微 hue，用于 link/focus 等点缀。 */
 :root
+  color-scheme: light
   --primary: oklch(0.30 0 0)
   --page-bg: oklch(1 0 0)
   --card-bg: transparent
@@ -43,6 +44,7 @@
   --line-color: oklch(0.85 0 0)
   --meta-divider: oklch(0.75 0 0)
   --content-meta: oklch(0.45 0 0)
+  --text-secondary: oklch(0.5 0 0)
   --article-pinned-accent: oklch(0.52 0.20 25)
   --article-title-marker: oklch(0.62 0.16 190)
   --article-category-lightness: 0.42
@@ -147,6 +149,7 @@
 
 /* 暗色主题：纯黑底 + 白前景，所有色块去饱和 */
 :root.dark
+  color-scheme: dark
   --primary: oklch(0.85 0 0)
   --page-bg: oklch(0.08 0 0)
   --card-bg: transparent
@@ -170,6 +173,7 @@
   --line-color: oklch(0.25 0 0)
   --meta-divider: oklch(0.35 0 0)
   --content-meta: oklch(0.65 0 0)
+  --text-secondary: oklch(0.7 0 0)
   --article-pinned-accent: oklch(0.72 0.16 25)
   --article-title-marker: oklch(0.78 0.15 190)
   --article-category-lightness: 0.75

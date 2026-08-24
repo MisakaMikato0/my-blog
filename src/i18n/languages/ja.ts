@@ -553,8 +553,6 @@ export const ja: Translation = {
 	[Key.tagUnit]: "個のタグ",
 	[Key.browseAllTags]: "すべてのタグ",
 	[Key.subscribeContact]: "購読と連絡",
-	[Key.expandContacts]: "すべての連絡先を展開",
-	[Key.allContacts]: "すべての連絡先",
 	[Key.viewsLabel]: "閲覧数",
 
 	// ===== 页脚 =====

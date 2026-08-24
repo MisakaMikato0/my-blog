@@ -427,7 +427,7 @@ export function mountHomeHero() {
 			timeline.to(
 				mosaicComplete,
 				{ autoAlpha: 1, duration: 0.03, ease: "none" },
-				0.72,
+				0.68,
 			);
 		}
 
@@ -442,15 +442,17 @@ export function mountHomeHero() {
 			0.72,
 		);
 
+
+		// 放大与最后几块碎片的归位重叠进行，避免合并完成后先停顿再弹开的顿挫感
 		timeline.to(
 			mosaic,
 			{
 				y: () => getMosaicTransform().y,
 				scale: () => getMosaicTransform().scale,
-				duration: 0.2,
+				duration: 0.28,
 				ease: "power3.inOut",
 			},
-			0.76,
+			0.68,
 		);
 		timeline.to(
 			backdrop,

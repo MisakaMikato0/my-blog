@@ -557,8 +557,6 @@ export const en: Translation = {
 	[Key.tagUnit]: " tags",
 	[Key.browseAllTags]: "All Tags",
 	[Key.subscribeContact]: "Subscribe & Contact",
-	[Key.expandContacts]: "Expand all contacts",
-	[Key.allContacts]: "All contacts",
 	[Key.viewsLabel]: "Views",
 
 	// ===== 页脚 =====

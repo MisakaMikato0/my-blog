@@ -556,8 +556,6 @@ export const ru: Translation = {
 	[Key.tagUnit]: " тегов",
 	[Key.browseAllTags]: "Все теги",
 	[Key.subscribeContact]: "Подписка и контакты",
-	[Key.expandContacts]: "Показать все контакты",
-	[Key.allContacts]: "Все контакты",
 	[Key.viewsLabel]: "Просмотры",
 
 	// ===== 页脚 =====

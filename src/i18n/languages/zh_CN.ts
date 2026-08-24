@@ -543,8 +543,6 @@ export const zh_CN: Translation = {
 	[Key.tagUnit]: "个标签",
 	[Key.browseAllTags]: "全部标签",
 	[Key.subscribeContact]: "订阅与联系",
-	[Key.expandContacts]: "展开全部联系方式",
-	[Key.allContacts]: "全部联系方式",
 	[Key.viewsLabel]: "访问量",
 
 	// ===== 页脚 =====

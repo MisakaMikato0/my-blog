@@ -48,6 +48,7 @@ enum I18nKey {
 	minutesCount = "minutesCount",
 	postCount = "postCount",
 	postsCount = "postsCount",
+	articles = "articles",
 
 	// Music Widget
 	musicNoPlaying = "musicNoPlaying",
@@ -191,6 +192,7 @@ enum I18nKey {
 	paginationOf = "paginationOf",
 	paginationTotal = "paginationTotal",
 	paginationRecords = "paginationRecords",
+	paginationStatus = "paginationStatus",
 
 	// 404页面
 	notFound = "notFound",
@@ -502,8 +504,28 @@ enum I18nKey {
 	noPinnedContent = "noPinnedContent",
 	contactMethods = "contactMethods",
 	viewsBrowseLabel = "viewsBrowseLabel",
+
 	siteData = "siteData",
 	noPosts = "noPosts",
+	// ===== 页脚 =====
+	privacyPolicy = "privacyPolicy",
+	userAgreement = "userAgreement",
+	policeBeianAlt = "policeBeianAlt",
+
+	// ===== 文章列表页 =====
+	publishDatePrefix = "publishDatePrefix",
+	viewPostPrefix = "viewPostPrefix",
+	encryptedPost = "encryptedPost",
+	totalPostsPrefix = "totalPostsPrefix",
+	sortPosts = "sortPosts",
+	sortLatest = "sortLatest",
+	sortOldest = "sortOldest",
+	sortPopular = "sortPopular",
+	sortByPrefix = "sortByPrefix",
+	sortBySuffix = "sortBySuffix",
+	regularPosts = "regularPosts",
+	noRegularPosts = "noRegularPosts",
+4239 (feat: 重构文章列表页，新增像素化图片加载动效与分页功能)
 	noPostsHint = "noPostsHint",
 }
 

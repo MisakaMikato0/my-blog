@@ -100,6 +100,7 @@ export const en: Translation = {
 	[Key.minutesCount]: "minutes",
 	[Key.postCount]: "post",
 	[Key.postsCount]: "posts",
+	[Key.articles]: "Articles",
 
 	[Key.themeColor]: "Theme Color",
 
@@ -189,7 +190,7 @@ export const en: Translation = {
 	[Key.paginationPage]: "Page",
 	[Key.paginationOf]: "of",
 	[Key.paginationTotal]: ", Total",
-	[Key.paginationRecords]: " records",
+	[Key.paginationRecords]: " records",		[Key.paginationStatus]: "Page {current} of {total}",4239 (feat: 重构文章列表页，新增像素化图片加载动效与分页功能)
 
 	// 404 Page
 	[Key.notFound]: "404",
@@ -498,6 +499,87 @@ export const en: Translation = {
 	[Key.dynamicUploadSuccess]: "Uploaded",
 	[Key.dynamicUploadFail]: "Upload failed",
 	[Key.copyPrefix]: "Copy",
+	[Key.copyTemplate]: "Copy template",
+
+	// ===== 悬浮坞 / 导航 / 主题 =====
+	[Key.aiSearch]: "AI Search",
+	[Key.switchToDark]: "Switch to dark mode",
+	[Key.switchToLight]: "Switch to light mode",
+	[Key.spineModel]: "Spine model",
+	[Key.toggleDock]: "Toggle dock",
+	[Key.quickActions]: "Quick actions",
+	[Key.announcementTicker]: "Announcement ticker",
+	[Key.viewAnnouncement]: "View announcement",
+
+	// ===== 搜索弹窗 =====
+	[Key.searchArticles]: "Search articles",
+	[Key.searchPlaceholder1]: "Search posts, tags, categories...",
+	[Key.searchPlaceholder2]: "Type a keyword to start searching",
+	[Key.searchPlaceholder3]: "Try searching for 'Astro' or 'Svelte'",
+	[Key.searchPlaceholder4]: "Press ESC to close the search panel",
+	[Key.searchPlaceholder5]:
+		"Ctrl+K switches between AI search and normal search",
+	[Key.searchViewAllPrefix]: "View all",
+	[Key.searchViewAllSuffix]: "results →",
+	[Key.searchHintClose]: "ESC to close",
+	[Key.searchHintSearch]: "ENTER to search",
+	[Key.searchHintToggle]: "Ctrl+K to switch",
+
+	// ===== 首页 Hero 对话 =====
+	[Key.dialogueMenuTitle]: "What shall we talk about?",
+	[Key.characterDialogue]: "Character dialogue",
+	[Key.dialoguePrev]: "Previous line",
+	[Key.dialogueNext]: "Next line",
+	[Key.dialogueAutoPlay]: "Auto play",
+	[Key.reopenDialogue]: "Reopen dialogue",
+	[Key.dialogueRestoreHint]: "Meow? Want to keep chatting?",
+
+	// ===== 首页数据层 =====
+	[Key.mapGuide]: "Map Guide",
+	[Key.siteVisits]: "Site Visits",
+	[Key.visitsLoading]: "Loading visitor and view stats",
+	[Key.visitTrajectory]: "Visit Trajectory",
+	[Key.articleArchive]: "Article Archive",
+	[Key.contentIndex]: "Content Index",
+	[Key.switchPinnedPost]: "Switch to next pinned post",
+	[Key.openPost]: "Open current post",
+	[Key.viewPinnedPostPrefix]: "View pinned post: ",
+	[Key.viewLatestPostPrefix]: "View latest post: ",
+	[Key.continueReadingFallback]: "Open this post to continue reading.",
+	[Key.categoryIndex]: "Category Index",
+	[Key.viewAll]: "View all",
+	[Key.categoryUnit]: " categories",
+	[Key.tagIndex]: "Tag Index",
+	[Key.tagUnit]: " tags",
+	[Key.browseAllTags]: "All Tags",
+	[Key.subscribeContact]: "Subscribe & Contact",
+	[Key.expandContacts]: "Expand all contacts",
+	[Key.allContacts]: "All contacts",
+	[Key.viewsLabel]: "Views",
+
+	// ===== 页脚 =====
+	[Key.privacyPolicy]: "Privacy Policy",
+	[Key.userAgreement]: "User Agreement",
+	[Key.policeBeianAlt]: "Police registration",
+
+	// ===== 文章列表页 =====
+	[Key.publishDatePrefix]: "Published: ",
+	[Key.viewPostPrefix]: "View post: ",
+	[Key.encryptedPost]: "Encrypted post",
+	[Key.totalPostsPrefix]: "",
+	[Key.sortPosts]: "Sort posts",
+	[Key.sortLatest]: "Latest",
+	[Key.sortOldest]: "Earliest",
+	[Key.sortPopular]: "Popular",
+	[Key.sortByPrefix]: "Sorted by ",
+	[Key.sortBySuffix]: "",
+	[Key.regularPosts]: "Regular posts",
+	[Key.noRegularPosts]: "No regular posts yet",
+	[Key.paginationNav]: "Post pagination",
+
+	// ===== 相对时间 =====
+
+	// ===== 友链 =====4239 (feat: 重构文章列表页，新增像素化图片加载动效与分页功能)
 	[Key.friendRulesTitle]: "Friend Link Guide",
 	[Key.friendSiteInfo]: "Site Info",
 	[Key.friendApplyUnderstood]: "Got it, apply now",

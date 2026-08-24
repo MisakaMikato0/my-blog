@@ -97,6 +97,7 @@ export const zh_TW: Translation = {
 	[Key.minutesCount]: "分鐘",
 	[Key.postCount]: "篇文章",
 	[Key.postsCount]: "篇文章",
+	[Key.articles]: "文章",
 
 	[Key.themeColor]: "主題色相",
 
@@ -186,7 +187,7 @@ export const zh_TW: Translation = {
 	[Key.paginationPage]: "第",
 	[Key.paginationOf]: "頁，共",
 	[Key.paginationTotal]: "頁，總計",
-	[Key.paginationRecords]: "條記錄",
+	[Key.paginationRecords]: "條記錄",		[Key.paginationStatus]: "第 {current} 頁，共 {total} 頁",4239 (feat: 重构文章列表页，新增像素化图片加载动效与分页功能)
 
 	// 404頁面
 	[Key.notFound]: "404",
@@ -484,6 +485,86 @@ export const zh_TW: Translation = {
 	[Key.dynamicUploadSuccess]: "上傳成功",
 	[Key.dynamicUploadFail]: "上傳失敗",
 	[Key.copyPrefix]: "複製",
+	[Key.copyTemplate]: "複製範本",
+
+	// ===== 悬浮坞 / 导航 / 主题 =====
+	[Key.aiSearch]: "AI 搜尋",
+	[Key.switchToDark]: "切換深色",
+	[Key.switchToLight]: "切換淺色",
+	[Key.spineModel]: "Spine 模型",
+	[Key.toggleDock]: "工具列",
+	[Key.quickActions]: "快捷入口",
+	[Key.announcementTicker]: "公告跑馬燈",
+	[Key.viewAnnouncement]: "查看公告",
+
+	// ===== 搜索弹窗 =====
+	[Key.searchArticles]: "搜尋文章",
+	[Key.searchPlaceholder1]: "搜尋文章、標籤、分類...",
+	[Key.searchPlaceholder2]: "輸入關鍵字開始搜尋",
+	[Key.searchPlaceholder3]: "試試搜尋「Astro」或「Svelte」",
+	[Key.searchPlaceholder4]: "按 ESC 關閉搜尋面板",
+	[Key.searchPlaceholder5]: "Ctrl+K 快速切換AI搜尋/一般搜尋",
+	[Key.searchViewAllPrefix]: "查看全部",
+	[Key.searchViewAllSuffix]: "條結果 →",
+	[Key.searchHintClose]: "ESC 關閉",
+	[Key.searchHintSearch]: "ENTER 搜尋",
+	[Key.searchHintToggle]: "Ctrl+K 切換",
+
+	// ===== 首页 Hero 对话 =====
+	[Key.dialogueMenuTitle]: "想聊些什麼？",
+	[Key.characterDialogue]: "角色對話",
+	[Key.dialoguePrev]: "上一句",
+	[Key.dialogueNext]: "下一句",
+	[Key.dialogueAutoPlay]: "自動播放",
+	[Key.reopenDialogue]: "重新開啟對話",
+	[Key.dialogueRestoreHint]: "喵？還想繼續聊聊嗎",
+
+	// ===== 首页数据层 =====
+	[Key.mapGuide]: "地圖指南",
+	[Key.siteVisits]: "網站訪問",
+	[Key.visitsLoading]: "訪客與瀏覽統計載入中",
+	[Key.visitTrajectory]: "訪問軌跡",
+	[Key.articleArchive]: "文章檔案",
+	[Key.contentIndex]: "內容索引",
+	[Key.switchPinnedPost]: "切換下一篇置頂文章",
+	[Key.openPost]: "開啟目前文章",
+	[Key.viewPinnedPostPrefix]: "查看置頂文章：",
+	[Key.viewLatestPostPrefix]: "查看最新文章：",
+	[Key.continueReadingFallback]: "開啟這篇文章繼續閱讀。",
+	[Key.categoryIndex]: "分類索引",
+	[Key.viewAll]: "查看全部",
+	[Key.categoryUnit]: "個分類",
+	[Key.tagIndex]: "標籤索引",
+	[Key.tagUnit]: "個標籤",
+	[Key.browseAllTags]: "全部標籤",
+	[Key.subscribeContact]: "訂閱與聯絡",
+	[Key.expandContacts]: "展開全部聯絡方式",
+	[Key.allContacts]: "全部聯絡方式",
+	[Key.viewsLabel]: "訪問量",
+
+	// ===== 页脚 =====
+	[Key.privacyPolicy]: "隱私政策",
+	[Key.userAgreement]: "使用者協議",
+	[Key.policeBeianAlt]: "公安網備",
+
+	// ===== 文章列表页 =====
+	[Key.publishDatePrefix]: "發布日期：",
+	[Key.viewPostPrefix]: "查看文章：",
+	[Key.encryptedPost]: "加密文章",
+	[Key.totalPostsPrefix]: "共",
+	[Key.sortPosts]: "文章排序",
+	[Key.sortLatest]: "最新",
+	[Key.sortOldest]: "最早",
+	[Key.sortPopular]: "熱門",
+	[Key.sortByPrefix]: "目前按",
+	[Key.sortBySuffix]: "排序",
+	[Key.regularPosts]: "一般文章",
+	[Key.noRegularPosts]: "暫無一般文章",
+	[Key.paginationNav]: "文章分頁",
+
+	// ===== 相对时间 =====
+
+	// ===== 友链 =====4239 (feat: 重构文章列表页，新增像素化图片加载动效与分页功能)
 	[Key.friendRulesTitle]: "友鏈申請指南",
 	[Key.friendSiteInfo]: "本站資訊",
 	[Key.friendApplyUnderstood]: "已了解，申請友鏈",

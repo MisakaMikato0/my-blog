@@ -99,6 +99,7 @@ export const ja: Translation = {
 	[Key.minutesCount]: "分",
 	[Key.postCount]: "投稿",
 	[Key.postsCount]: "投稿",
+	[Key.articles]: "記事",
 
 	[Key.themeColor]: "テーマカラー",
 
@@ -188,7 +189,7 @@ export const ja: Translation = {
 	[Key.paginationPage]: "",
 	[Key.paginationOf]: "ページ、全",
 	[Key.paginationTotal]: "ページ、合計",
-	[Key.paginationRecords]: "件",
+	[Key.paginationRecords]: "件",		[Key.paginationStatus]: "{current} / {total} ページ",4239 (feat: 重构文章列表页，新增像素化图片加载动效与分页功能)
 
 	// 404ページ
 	[Key.notFound]: "404",
@@ -494,6 +495,86 @@ export const ja: Translation = {
 	[Key.dynamicUploadSuccess]: "アップロード完了",
 	[Key.dynamicUploadFail]: "アップロード失敗",
 	[Key.copyPrefix]: "コピー",
+	[Key.copyTemplate]: "テンプレートをコピー",
+
+	// ===== 悬浮坞 / 导航 / 主题 =====
+	[Key.aiSearch]: "AI検索",
+	[Key.switchToDark]: "ダークモードに切替",
+	[Key.switchToLight]: "ライトモードに切替",
+	[Key.spineModel]: "Spineモデル",
+	[Key.toggleDock]: "ドック切替",
+	[Key.quickActions]: "クイックアクション",
+	[Key.announcementTicker]: "お知らせティッカー",
+	[Key.viewAnnouncement]: "お知らせを見る",
+
+	// ===== 搜索弹窗 =====
+	[Key.searchArticles]: "記事を検索",
+	[Key.searchPlaceholder1]: "記事・タグ・カテゴリを検索...",
+	[Key.searchPlaceholder2]: "キーワードを入力して検索",
+	[Key.searchPlaceholder3]: "「Astro」や「Svelte」を試してみて",
+	[Key.searchPlaceholder4]: "ESCで検索パネルを閉じる",
+	[Key.searchPlaceholder5]: "Ctrl+KでAI検索と通常検索を切替",
+	[Key.searchViewAllPrefix]: "すべて見る",
+	[Key.searchViewAllSuffix]: "件の結果 →",
+	[Key.searchHintClose]: "ESC 閉じる",
+	[Key.searchHintSearch]: "ENTER 検索",
+	[Key.searchHintToggle]: "Ctrl+K 切替",
+
+	// ===== 首页 Hero 对话 =====
+	[Key.dialogueMenuTitle]: "何を話そうか？",
+	[Key.characterDialogue]: "キャラクターとの対話",
+	[Key.dialoguePrev]: "前の一言",
+	[Key.dialogueNext]: "次の一言",
+	[Key.dialogueAutoPlay]: "自動再生",
+	[Key.reopenDialogue]: "対話を再開",
+	[Key.dialogueRestoreHint]: "ニャ？まだ話したい？",
+
+	// ===== 首页数据层 =====
+	[Key.mapGuide]: "マップガイド",
+	[Key.siteVisits]: "サイトアクセス",
+	[Key.visitsLoading]: "訪問者と閲覧統計を読み込み中",
+	[Key.visitTrajectory]: "アクセス履歴",
+	[Key.articleArchive]: "記事アーカイブ",
+	[Key.contentIndex]: "コンテンツインデックス",
+	[Key.switchPinnedPost]: "次のピン留め記事へ切替",
+	[Key.openPost]: "現在の記事を開く",
+	[Key.viewPinnedPostPrefix]: "ピン留め記事を見る：",
+	[Key.viewLatestPostPrefix]: "最新記事を見る：",
+	[Key.continueReadingFallback]: "この記事を開いて読み続けましょう。",
+	[Key.categoryIndex]: "カテゴリインデックス",
+	[Key.viewAll]: "すべて見る",
+	[Key.categoryUnit]: "個のカテゴリ",
+	[Key.tagIndex]: "タグインデックス",
+	[Key.tagUnit]: "個のタグ",
+	[Key.browseAllTags]: "すべてのタグ",
+	[Key.subscribeContact]: "購読と連絡",
+	[Key.expandContacts]: "すべての連絡先を展開",
+	[Key.allContacts]: "すべての連絡先",
+	[Key.viewsLabel]: "閲覧数",
+
+	// ===== 页脚 =====
+	[Key.privacyPolicy]: "プライバシーポリシー",
+	[Key.userAgreement]: "利用規約",
+	[Key.policeBeianAlt]: "公安備案",
+
+	// ===== 文章列表页 =====
+	[Key.publishDatePrefix]: "公開日：",
+	[Key.viewPostPrefix]: "記事を見る：",
+	[Key.encryptedPost]: "暗号化された記事",
+	[Key.totalPostsPrefix]: "計",
+	[Key.sortPosts]: "記事の並び替え",
+	[Key.sortLatest]: "最新",
+	[Key.sortOldest]: "最古",
+	[Key.sortPopular]: "人気",
+	[Key.sortByPrefix]: "現在",
+	[Key.sortBySuffix]: "順",
+	[Key.regularPosts]: "通常の記事",
+	[Key.noRegularPosts]: "通常の記事はありません",
+	[Key.paginationNav]: "記事ページネーション",
+
+	// ===== 相对时间 =====
+
+	// ===== 友链 =====4239 (feat: 重构文章列表页，新增像素化图片加载动效与分页功能)
 	[Key.friendRulesTitle]: "リンク申請ガイド",
 	[Key.friendSiteInfo]: "当サイトの情報",
 	[Key.friendApplyUnderstood]: "了解しました、申請する",

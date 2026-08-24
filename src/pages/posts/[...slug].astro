@@ -20,15 +20,15 @@ import {
 	getTagUrl,
 	removeFileExtension,
 } from "@utils/url-utils";
-import type { ImageMetadata } from "astro";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 import PostFooterActions from "@/components/misc/PostFooterActions.astro";
+import RelatedPosts from "@/components/misc/RelatedPosts.astro";
 import { coverImageConfig } from "@/config/coverImageConfig";
 import { homeConfig } from "@/config/homeConfig";
 import { siteConfig } from "@/config/siteConfig";
 import { formatDateI18n, formatDateToYYYYMMDD } from "@/utils/date-utils";
-import { processCoverImageSync } from "@/utils/image-utils";
+import { getApiUrlList, processCoverImageSync } from "@/utils/image-utils";
 import { url } from "@/utils/url-utils";
 
 export async function getStaticPaths() {
@@ -56,6 +56,7 @@ const bannerPostMeta = {
 
 // 处理随机图：如果image为"api"，则从配置的API获取随机图
 const processedImage = processCoverImageSync(entry.data.image, entry.id);
+const coverApiUrls = getApiUrlList(entry.data.image, entry.id);
 const posterFallbackCoverUrl = coverImageConfig.randomCoverImage.fallback
 	? url(coverImageConfig.randomCoverImage.fallback)
 	: null;
@@ -87,6 +88,25 @@ if (processedImage) {
 	}
 }
 
+function getDirectImageUrl(src: string | undefined): string | null {
+	if (!src) return null;
+	if (
+		src.startsWith("http://") ||
+		src.startsWith("https://") ||
+		src.startsWith("//") ||
+		src.startsWith("data:")
+	) {
+		return src;
+	}
+	return src.startsWith("/") ? url(src) : null;
+}
+
+const showPostCover = Boolean(coverImageConfig.enableInPost && posterCoverUrl);
+const sharePosterCoverUrl = showPostCover
+	? null
+	: getDirectImageUrl(processedImage);
+const sharePosterCoverSelector = showPostCover ? "#post-cover img" : null;
+
 // 处理头像URL
 let posterAvatarUrl: string | null = homeConfig.avatar || null;
 if (posterAvatarUrl) {
@@ -117,10 +137,8 @@ if (posterAvatarUrl) {
 dayjs.extend(utc);
 
 const canonicalUrl = new URL(Astro.url.pathname, Astro.site).href;
-const defaultStructuredImageUrl = new URL(
-	siteConfig.defaultOgImage || "/assets/images/aut.webp",
-	Astro.site,
-).href;
+const defaultStructuredImageUrl = new URL(siteConfig.defaultOgImage, Astro.site)
+	.href;
 const structuredImageUrl = posterCoverUrl
 	? new URL(posterCoverUrl, Astro.site).href
 	: defaultStructuredImageUrl;
@@ -132,7 +150,7 @@ const jsonLd = {
 	headline: entry.data.title,
 	description: entry.data.description || entry.data.title,
 	keywords: entry.data.tags,
-	articleSection: entry.data.category || "未分类",
+	articleSection: entry.data.category || i18n(I18nKey.uncategorized),
 	wordCount: remarkPluginFrontmatter.words,
 	image: structuredImageUrl,
 	author: { "@id": `${Astro.site}#person` },
@@ -163,6 +181,37 @@ const jsonLd = {
 };
 
 const serializedJsonLd = JSON.stringify(jsonLd).replace(/</g, "\\u003c");
+const breadcrumbJsonLd = {
+	"@context": "https://schema.org",
+	"@type": "BreadcrumbList",
+	itemListElement: [
+		{
+			"@type": "ListItem",
+			position: 1,
+			name: siteConfig.title,
+			item: new URL("/", Astro.site).href,
+		},
+		{
+			"@type": "ListItem",
+			position: 2,
+			name: entry.data.category || i18n(I18nKey.navPosts),
+			item: new URL(
+				`/archive/?category=${encodeURIComponent(entry.data.category || "")}`,
+				Astro.site,
+			).href,
+		},
+		{
+			"@type": "ListItem",
+			position: 3,
+			name: entry.data.title,
+			item: canonicalUrl,
+		},
+	],
+};
+const serializedBreadcrumbJsonLd = JSON.stringify(breadcrumbJsonLd).replace(
+	/</g,
+	"\\u003c",
+);
 ---
 
 <MainGridLayout
@@ -174,6 +223,13 @@ const serializedJsonLd = JSON.stringify(jsonLd).replace(/</g, "\\u003c");
   postSlug={entry.id}
   postCategory={entry.data.category || undefined}
   bannerPostMeta={bannerPostMeta}
+  articleMeta={{
+    published: entry.data.published,
+    updated: entry.data.updated,
+    author: entry.data.author || homeConfig.name,
+    category: entry.data.category || undefined,
+    tags: entry.data.tags,
+  }}
 >
   <!-- KaTeX 按需加载 - 仅在文章页面 -->
   <KatexManager slot="head" />
@@ -184,6 +240,12 @@ const serializedJsonLd = JSON.stringify(jsonLd).replace(/</g, "\\u003c");
     type="application/ld+json"
     set:html={serializedJsonLd}
   />
+	<script
+		slot="head"
+		is:inline
+		type="application/ld+json"
+		set:html={serializedBreadcrumbJsonLd}
+	/>
   <!-- Layer 1: Title + meta -->
   <div class="post-hero rounded-(--radius-large) mb-2 onload-animation">
     <div class="post-hero__content">
@@ -233,7 +295,8 @@ const serializedJsonLd = JSON.stringify(jsonLd).replace(/</g, "\\u003c");
             author={homeConfig.name}
             description={entry.data.description || entry.data.title}
             pubDate={formatDateToYYYYMMDD(entry.data.published)}
-            coverImage={posterCoverUrl}
+            coverImage={sharePosterCoverUrl}
+            coverImageSelector={sharePosterCoverSelector}
             fallbackCoverImage={posterFallbackCoverUrl}
             url={Astro.url.href}
             siteTitle={siteConfig.title}
@@ -277,7 +340,7 @@ const serializedJsonLd = JSON.stringify(jsonLd).replace(/</g, "\\u003c");
             <>
               {siteConfig.showLastModified && <div class="post-intro-card__divider" />}
               <div class="post-intro-card__section">
-                <div class="post-intro-card__label">简介</div>
+                <div class="post-intro-card__label">{i18n(I18nKey.postIntroLabel)}</div>
                 <p class="post-intro-card__desc">{entry.data.description}</p>
               </div>
             </>
@@ -287,14 +350,20 @@ const serializedJsonLd = JSON.stringify(jsonLd).replace(/</g, "\\u003c");
     })()
   }
 
-  <!-- Layer 3: Cover image -->
-  {coverImageConfig.enableInPost && posterCoverUrl && (
-    <div class="post-cover mb-2">
+  {/* Layer 3: Cover image */}
+  {showPostCover && (
+    <div
+      id="post-cover"
+      class="post-cover mb-2"
+      data-api-urls={coverApiUrls.length > 0 ? JSON.stringify(coverApiUrls) : undefined}
+      data-fallback-image={posterFallbackCoverUrl || undefined}
+    >
       <img
         src={posterCoverUrl}
-        alt=""
+        alt={`${entry.data.title} - ${i18n(I18nKey.coverImageAltSuffix)}`}
         loading="eager"
         fetchpriority="high"
+        data-post-cover-image
       />
     </div>
   )}
@@ -316,6 +385,11 @@ const serializedJsonLd = JSON.stringify(jsonLd).replace(/</g, "\\u003c");
             licenseName={entry.data.licenseName}
             licenseUrl={entry.data.licenseUrl}
           />
+          <RelatedPosts
+            currentId={entry.id}
+            tags={entry.data.tags}
+            category={entry.data.category || undefined}
+          />
         </EncryptedPost>
       ) : (
         <>
@@ -332,6 +406,11 @@ const serializedJsonLd = JSON.stringify(jsonLd).replace(/</g, "\\u003c");
             licenseName={entry.data.licenseName}
             licenseUrl={entry.data.licenseUrl}
           />
+          <RelatedPosts
+            currentId={entry.id}
+            tags={entry.data.tags}
+            category={entry.data.category || undefined}
+          />
         </>
       )}
     </div>
@@ -339,6 +418,48 @@ const serializedJsonLd = JSON.stringify(jsonLd).replace(/</g, "\\u003c");
 
   <script>
     import dayjs from "dayjs";
+
+    function initPostCoverImage() {
+      const cover = document.getElementById("post-cover");
+      if (!cover || cover.dataset.initialized === "true") return;
+      cover.dataset.initialized = "true";
+
+      const image = cover.querySelector<HTMLImageElement>("img[data-post-cover-image]");
+      if (!image) return;
+
+      let apiUrls: string[] = [];
+      if (cover.dataset.apiUrls) {
+        try {
+          apiUrls = JSON.parse(cover.dataset.apiUrls);
+        } catch {
+          apiUrls = [];
+        }
+      }
+
+      let currentApiIndex = 1;
+      let triedFallback = false;
+      const retryImage = () => {
+        if (currentApiIndex < apiUrls.length) {
+          image.addEventListener("error", retryImage, { once: true });
+          image.src = apiUrls[currentApiIndex];
+          currentApiIndex += 1;
+          return;
+        }
+
+        const fallbackImage = cover.dataset.fallbackImage;
+        if (fallbackImage && !triedFallback && image.currentSrc !== fallbackImage) {
+          triedFallback = true;
+          image.addEventListener("error", retryImage, { once: true });
+          image.src = fallbackImage;
+        }
+      };
+
+      if (image.complete) {
+        if (image.naturalWidth === 0) retryImage();
+      } else {
+        image.addEventListener("error", retryImage, { once: true });
+      }
+    }
 
     function checkOutdated() {
       const info = document.getElementById('outdated-info');
@@ -360,6 +481,8 @@ const serializedJsonLd = JSON.stringify(jsonLd).replace(/</g, "\\u003c");
       }
     }
 
+    initPostCoverImage();
+    document.addEventListener("astro:page-load", initPostCoverImage);
     document.addEventListener("astro:page-load", checkOutdated);
   </script>
 

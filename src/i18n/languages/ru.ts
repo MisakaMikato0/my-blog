@@ -100,6 +100,7 @@ export const ru: Translation = {
 	[Key.minutesCount]: "минуты",
 	[Key.postCount]: "пост",
 	[Key.postsCount]: "постов",
+	[Key.articles]: "Статьи",
 
 	[Key.themeColor]: "Цвет темы",
 
@@ -189,7 +190,7 @@ export const ru: Translation = {
 	[Key.paginationPage]: "Страница",
 	[Key.paginationOf]: "из",
 	[Key.paginationTotal]: ", всего",
-	[Key.paginationRecords]: " записей",
+	[Key.paginationRecords]: " записей",		[Key.paginationStatus]: "Страница {current} из {total}",4239 (feat: 重构文章列表页，新增像素化图片加载动效与分页功能)
 
 	// 404 Страница
 	[Key.notFound]: "404",
@@ -498,6 +499,86 @@ export const ru: Translation = {
 	[Key.dynamicUploadSuccess]: "Загружено",
 	[Key.dynamicUploadFail]: "Ошибка загрузки",
 	[Key.copyPrefix]: "Копировать",
+	[Key.copyTemplate]: "Копировать шаблон",
+
+	// ===== 悬浮坞 / 导航 / 主题 =====
+	[Key.aiSearch]: "ИИ-поиск",
+	[Key.switchToDark]: "Включить тёмную тему",
+	[Key.switchToLight]: "Включить светлую тему",
+	[Key.spineModel]: "Модель Spine",
+	[Key.toggleDock]: "Панель инструментов",
+	[Key.quickActions]: "Быстрые действия",
+	[Key.announcementTicker]: "Бегущая строка объявлений",
+	[Key.viewAnnouncement]: "Открыть объявление",
+
+	// ===== 搜索弹窗 =====
+	[Key.searchArticles]: "Поиск по статьям",
+	[Key.searchPlaceholder1]: "Поиск по статьям, тегам, категориям...",
+	[Key.searchPlaceholder2]: "Введите ключевое слово",
+	[Key.searchPlaceholder3]: "Попробуйте «Astro» или «Svelte»",
+	[Key.searchPlaceholder4]: "ESC — закрыть панель поиска",
+	[Key.searchPlaceholder5]: "Ctrl+K — переключить ИИ-поиск / обычный поиск",
+	[Key.searchViewAllPrefix]: "Все",
+	[Key.searchViewAllSuffix]: "результатов →",
+	[Key.searchHintClose]: "ESC закрыть",
+	[Key.searchHintSearch]: "ENTER искать",
+	[Key.searchHintToggle]: "Ctrl+K переключить",
+
+	// ===== 首页 Hero 对话 =====
+	[Key.dialogueMenuTitle]: "О чём поговорим?",
+	[Key.characterDialogue]: "Диалог с персонажем",
+	[Key.dialoguePrev]: "Предыдущая реплика",
+	[Key.dialogueNext]: "Следующая реплика",
+	[Key.dialogueAutoPlay]: "Автовоспроизведение",
+	[Key.reopenDialogue]: "Снова открыть диалог",
+	[Key.dialogueRestoreHint]: "Мяу? Продолжим беседу?",
+
+	// ===== 首页数据层 =====
+	[Key.mapGuide]: "Путеводитель",
+	[Key.siteVisits]: "Посещения",
+	[Key.visitsLoading]: "Загрузка статистики посетителей",
+	[Key.visitTrajectory]: "Траектория посещений",
+	[Key.articleArchive]: "Архив статей",
+	[Key.contentIndex]: "Индекс контента",
+	[Key.switchPinnedPost]: "Следующая закреплённая статья",
+	[Key.openPost]: "Открыть текущую статью",
+	[Key.viewPinnedPostPrefix]: "Открыть закреплённую: ",
+	[Key.viewLatestPostPrefix]: "Открыть последнюю: ",
+	[Key.continueReadingFallback]: "Откройте статью, чтобы продолжить чтение.",
+	[Key.categoryIndex]: "Каталог категорий",
+	[Key.viewAll]: "Показать все",
+	[Key.categoryUnit]: " категорий",
+	[Key.tagIndex]: "Каталог тегов",
+	[Key.tagUnit]: " тегов",
+	[Key.browseAllTags]: "Все теги",
+	[Key.subscribeContact]: "Подписка и контакты",
+	[Key.expandContacts]: "Показать все контакты",
+	[Key.allContacts]: "Все контакты",
+	[Key.viewsLabel]: "Просмотры",
+
+	// ===== 页脚 =====
+	[Key.privacyPolicy]: "Политика конфиденциальности",
+	[Key.userAgreement]: "Пользовательское соглашение",
+	[Key.policeBeianAlt]: "Регистрация в полиции КНР",
+
+	// ===== 文章列表页 =====
+	[Key.publishDatePrefix]: "Опубликовано: ",
+	[Key.viewPostPrefix]: "Открыть статью: ",
+	[Key.encryptedPost]: "Зашифрованная статья",
+	[Key.totalPostsPrefix]: "Всего",
+	[Key.sortPosts]: "Сортировка статей",
+	[Key.sortLatest]: "Новые",
+	[Key.sortOldest]: "Старые",
+	[Key.sortPopular]: "Популярные",
+	[Key.sortByPrefix]: "Сортировка: ",
+	[Key.sortBySuffix]: "",
+	[Key.regularPosts]: "Обычные статьи",
+	[Key.noRegularPosts]: "Пока нет обычных статей",
+	[Key.paginationNav]: "Постраничная навигация статей",
+
+	// ===== 相对时间 =====
+
+	// ===== 友链 =====4239 (feat: 重构文章列表页，新增像素化图片加载动效与分页功能)
 	[Key.friendRulesTitle]: "Как обменяться ссылками",
 	[Key.friendSiteInfo]: "Информация о сайте",
 	[Key.friendApplyUnderstood]: "Понятно, подать заявку",

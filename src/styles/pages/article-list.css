@@ -941,6 +941,8 @@
 	}
 }
 
+@import '../components/skull-switch.css';
+
 /* ==== 鼠标移入 3D 效果（从 HEAD 迁移，适配新架构：绑定 .article-list-card）==== */
 .article-list-card {
 	transform-style: preserve-3d;

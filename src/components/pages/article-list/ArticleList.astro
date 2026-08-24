@@ -99,27 +99,26 @@ const totalPostLabel = i18n(
 			</button>
 		</div>
 
-		<div class="article-list-toolbar__layout" aria-label="切换文章列表布局">
-			<button
-				type="button"
-				class="is-active"
-				data-article-list-view="list"
-				aria-pressed="true"
-				title="列表视图"
-			>
-				<svg width="0.9em" height="0.9em" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M3 5h18v3H3zM3 10.5h18v3H3zM3 16h18v3H3z"/></svg>
-				<span class="sr-only">列表视图</span>
-			</button>
-			<button
-				type="button"
-				data-article-list-view="grid"
-				aria-pressed="false"
-				title="网格视图"
-			>
-				<svg width="0.9em" height="0.9em" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M3 3h8v8H3zM13 3h8v8h-8zM3 13h8v8H3zM13 13h8v8h-8z"/></svg>
-				<span class="sr-only">网格视图</span>
-			</button>
-		</div>
+		<label class="skull-switch" data-article-list-layout-toggle aria-label="切换文章列表布局" title="切换文章卡片/列表视图">
+			<input type="checkbox" data-article-list-layout-checkbox />
+			<span class="thumb">
+				<span class="cranium"></span>
+				<span class="mouth"></span>
+			</span>
+			<span class="arm-wrapper">
+				<span class="arm">
+					<span class="bone"></span>
+					<span class="bone"></span>
+					<span class="hand">
+						<span class="bone"></span>
+						<span class="bone"></span>
+						<span class="bone"></span>
+						<span class="bone"></span>
+					</span>
+					<span class="big"></span>
+				</span>
+			</span>
+		</label>
 	</header>
 
 	<p class="sr-only" data-article-list-status aria-live="polite">
@@ -210,10 +209,8 @@ const totalPostLabel = i18n(
 				"[data-article-list-sort]",
 			),
 		);
-		const viewButtons = Array.from(
-			articleListRoot.querySelectorAll<HTMLButtonElement>(
-				"[data-article-list-view]",
-			),
+		const layoutToggle = articleListRoot.querySelector<HTMLInputElement>(
+			"[data-article-list-layout-checkbox]",
 		);
 		const controller = new AbortController();
 		const { signal } = controller;
@@ -522,26 +519,6 @@ const totalPostLabel = i18n(
 		}
 
 		function handleClick(event: MouseEvent) {
-			const viewButton = elementFromTarget<HTMLButtonElement>(
-				event.target,
-				"[data-article-list-view]",
-			);
-			if (viewButton) {
-				const nextView = viewButton.dataset.articleListView;
-				if (!nextView || nextView === viewMode) return;
-				viewMode = nextView as "list" | "grid";
-				if (cardGrid) cardGrid.dataset.view = viewMode;
-				viewButtons.forEach((button) => {
-					const active = button.dataset.articleListView === viewMode;
-					button.classList.toggle("is-active", active);
-					button.setAttribute("aria-pressed", String(active));
-				});
-				try {
-					localStorage.setItem("postListLayout", viewMode);
-				} catch {}
-				return;
-			}
-
 			const sortButton = elementFromTarget<HTMLButtonElement>(
 				event.target,
 				"[data-article-list-sort]",
@@ -670,11 +647,20 @@ const totalPostLabel = i18n(
 			if (saved === "list" || saved === "grid") viewMode = saved;
 		} catch {}
 		if (cardGrid) cardGrid.dataset.view = viewMode;
-		viewButtons.forEach((button) => {
-			const active = button.dataset.articleListView === viewMode;
-			button.classList.toggle("is-active", active);
-			button.setAttribute("aria-pressed", String(active));
-		});
+		if (layoutToggle) {
+			layoutToggle.checked = viewMode === "grid";
+			layoutToggle.addEventListener(
+				"change",
+				() => {
+					viewMode = layoutToggle.checked ? "grid" : "list";
+					if (cardGrid) cardGrid.dataset.view = viewMode;
+					try {
+						localStorage.setItem("postListLayout", viewMode);
+					} catch {}
+				},
+				{ signal },
+			);
+		}
 		renderList();
 		renderPageviews();
 

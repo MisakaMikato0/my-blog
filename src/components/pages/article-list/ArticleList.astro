@@ -99,25 +99,25 @@ const totalPostLabel = i18n(
 			</button>
 		</div>
 
-		<div class="article-list-toolbar__layout" aria-label="鍒囨崲鏂囩珷鍒楄〃甯冨眬">
+		<div class="article-list-toolbar__layout" aria-label="切换文章列表布局">
 			<button
 				type="button"
 				class="is-active"
 				data-article-list-view="list"
 				aria-pressed="true"
-				title="鍒楄〃瑙嗗浘"
+				title="列表视图"
 			>
 				<svg width="0.9em" height="0.9em" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M3 5h18v3H3zM3 10.5h18v3H3zM3 16h18v3H3z"/></svg>
-				<span class="sr-only">鍒楄〃瑙嗗浘</span>
+				<span class="sr-only">列表视图</span>
 			</button>
 			<button
 				type="button"
 				data-article-list-view="grid"
 				aria-pressed="false"
-				title="缃戞牸瑙嗗浘"
+				title="网格视图"
 			>
 				<svg width="0.9em" height="0.9em" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M3 3h8v8H3zM13 3h8v8h-8zM3 13h8v8H3zM13 13h8v8h-8z"/></svg>
-				<span class="sr-only">缃戞牸瑙嗗浘</span>
+				<span class="sr-only">网格视图</span>
 			</button>
 		</div>
 	</header>
@@ -215,6 +215,51 @@ const totalPostLabel = i18n(
 				"[data-article-list-view]",
 			),
 		);
+
+		// 鼠标移入 3D 效果：四象限 zone 检测（从 HEAD Svelte 版迁移）
+		const cardRects = new Map<HTMLElement, DOMRect>();
+		cards.forEach((card) => {
+			card.addEventListener(
+				"mouseenter",
+				(event) => {
+					const link = event.currentTarget as HTMLElement;
+					cardRects.set(link, link.getBoundingClientRect());
+				},
+				{ signal },
+			);
+			card.addEventListener(
+				"mousemove",
+				(event) => {
+					const link = event.currentTarget as HTMLElement;
+					let rect = cardRects.get(link);
+					if (!rect) {
+						rect = link.getBoundingClientRect();
+						cardRects.set(link, rect);
+					}
+					const x = event.clientX - rect.left;
+					const y = event.clientY - rect.top;
+					const zone =
+						x < rect.width / 2
+							? y < rect.height / 2
+								? "tl"
+								: "bl"
+							: y < rect.height / 2
+								? "tr"
+								: "br";
+					if (link.dataset.hoverZone !== zone) link.dataset.hoverZone = zone;
+				},
+				{ signal },
+			);
+			card.addEventListener(
+				"mouseleave",
+				(event) => {
+					const link = event.currentTarget as HTMLElement;
+					cardRects.delete(link);
+					link.removeAttribute("data-hover-zone");
+				},
+				{ signal },
+			);
+		});
 		const previousButton = articleListRoot.querySelector<HTMLButtonElement>(
 			'[data-article-list-page-action="previous"]',
 		);

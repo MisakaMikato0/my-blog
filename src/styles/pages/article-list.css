@@ -895,3 +895,38 @@
 		width: 100%;
 	}
 }
+
+/* ==== 鼠标移入 3D 效果（从 HEAD 迁移，适配新架构：绑定 .article-list-card）==== */
+.article-list-card {
+	transform-style: preserve-3d;
+	transition:
+		transform 180ms ease-out,
+		border-color 180ms ease-out,
+		box-shadow 180ms ease-out;
+}
+
+@media (hover: hover) and (pointer: fine) {
+	/* 网格视图：鼠标位于卡片四象限时的 3D 旋转 */
+	.article-list-card[data-hover-zone="tl"] {
+		transform: perspective(1000px) rotateX(9deg) rotateY(-9deg);
+	}
+	.article-list-card[data-hover-zone="tr"] {
+		transform: perspective(1000px) rotateX(9deg) rotateY(9deg);
+	}
+	.article-list-card[data-hover-zone="bl"] {
+		transform: perspective(1000px) rotateX(-9deg) rotateY(-9deg);
+	}
+	.article-list-card[data-hover-zone="br"] {
+		transform: perspective(1000px) rotateX(-9deg) rotateY(9deg);
+	}
+
+	/* 悬停增强：封面图微微放大（transition 沿用上游既有定义） */
+	.article-list-card:hover .article-list-card__cover {
+		transform: scale(1.04);
+	}
+
+	/* 悬停增强：标题颜色高亮 */
+	.article-list-card:hover .article-list-card__title-text {
+		color: var(--primary);
+	}
+}

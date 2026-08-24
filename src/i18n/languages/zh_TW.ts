@@ -83,10 +83,12 @@ export const zh_TW: Translation = {
 	[Key.guestbookCommentHint]:
 		"您還未在配置文件中啟用評論系統，啟用後訪客才可在此留言",
 	[Key.friends]: "友鏈",
-	[Key.friendsDescription]: "這裡是我的朋友們，歡迎互相訪問交流",
+	[Key.friendsDescription]:
+		"瀏覽本站收錄的友鏈，發現其他獨立部落格和網站；也可了解友鏈申請方式，與站長互相訪問交流。",
 	[Key.friendsApply]: "自助申請友鏈",
 	[Key.guestbook]: "留言",
-	[Key.guestbookDescription]: "歡迎在這裡留下你的足跡，分享你的想法和建議",
+	[Key.guestbookDescription]:
+		"在留言板留下想法、建議和交流內容，與其他訪客互動；請遵守社群規則，共同維護友善的討論環境。",
 	[Key.untitled]: "無標題",
 	[Key.uncategorized]: "未分類",
 	[Key.noTags]: "無標籤",
@@ -198,7 +200,8 @@ export const zh_TW: Translation = {
 
 	// RSS頁面
 	[Key.rss]: "RSS 訂閱",
-	[Key.rssDescription]: "訂閱獲取最新更新",
+	[Key.rssDescription]:
+		"透過 RSS 訂閱本站最新文章更新，將內容推送到常用閱讀器，方便集中閱讀並持續關注網站動態。",
 	[Key.rssSubtitle]: "通過 RSS 訂閱，第一時間獲取最新文章和動態",
 	[Key.rssLink]: "RSS 鏈接",
 	[Key.rssCopyToReader]: "複製鏈接到你的 RSS 閱讀器",
@@ -249,7 +252,7 @@ export const zh_TW: Translation = {
 	[Key.sponsor]: "贊助",
 	[Key.sponsorTitle]: "贊助支持",
 	[Key.sponsorDescription]:
-		"如果我的內容對你有幫助，歡迎通過以下方式贊助我，你的支持是我持續創作的動力！",
+		"本頁提供贊助方式和贊助者名單，用於支持本站內容創作、維護與持續更新；感謝每一份支持。",
 	[Key.sponsorMethods]: "贊助方式",
 	[Key.sponsorList]: "贊助列表",
 	[Key.sponsorEmpty]: "暫無贊助記錄",
@@ -328,7 +331,8 @@ export const zh_TW: Translation = {
 
 	// 相簿頁面
 	[Key.gallery]: "相簿",
-	[Key.galleryDescription]: "記錄生活中的美好瞬間",
+	[Key.galleryDescription]:
+		"瀏覽本站收錄的本地與網路相簿，按主題探索圖片和作品，記錄值得保存的生活片段與創作內容。",
 	[Key.galleryPhotos]: "張照片",
 	[Key.galleryAlbums]: "本相簿",
 	[Key.galleryNoAlbums]: "暫無相簿",
@@ -394,7 +398,8 @@ export const zh_TW: Translation = {
 
 	// 收藏API頁面
 	[Key.collections]: "工具導航",
-	[Key.collectionsDescription]: "收集和管理常用的 API 與工具",
+	[Key.collectionsDescription]:
+		"集中瀏覽本站整理的常用工具、公開 API 與資源連結，按分類快速查找並存取適合目前任務的服務。",
 	[Key.collectionsEmpty]: "暫無收藏的 API",
 	[Key.collectionsCopy]: "複製連結",
 	[Key.collectionsCopied]: "已複製",
@@ -422,7 +427,8 @@ export const zh_TW: Translation = {
 	[Key.navPosts]: "文章",
 	[Key.navMy]: "我的",
 	[Key.writePost]: "撰寫文章",
-	[Key.calendarDescription]: "節日、生日、安排與文章發布的綜合日曆",
+	[Key.calendarDescription]:
+		"在綜合日曆中查看節日、生日、行程和文章發布記錄，按日期了解近期安排與網站更新動態。",
 	[Key.calendarToday]: "今日",
 	[Key.calendarTomorrow]: "明日",
 	[Key.calendarDaysLater]: "{n} 天後",
@@ -587,6 +593,9 @@ export const zh_TW: Translation = {
 	[Key.categoryExplorerTitle]: "分類與標籤",
 	[Key.categoryExplorerViewPosts]: "查看分類文章",
 	[Key.categoryExplorerAria]: "分類與標籤瀏覽",
+	[Key.listDescription]:
+		"以卡片列表瀏覽本站全部文章，可按發布時間、主題、分類、標籤和訪問熱度篩選排序，快速找到想讀的內容。",
+	[Key.noDescriptionFallback]: "暫無文章簡介，點擊查看完整內容。",
 	[Key.aboutChangelogTitle]: "更新日誌",
 	[Key.aboutChangelogPagesLabel]: "涉及頁面",
 	[Key.aboutChangelogRelatedLabel]: "相關更新",

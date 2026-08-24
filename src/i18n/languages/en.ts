@@ -85,11 +85,11 @@ export const en: Translation = {
 		"You have not enabled the comment system in the configuration file yet. After enabling it, visitors will be able to leave messages here",
 	[Key.friends]: "Friends",
 	[Key.friendsDescription]:
-		"Here are my friends, welcome to visit and communicate with each other",
+		"Browse this site's collection of friendly links and independent blogs, discover other websites, and learn how to exchange links and stay connected.",
 	[Key.friendsApply]: "Apply for Friend Link",
 	[Key.guestbook]: "Guestbook",
 	[Key.guestbookDescription]:
-		"Welcome to leave your mark here, share your thoughts and suggestions",
+		"Use the guestbook to leave ideas, suggestions, and messages for other visitors. Please follow the community rules to help keep the conversation respectful and welcoming.",
 	[Key.untitled]: "Untitled",
 	[Key.uncategorized]: "Uncategorized",
 	[Key.noTags]: "No Tags",
@@ -202,7 +202,8 @@ export const en: Translation = {
 
 	// RSS Page
 	[Key.rss]: "RSS Feed",
-	[Key.rssDescription]: "Subscribe to get latest updates",
+	[Key.rssDescription]:
+		"Subscribe to this site's RSS feed to receive new posts in your preferred reader and follow the latest updates without checking the website manually.",
 	[Key.rssSubtitle]:
 		"Subscribe via RSS to get the latest articles and updates imediately",
 	[Key.rssLink]: "RSS Link",
@@ -256,7 +257,7 @@ export const en: Translation = {
 	[Key.sponsor]: "Sponsor",
 	[Key.sponsorTitle]: "Support Me",
 	[Key.sponsorDescription]:
-		"If my content has been helpful to you, welcome to sponsor me through the following methods. Your support is the driving force for my continued creation!",
+		"Find available sponsorship methods and a list of supporters. Contributions help maintain the site, fund new content, and support ongoing updates.",
 	[Key.sponsorMethods]: "Payment Methods",
 	[Key.sponsorList]: "Sponsors",
 	[Key.sponsorEmpty]: "No sponsors yet",
@@ -336,7 +337,8 @@ export const en: Translation = {
 
 	// Gallery Page
 	[Key.gallery]: "Gallery",
-	[Key.galleryDescription]: "Capturing beautiful moments in life",
+	[Key.galleryDescription]:
+		"Browse the site's local and online albums, explore images and works by theme, and revisit saved moments, visual ideas, and creative projects.",
 	[Key.galleryPhotos]: "photos",
 	[Key.galleryAlbums]: "albums",
 	[Key.galleryNoAlbums]: "No albums yet",
@@ -403,7 +405,8 @@ export const en: Translation = {
 
 	// Collections API page
 	[Key.collections]: "Tools",
-	[Key.collectionsDescription]: "Collect and manage useful APIs and tools",
+	[Key.collectionsDescription]:
+		"Browse a curated directory of useful tools, public APIs, and resource links. Explore categories to quickly find services that suit your current task.",
 	[Key.collectionsEmpty]: "No collected APIs yet",
 	[Key.collectionsCopy]: "Copy link",
 	[Key.collectionsCopied]: "Copied",
@@ -435,7 +438,7 @@ export const en: Translation = {
 	[Key.navMy]: "My",
 	[Key.writePost]: "Write Post",
 	[Key.calendarDescription]:
-		"Holidays, birthdays, schedules and post updates at a glance",
+		"View holidays, birthdays, schedules, and post publications in one calendar. Check upcoming plans and follow recent updates by date.",
 	[Key.calendarToday]: "Today",
 	[Key.calendarTomorrow]: "Tomorrow",
 	[Key.calendarDaysLater]: "In {n} days",
@@ -602,6 +605,9 @@ export const en: Translation = {
 	[Key.categoryExplorerTitle]: "Categories & Tags",
 	[Key.categoryExplorerViewPosts]: "Browse posts",
 	[Key.categoryExplorerAria]: "Category and tag browser",
+	[Key.listDescription]:
+		"Browse all posts in a card-based list, with sorting and filters for publication date, topics, categories, tags, and popularity to find what you want to read.",
+	[Key.noDescriptionFallback]: "No description. Click to read the full post.",
 	[Key.aboutChangelogTitle]: "Changelog",
 	[Key.aboutChangelogPagesLabel]: "Pages involved",
 	[Key.aboutChangelogRelatedLabel]: "Related updates",

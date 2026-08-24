@@ -109,6 +109,8 @@ enum I18nKey {
 	categoryExplorerTitle = "categoryExplorerTitle",
 	categoryExplorerViewPosts = "categoryExplorerViewPosts",
 	categoryExplorerAria = "categoryExplorerAria",
+	listDescription = "listDescription",
+	noDescriptionFallback = "noDescriptionFallback",
 	aboutChangelogTitle = "aboutChangelogTitle",
 	aboutChangelogPagesLabel = "aboutChangelogPagesLabel",
 	aboutChangelogRelatedLabel = "aboutChangelogRelatedLabel",

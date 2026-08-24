@@ -83,11 +83,12 @@ export const zh_CN: Translation = {
 	[Key.guestbookCommentHint]:
 		"您还未在配置文件中启用评论系统，启用后访客才可在此留言",
 	[Key.friends]: "友链",
-	[Key.friendsDescription]: "这里是我的朋友们，欢迎互相访问交流",
+	[Key.friendsDescription]:
+		"浏览本站收录的友链，发现其他独立博客和网站；也可了解友链申请方式，与站长互相访问交流。",
 	[Key.friendsApply]: "自助申请友链",
 	[Key.guestbook]: "留言",
 	[Key.guestbookDescription]:
-		"欢迎在这里留下你的足迹，分享你的想法和建议，但是请不要发布任何违规内容",
+		"在留言板留下想法、建议和交流内容，与其他访客互动；请遵守社区规则，共同维护友善的讨论环境。",
 	[Key.untitled]: "无标题",
 	[Key.uncategorized]: "未分类",
 	[Key.noTags]: "无标签",
@@ -197,7 +198,8 @@ export const zh_CN: Translation = {
 
 	// RSS页面
 	[Key.rss]: "RSS 订阅",
-	[Key.rssDescription]: "订阅获取最新更新",
+	[Key.rssDescription]:
+		"通过 RSS 订阅本站最新文章更新，将内容推送到常用阅读器，方便集中阅读并持续关注网站动态。",
 	[Key.rssSubtitle]: "通过 RSS 订阅，第一时间获取最新文章和动态",
 	[Key.rssLink]: "RSS 链接",
 	[Key.rssCopyToReader]: "复制链接到你的 RSS 阅读器",
@@ -248,7 +250,7 @@ export const zh_CN: Translation = {
 	[Key.sponsor]: "赞助",
 	[Key.sponsorTitle]: "赞助支持",
 	[Key.sponsorDescription]:
-		"如果我的内容对你有帮助，欢迎通过以下方式赞助我，你的支持是我持续创作的动力！",
+		"本页提供赞助方式和赞助者名单，用于支持本站内容创作、维护与持续更新；感谢每一份支持。",
 	[Key.sponsorMethods]: "赞助方式",
 	[Key.sponsorList]: "赞助列表",
 	[Key.sponsorEmpty]: "暂无赞助记录",
@@ -327,7 +329,8 @@ export const zh_CN: Translation = {
 
 	// 相册页面
 	[Key.gallery]: "相册",
-	[Key.galleryDescription]: "记录生活中的美好瞬间",
+	[Key.galleryDescription]:
+		"浏览本站收录的本地与网络相册，按主题探索图片和作品，记录值得保存的生活片段与创作内容。",
 	[Key.galleryPhotos]: "张照片",
 	[Key.galleryAlbums]: "本相册",
 	[Key.galleryNoAlbums]: "暂无相册",
@@ -393,7 +396,8 @@ export const zh_CN: Translation = {
 
 	// 收藏API页面
 	[Key.collections]: "工具导航",
-	[Key.collectionsDescription]: "收集和管理常用的 API 与工具",
+	[Key.collectionsDescription]:
+		"集中浏览本站整理的常用工具、公开 API 与资源链接，按分类快速查找并访问适合当前任务的服务。",
 	[Key.collectionsEmpty]: "暂无收藏的 API",
 	[Key.collectionsCopy]: "复制链接",
 	[Key.collectionsCopied]: "已复制",
@@ -421,7 +425,8 @@ export const zh_CN: Translation = {
 	[Key.navPosts]: "文章",
 	[Key.navMy]: "我的",
 	[Key.writePost]: "写文章",
-	[Key.calendarDescription]: "节日、生日、安排与文章发布的综合日历",
+	[Key.calendarDescription]:
+		"在综合日历中查看节日、生日、日程和文章发布记录，按日期了解近期安排与网站更新动态。",
 	[Key.calendarToday]: "今日",
 	[Key.calendarTomorrow]: "明日",
 	[Key.calendarDaysLater]: "{n} 天后",
@@ -586,6 +591,9 @@ export const zh_CN: Translation = {
 	[Key.categoryExplorerTitle]: "分类与标签",
 	[Key.categoryExplorerViewPosts]: "查看分类文章",
 	[Key.categoryExplorerAria]: "分类与标签浏览",
+	[Key.listDescription]:
+		"以卡片列表浏览本站全部文章，可按发布时间、主题、分类、标签和访问热度筛选排序，快速找到想读的内容。",
+	[Key.noDescriptionFallback]: "暂无文章简介，点击查看完整内容。",
 	[Key.aboutChangelogTitle]: "更新日志",
 	[Key.aboutChangelogPagesLabel]: "涉及页面",
 	[Key.aboutChangelogRelatedLabel]: "相关更新",

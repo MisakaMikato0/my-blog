@@ -885,14 +885,36 @@
 		gap: var(--space-5);
 	}
 
-	.article-list-toolbar__layout {
-		flex-shrink: 0;
+	/* 手机端不提供布局切换，固定使用列表模式 */
+	.article-list-toolbar__layout,
+	.article-list-toolbar .skull-switch {
+		display: none;
 	}
 
-	.skull-switch {
-		transform: scale(0.82);
-		transform-origin: right center;
-		margin-left: -0.75rem;
+	.article-list-card-grid[data-view="grid"] {
+		grid-template-columns: minmax(0, 1fr);
+	}
+
+	.article-list-card-grid[data-view="grid"] .article-list-card {
+		display: flex;
+		flex-direction: column;
+		align-items: stretch;
+	}
+
+	.article-list-card-grid[data-view="grid"] .article-list-card__cover-wrap {
+		width: 100%;
+		aspect-ratio: 16/9;
+	}
+
+	.article-list-card-grid[data-view="grid"] .article-list-card__content {
+		padding: var(--space-3) var(--space-2) var(--space-2);
+	}
+
+	.article-list-card-grid[data-view="grid"] .article-list-card__description {
+		height: 3.3em;
+		min-height: 3.3em;
+		max-height: 3.3em;
+		-webkit-line-clamp: 2;
 	}
 
 	.article-list-card-grid[data-view="list"] .article-list-card__content {

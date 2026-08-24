@@ -643,8 +643,12 @@ const totalPostLabel = i18n(
 		const cleanupPinnedCarousel = initializePinnedCarousel();
 		initCoverLoading();
 		try {
-			const saved = localStorage.getItem("postListLayout");
-			if (saved === "list" || saved === "grid") viewMode = saved;
+			if (!mobileQuery.matches) {
+				const saved = localStorage.getItem("postListLayout");
+				if (saved === "list" || saved === "grid") viewMode = saved;
+			} else {
+				viewMode = "list";
+			}
 		} catch {}
 		if (cardGrid) cardGrid.dataset.view = viewMode;
 		if (layoutToggle) {
@@ -652,6 +656,7 @@ const totalPostLabel = i18n(
 			layoutToggle.addEventListener(
 				"change",
 				() => {
+					if (mobileQuery.matches) return;
 					viewMode = layoutToggle.checked ? "grid" : "list";
 					if (cardGrid) cardGrid.dataset.view = viewMode;
 					try {

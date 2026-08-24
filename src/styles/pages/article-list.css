@@ -926,6 +926,11 @@
 	aspect-ratio: 4/3;
 }
 
+.article-list-card-grid[data-view="list"] .article-list-card__cover {
+	height: 100%;
+	object-fit: cover;
+}
+
 .article-list-card-grid[data-view="list"] .article-list-card__content {
 	flex: 1 1 auto;
 	padding: var(--space-5);

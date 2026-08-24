@@ -442,7 +442,6 @@ export function mountHomeHero() {
 			0.72,
 		);
 
-
 		// 放大与最后几块碎片的归位重叠进行，避免合并完成后先停顿再弹开的顿挫感
 		timeline.to(
 			mosaic,

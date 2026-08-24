@@ -328,3 +328,26 @@
 		display: none;
 	}
 }
+
+/* ── 日历小组件视图（sheet 内） ── */
+.mobile-dock__sheet-calendar {
+	padding-top: 0.25rem;
+}
+
+.mobile-dock__sheet-back {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.25rem;
+	padding: 0.25rem 0.5rem;
+	margin-bottom: 0.5rem;
+	border: none;
+	border-radius: var(--radius-small);
+	background: transparent;
+	color: var(--deep-text);
+	font-size: 0.75rem;
+	cursor: pointer;
+}
+
+.mobile-dock__sheet-back:hover {
+	background: var(--btn-plain-bg-hover);
+}

@@ -1,5 +1,6 @@
 ---
 import Icon from "@components/common/Icon.astro";
+import CalendarWidget from "@/components/controls/CalendarWidget.astro";
 /**
  * 移动端底部悬浮 Dock — 仅 ≤768px 显示
  * 5 栏位单浮岛 + 中间凸出搜索按钮 + 工具栏底部 sheet
@@ -60,7 +61,7 @@ const showSpine = !!spineModelConfig?.enable;
 <!-- 工具栏底部 Sheet -->
 <div class="mobile-dock__sheet" id="mobile-dock-sheet">
 	<div class="mobile-dock__sheet-title">工具</div>
-	<div class="mobile-dock__sheet-grid">
+	<div class="mobile-dock__sheet-grid" id="mobile-dock-sheet-grid">
 		<button class="mobile-dock__sheet-item" id="md-ai-search-btn" aria-label="AI 搜索" type="button">
 			<span class="mobile-dock__sheet-item-icon"><Icon name="ri:ai" is:inline /></span>
 			<span class="mobile-dock__sheet-item-label">AI 搜索</span>
@@ -81,6 +82,10 @@ const showSpine = !!spineModelConfig?.enable;
 			<span class="mobile-dock__sheet-item-icon"><Icon name="material-symbols:label-outline" is:inline /></span>
 			<span class="mobile-dock__sheet-item-label">标签</span>
 		</button>
+		<button class="mobile-dock__sheet-item" id="md-calendar-btn" aria-label="日历" type="button">
+			<span class="mobile-dock__sheet-item-icon"><Icon name="material-symbols:calendar-month-rounded" is:inline /></span>
+			<span class="mobile-dock__sheet-item-label">日历</span>
+		</button>
 		<button class="mobile-dock__sheet-item hide" id="md-toc-btn" aria-label="目录" type="button">
 			<span class="mobile-dock__sheet-item-icon"><Icon name="material-symbols:format-list-bulleted" is:inline /></span>
 			<span class="mobile-dock__sheet-item-label">目录</span>
@@ -99,6 +104,13 @@ const showSpine = !!spineModelConfig?.enable;
 				<span class="mobile-dock__sheet-item-label">Spine</span>
 			</button>
 		)}
+	</div>
+	<div class="mobile-dock__sheet-calendar" id="md-calendar-panel" hidden>
+		<button class="mobile-dock__sheet-back" id="md-calendar-back-btn" type="button">
+			<Icon name="material-symbols:arrow-back-rounded" is:inline />
+			<span>返回</span>
+		</button>
+		<CalendarWidget id="mobile-calendar-widget" />
 	</div>
 </div>
 
@@ -232,6 +244,11 @@ const showSpine = !!spineModelConfig?.enable;
 			if (toolsCollapsedIcon) (toolsCollapsedIcon as HTMLElement).style.display = "";
 			if (toolsOpenIcon) (toolsOpenIcon as HTMLElement).style.display = "none";
 			isOverlayOpen = false;
+			// 关闭 sheet 时复位日历视图
+			const sheetGridEl = document.getElementById("mobile-dock-sheet-grid");
+			const calendarPanelEl = document.getElementById("md-calendar-panel");
+			if (calendarPanelEl) calendarPanelEl.hidden = true;
+			if (sheetGridEl) sheetGridEl.hidden = false;
 		}
 
 		function setGuestbookComposerFocus(active: boolean) {
@@ -315,6 +332,28 @@ const showSpine = !!spineModelConfig?.enable;
 			e.stopPropagation();
 			closeSheet();
 			window.dispatchEvent(new CustomEvent("toggle-ai-search"));
+		});
+
+		// 日历：在 sheet 内切换到日历小组件视图
+		const sheetGrid = document.getElementById("mobile-dock-sheet-grid");
+		const calendarPanel = document.getElementById("md-calendar-panel");
+		document.getElementById("md-calendar-btn")?.addEventListener("click", (e) => {
+			e.stopPropagation();
+			if (!calendarPanel || !sheetGrid) return;
+			if (calendarPanel.hidden) {
+				sheetGrid.hidden = true;
+				calendarPanel.hidden = false;
+				window.dispatchEvent(new Event("calendar:open"));
+			} else {
+				calendarPanel.hidden = true;
+				sheetGrid.hidden = false;
+			}
+		});
+		document.getElementById("md-calendar-back-btn")?.addEventListener("click", (e) => {
+			e.stopPropagation();
+			if (!calendarPanel || !sheetGrid) return;
+			calendarPanel.hidden = true;
+			sheetGrid.hidden = false;
 		});
 
 		// 回顶部

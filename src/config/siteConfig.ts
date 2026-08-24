@@ -159,8 +159,6 @@ export const siteConfig: SiteConfig = {
 		gallery: true,
 		// 收藏API页面开关
 		collections: true,
-		// 日历页面开关
-		calendar: true,
 		// 动态页面开关
 		dynamic: true,
 		// 追番页面开关

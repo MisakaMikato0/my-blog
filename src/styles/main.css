@@ -17,6 +17,7 @@
 @import './components/image-pixel-reveal.css';
 @import './components/floating-dock.css';
 @import './components/mobile-dock.css';
+@import './components/calendar-widget.css';
 @import './components/widget-layout.css';
 @import './components/cover-image.css';
 @import './components/button-tag.css';
@@ -36,7 +37,6 @@
 @import './components/about-timeline.css';
 
 /* === 侧边栏组件层 === */
-@import './widgets/calendar.css';
 @import './widgets/sidebar-toc.css';
 @import './widgets/archive-stats.css';
 @import './widgets/terrarium-model.css';

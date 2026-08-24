@@ -34,7 +34,6 @@ export type {
 	MusicPlayerConfig,
 	NavBarConfig,
 	PlantUMLConfig,
-	ScheduleItem,
 	SidebarLayoutConfig,
 	SiteConfig,
 	SolarOrLunarDate,

@@ -941,6 +941,12 @@
 	grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
+@media (max-width: 768px) {
+	.article-list-card-grid[data-view="grid"] {
+		grid-template-columns: minmax(0, 1fr);
+	}
+}
+
 .article-list-card-grid[data-view="list"] {
 	grid-template-columns: minmax(0, 1fr);
 }

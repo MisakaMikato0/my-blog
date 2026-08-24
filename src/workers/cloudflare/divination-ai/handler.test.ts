@@ -38,15 +38,17 @@ describe("handleDivinationInterpret", () => {
 		expect(response.status).toBe(405);
 	});
 
-	it("未配置 API Key 时返回 503", async () => {
+	it("未配置 API Key 时返回提示词兜底响应", async () => {
 		const liuyao = createLiuyaoReading({ customDate: FIXED_DATE });
 		const response = await handleDivinationInterpret(
 			jsonRequest({ method: "liuyao", data: liuyao.data }),
 			buildEnv({}),
 		);
-		expect(response.status).toBe(503);
-		const payload = (await response.json()) as { error: string };
-		expect(payload.error).toBe("AI_KEY_NOT_CONFIGURED");
+		expect(response.status).toBe(200);
+		const payload = (await response.json()) as { prompt?: string };
+		// 提示词包含排盘信息（六爻占法标注）
+		expect(payload.prompt).toBeTruthy();
+		expect(payload.prompt).toContain("占法：六爻");
 	});
 
 	it("非法 method 返回 400", async () => {

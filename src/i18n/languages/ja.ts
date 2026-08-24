@@ -189,7 +189,8 @@ export const ja: Translation = {
 	[Key.paginationPage]: "",
 	[Key.paginationOf]: "ページ、全",
 	[Key.paginationTotal]: "ページ、合計",
-	[Key.paginationRecords]: "件",		[Key.paginationStatus]: "{current} / {total} ページ",4239 (feat: 重构文章列表页，新增像素化图片加载动效与分页功能)
+	[Key.paginationRecords]: "件",
+	[Key.paginationStatus]: "{current} / {total} ページ",
 
 	// 404ページ
 	[Key.notFound]: "404",
@@ -574,7 +575,7 @@ export const ja: Translation = {
 
 	// ===== 相对时间 =====
 
-	// ===== 友链 =====4239 (feat: 重构文章列表页，新增像素化图片加载动效与分页功能)
+	// ===== 友链 =====
 	[Key.friendRulesTitle]: "リンク申請ガイド",
 	[Key.friendSiteInfo]: "当サイトの情報",
 	[Key.friendApplyUnderstood]: "了解しました、申請する",

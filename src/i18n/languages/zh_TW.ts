@@ -187,7 +187,8 @@ export const zh_TW: Translation = {
 	[Key.paginationPage]: "第",
 	[Key.paginationOf]: "頁，共",
 	[Key.paginationTotal]: "頁，總計",
-	[Key.paginationRecords]: "條記錄",		[Key.paginationStatus]: "第 {current} 頁，共 {total} 頁",4239 (feat: 重构文章列表页，新增像素化图片加载动效与分页功能)
+	[Key.paginationRecords]: "條記錄",
+	[Key.paginationStatus]: "第 {current} 頁，共 {total} 頁",
 
 	// 404頁面
 	[Key.notFound]: "404",
@@ -564,7 +565,7 @@ export const zh_TW: Translation = {
 
 	// ===== 相对时间 =====
 
-	// ===== 友链 =====4239 (feat: 重构文章列表页，新增像素化图片加载动效与分页功能)
+	// ===== 友链 =====
 	[Key.friendRulesTitle]: "友鏈申請指南",
 	[Key.friendSiteInfo]: "本站資訊",
 	[Key.friendApplyUnderstood]: "已了解，申請友鏈",

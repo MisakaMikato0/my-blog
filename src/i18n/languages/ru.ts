@@ -190,7 +190,8 @@ export const ru: Translation = {
 	[Key.paginationPage]: "Страница",
 	[Key.paginationOf]: "из",
 	[Key.paginationTotal]: ", всего",
-	[Key.paginationRecords]: " записей",		[Key.paginationStatus]: "Страница {current} из {total}",4239 (feat: 重构文章列表页，新增像素化图片加载动效与分页功能)
+	[Key.paginationRecords]: " записей",
+	[Key.paginationStatus]: "Страница {current} из {total}",
 
 	// 404 Страница
 	[Key.notFound]: "404",
@@ -578,7 +579,7 @@ export const ru: Translation = {
 
 	// ===== 相对时间 =====
 
-	// ===== 友链 =====4239 (feat: 重构文章列表页，新增像素化图片加载动效与分页功能)
+	// ===== 友链 =====
 	[Key.friendRulesTitle]: "Как обменяться ссылками",
 	[Key.friendSiteInfo]: "Информация о сайте",
 	[Key.friendApplyUnderstood]: "Понятно, подать заявку",

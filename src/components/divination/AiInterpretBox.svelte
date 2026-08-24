@@ -17,6 +17,8 @@ let { method, data, question: initialQuestion = "" }: Props = $props();
 let question = $state(initialQuestion);
 let status: "idle" | "loading" | "done" | "error" = $state("idle");
 let resultText = $state("");
+let promptText = $state("");
+let copied = $state(false);
 let errorText = $state("");
 
 // ── 风水罗盘 loading 数据 ─────────────────────────
@@ -126,6 +128,7 @@ async function interpret() {
 	status = "loading";
 	errorText = "";
 	resultText = "";
+	promptText = "";
 	try {
 		const response = await fetch("/api/divination/interpret", {
 			method: "POST",
@@ -138,15 +141,22 @@ async function interpret() {
 		});
 		const payload = (await response.json()) as {
 			text?: string;
+			prompt?: string;
 			error?: string;
 		};
-		if (!response.ok || !payload.text) {
-			if (payload.error === "AI_KEY_NOT_CONFIGURED") {
-				throw new Error(
-					"站长尚未配置 AI 解卦 API Key，请联系管理员启用此功能。",
-				);
-			}
+		if (!response.ok) {
 			throw new Error(payload.error ?? `请求失败（${response.status}）`);
+		}
+
+		// 兜底模式：后端未配 Key，返回官方排盘提示词供用户自行复制给 AI
+		if (payload.prompt) {
+			promptText = payload.prompt;
+			status = "done";
+			return;
+		}
+
+		if (!payload.text) {
+			throw new Error("响应为空，请稍后重试");
 		}
 		resultText = payload.text;
 		status = "done";
@@ -161,6 +171,16 @@ async function interpret() {
 				? "网络异常，请稍后重试"
 				: message;
 		status = "error";
+	}
+}
+
+async function copyPrompt() {
+	try {
+		await navigator.clipboard.writeText(promptText);
+		copied = true;
+		setTimeout(() => (copied = false), 2000);
+	} catch {
+		// 剪贴板不可用时忽略（如非 HTTPS 环境）
 	}
 }
 </script>
@@ -200,7 +220,18 @@ async function interpret() {
 	{/if}
 
 	{#if status === "done"}
-		<div class="ai-box__result">{resultText}</div>
+		{#if promptText}
+			<p class="ai-box__fallback-note">
+				站长暂未开启 AI 一键解卦。以下是根据你的卦象生成的专业解卦提示词，
+				复制发给任意 AI（如 DeepSeek、豆包、ChatGPT）即可获得解读：
+			</p>
+			<div class="ai-box__result ai-box__result--prompt">{promptText}</div>
+			<button type="button" class="ai-box__copy-btn" onclick={copyPrompt}>
+				{copied ? "已复制 ✓" : "复制提示词"}
+			</button>
+		{:else}
+			<div class="ai-box__result">{resultText}</div>
+		{/if}
 	{/if}
 
 	{#if status === "idle"}
@@ -603,6 +634,36 @@ async function interpret() {
 		line-height: 1.8;
 		white-space: pre-wrap;
 		word-break: break-word;
+	}
+
+	.ai-box__fallback-note {
+		margin-top: 0.75rem;
+		color: var(--content-meta);
+		font-size: 0.85rem;
+		line-height: 1.6;
+	}
+
+	.ai-box__result--prompt {
+		max-height: 20rem;
+		overflow-y: auto;
+		font-size: 0.82rem;
+		line-height: 1.6;
+	}
+
+	.ai-box__copy-btn {
+		margin-top: 0.6rem;
+		padding: 0.4rem 1rem;
+		border: none;
+		border-radius: 0.5rem;
+		background: var(--btn-regular-bg);
+		color: var(--deep-text);
+		font-size: 0.85rem;
+		cursor: pointer;
+		transition: background 0.2s ease;
+	}
+
+	.ai-box__copy-btn:hover {
+		background: var(--btn-regular-bg-hover);
 	}
 
 	/* ── 风水罗盘 loading 覆盖层 ──────────────────── */

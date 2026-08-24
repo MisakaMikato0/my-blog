@@ -190,7 +190,8 @@ export const en: Translation = {
 	[Key.paginationPage]: "Page",
 	[Key.paginationOf]: "of",
 	[Key.paginationTotal]: ", Total",
-	[Key.paginationRecords]: " records",		[Key.paginationStatus]: "Page {current} of {total}",4239 (feat: 重构文章列表页，新增像素化图片加载动效与分页功能)
+	[Key.paginationRecords]: " records",
+	[Key.paginationStatus]: "Page {current} of {total}",
 
 	// 404 Page
 	[Key.notFound]: "404",
@@ -579,7 +580,7 @@ export const en: Translation = {
 
 	// ===== 相对时间 =====
 
-	// ===== 友链 =====4239 (feat: 重构文章列表页，新增像素化图片加载动效与分页功能)
+	// ===== 友链 =====
 	[Key.friendRulesTitle]: "Friend Link Guide",
 	[Key.friendSiteInfo]: "Site Info",
 	[Key.friendApplyUnderstood]: "Got it, apply now",

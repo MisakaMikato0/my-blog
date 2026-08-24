@@ -525,7 +525,6 @@ enum I18nKey {
 	sortBySuffix = "sortBySuffix",
 	regularPosts = "regularPosts",
 	noRegularPosts = "noRegularPosts",
-4239 (feat: 重构文章列表页，新增像素化图片加载动效与分页功能)
 	noPostsHint = "noPostsHint",
 }
 

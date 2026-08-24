@@ -8,7 +8,8 @@
  * - API Key 仅存于服务端环境变量（DEEPSEEK_API_KEY 或复用 AI_API_KEY），
  *   绝不下发到前端。
  * - method 白名单校验 + 请求体大小限制，防止滥用。
- * - 无 Key 时返回 503，前端友好提示。
+ * - 无 Key 时降级为"提示词模式"：返回官方排盘提示词，由用户复制给任意
+ *   AI 使用，零成本兜底。
  */
 
 import type { DivinationData } from "mingyu-core/divination";
@@ -178,9 +179,6 @@ export async function handleDivinationInterpret(
 		return jsonResponse({ error: "METHOD_NOT_ALLOWED" }, 405);
 	}
 	const { apiKey, apiUrl, chatModel } = resolveAiConfig(env);
-	if (!apiKey) {
-		return jsonResponse({ error: "AI_KEY_NOT_CONFIGURED" }, 503);
-	}
 
 	let parsed: InterpretRequest;
 	try {
@@ -197,6 +195,12 @@ export async function handleDivinationInterpret(
 			data: parsed.data,
 			question: parsed.question,
 		});
+
+		// 无 Key 兜底：返回提示词本身，让用户自行复制给任意 AI 解读。
+		if (!apiKey) {
+			return jsonResponse({ prompt }, 200);
+		}
+
 		const text = await callChatApi(apiUrl, apiKey, chatModel, prompt);
 		return jsonResponse({ text }, 200);
 	} catch (error) {

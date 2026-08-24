@@ -147,19 +147,28 @@ describe("AiInterpretBox 组件", () => {
 		expect(body.question).toBe("这段感情该如何经营");
 	});
 
-	it("后端未配置 Key 时展示友好提示", async () => {
+	it("后端未配置 Key 时展示提示词兜底与复制按钮", async () => {
 		const liuyao = createLiuyaoReading({ customDate: FIXED_DATE });
+		const writeText = vi.fn().mockResolvedValue(undefined);
+		vi.stubGlobal("navigator", { ...navigator, clipboard: { writeText } });
 		vi.mocked(fetch).mockResolvedValue(
-			new Response(JSON.stringify({ error: "AI_KEY_NOT_CONFIGURED" }), {
-				status: 503,
-			}),
+			new Response(
+				JSON.stringify({
+					prompt: "【传统依据】\n六爻先定用神和世应……",
+				}),
+				{ status: 200 },
+			),
 		);
 		render(AiInterpretBox, { props: { method: "liuyao", data: liuyao.data } });
 
 		await fireEvent.click(screen.getByRole("button", { name: "解卦" }));
-		expect(
-			await screen.findByText(/站长尚未配置 AI 解卦 API Key/),
-		).toBeTruthy();
+		expect(await screen.findByText(/复制发给任意 AI/)).toBeTruthy();
+
+		// 提示词可见，点击复制写入剪贴板
+		expect(screen.getByText(/六爻先定用神和世应/)).toBeTruthy();
+		await fireEvent.click(screen.getByRole("button", { name: "复制提示词" }));
+		expect(writeText).toHaveBeenCalledOnce();
+		expect(await screen.findByText(/已复制 ✓/)).toBeTruthy();
 	});
 
 	it("网络失败时展示错误信息", async () => {

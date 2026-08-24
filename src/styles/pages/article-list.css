@@ -461,7 +461,7 @@
 }
 
 .article-list-card.is-page-entering {
-	animation: article-list-page-enter 240ms ease both;
+	animation: article-list-page-enter 240ms ease backwards;
 }
 
 .article-list-card.is-page-entering {

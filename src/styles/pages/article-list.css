@@ -131,6 +131,51 @@
 	outline-offset: 2px;
 }
 
+/* ==== 列表/网格布局切换按钮 ==== */
+.article-list-toolbar__layout {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.25rem;
+	padding: 0.125rem;
+	border-radius: var(--radius-small);
+	background: var(--btn-plain-bg-hover);
+}
+
+.article-list-toolbar__layout button {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 2rem;
+	height: calc(var(--control-size) - 0.5rem);
+	border: 0;
+	border-radius: calc(var(--radius-small) - 0.125rem);
+	background: transparent;
+	color: var(--content-meta);
+	cursor: pointer;
+	transition:
+		color 180ms ease,
+		background-color 180ms ease;
+}
+
+.article-list-toolbar__layout button svg {
+	width: 1.1em;
+	height: 1.1em;
+}
+
+.article-list-toolbar__layout button:hover {
+	color: var(--deep-text);
+}
+
+.article-list-toolbar__layout button.is-active {
+	background: var(--btn-regular-bg-hover);
+	color: var(--deep-text);
+}
+
+.article-list-toolbar__layout button:focus-visible {
+	outline: 2px solid var(--primary);
+	outline-offset: 2px;
+}
+
 /* ===========================================================================
    Pinned text list
    ========================================================================== */

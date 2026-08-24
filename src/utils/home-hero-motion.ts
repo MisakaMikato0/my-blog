@@ -80,6 +80,11 @@ export function createHeroTileLayout({
 	});
 }
 
+export function getHeroMosaicCompletionTransform() {
+	// The assembled tile layer should stay at its original size while the full-screen backdrop fades in.
+	return { y: 0, scale: 1 };
+}
+
 export function getHeroPinEndDistance(
 	configuredDistance: number,
 	viewportHeight: number,

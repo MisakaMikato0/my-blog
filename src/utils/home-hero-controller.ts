@@ -2,7 +2,10 @@ import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import type { HeroMosaicConfig } from "@/types/config";
 import { createFlyText, type FlyTextHandle } from "@/utils/home-hero-fly-text";
-import { getHeroPinEndDistance } from "@/utils/home-hero-motion";
+import {
+	getHeroMosaicCompletionTransform,
+	getHeroPinEndDistance,
+} from "@/utils/home-hero-motion";
 import { initHomeHeroRain } from "@/utils/home-hero-rain";
 
 gsap.registerPlugin(ScrollTrigger);
@@ -255,23 +258,6 @@ export function mountHomeHero() {
 		}
 	};
 
-	const getMosaicTransform = () => {
-		if (!mosaic) return { y: 0, scale: 1 };
-		const heroWidth = hero.clientWidth;
-		const heroHeight = hero.clientHeight;
-		const mosaicWidth = mosaic.offsetWidth;
-		const mosaicHeight = mosaic.offsetHeight;
-		const mosaicCenterY = mosaic.offsetTop + mosaicHeight / 2;
-		return {
-			y: heroHeight / 2 - mosaicCenterY,
-			scale:
-				Math.max(
-					heroWidth / Math.max(1, mosaicWidth),
-					heroHeight / Math.max(1, mosaicHeight),
-				) * 1.015,
-		};
-	};
-
 	const getTileEntranceTransform = (tile: TileState): TileEntranceTransform => {
 		const horizontalRange = Math.max(
 			hero.clientWidth * (mobileQuery.matches ? 0.22 : 0.29),
@@ -442,17 +428,8 @@ export function mountHomeHero() {
 			0.72,
 		);
 
-		// 放大与最后几块碎片的归位重叠进行，避免合并完成后先停顿再弹开的顿挫感
-		timeline.to(
-			mosaic,
-			{
-				y: () => getMosaicTransform().y,
-				scale: () => getMosaicTransform().scale,
-				duration: 0.28,
-				ease: "power3.inOut",
-			},
-			0.68,
-		);
+		// 保持拼合图原尺寸，由全屏 backdrop 负责后续接管，避免下滑时图片被放大裁切
+		timeline.set(mosaic, getHeroMosaicCompletionTransform(), 0.68);
 		timeline.to(
 			backdrop,
 			{ autoAlpha: 1, duration: 0.1, ease: "power2.inOut" },

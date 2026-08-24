@@ -80,9 +80,27 @@ export function createHeroTileLayout({
 	});
 }
 
-export function getHeroMosaicCompletionTransform() {
-	// The assembled tile layer should stay at its original size while the full-screen backdrop fades in.
-	return { y: 0, scale: 1 };
+export type HeroMosaicCompletionMetrics = {
+	heroWidth: number;
+	heroHeight: number;
+	mosaicWidth: number;
+	mosaicHeight: number;
+	mosaicTop: number;
+};
+
+export function getHeroMosaicCompletionTransform({
+	heroWidth,
+	heroHeight,
+	mosaicWidth,
+	mosaicHeight,
+	mosaicTop,
+}: HeroMosaicCompletionMetrics) {
+	const safeMosaicWidth = Math.max(1, mosaicWidth);
+	const safeMosaicHeight = Math.max(1, mosaicHeight);
+	return {
+		y: heroHeight / 2 - (mosaicTop + safeMosaicHeight / 2),
+		scale: Math.max(heroWidth / safeMosaicWidth, heroHeight / safeMosaicHeight),
+	};
 }
 
 export function getHeroPinEndDistance(

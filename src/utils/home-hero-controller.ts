@@ -428,17 +428,24 @@ export function mountHomeHero() {
 			0.72,
 		);
 
-		// 保持拼合图原尺寸，由全屏 backdrop 负责后续接管，避免下滑时图片被放大裁切
-		timeline.set(mosaic, getHeroMosaicCompletionTransform(), 0.68);
-		timeline.to(
-			backdrop,
-			{ autoAlpha: 1, duration: 0.1, ease: "power2.inOut" },
-			0.87,
-		);
+		// 让拼合后的同一层图片连续放大到覆盖视口，不再在后段突然切换到另一张大图
+		const getCompletionTransform = () =>
+			getHeroMosaicCompletionTransform({
+				heroWidth: hero.clientWidth,
+				heroHeight: hero.clientHeight,
+				mosaicWidth: mosaic.offsetWidth,
+				mosaicHeight: mosaic.offsetHeight,
+				mosaicTop: mosaic.offsetTop,
+			});
 		timeline.to(
 			mosaic,
-			{ autoAlpha: 0, duration: 0.07, ease: "power2.in" },
-			0.92,
+			{
+				y: () => getCompletionTransform().y,
+				scale: () => getCompletionTransform().scale,
+				duration: 0.28,
+				ease: "power3.inOut",
+			},
+			0.68,
 		);
 
 		timeline.to(

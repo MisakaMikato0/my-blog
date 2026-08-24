@@ -947,7 +947,7 @@
 .article-list-card-grid[data-view="list"] .article-list-card__cover-wrap {
 	width: min(38%, 20rem);
 	flex-shrink: 0;
-	aspect-ratio: 4/3;
+	aspect-ratio: 16/9;
 }
 
 .article-list-card-grid[data-view="list"] .article-list-card__cover {
@@ -958,6 +958,13 @@
 .article-list-card-grid[data-view="list"] .article-list-card__content {
 	flex: 1 1 auto;
 	padding: var(--space-5);
+}
+
+.article-list-card-grid[data-view="list"] .article-list-card__description {
+	height: 3.3em;
+	min-height: 3.3em;
+	max-height: 3.3em;
+	-webkit-line-clamp: 2;
 }
 
 @media (max-width: 768px) {
@@ -980,7 +987,7 @@
 
 .article-list-pinned-item__cover-wrap {
 	width: min(30%, 16rem);
-	aspect-ratio: 4/3;
+	aspect-ratio: 16/9;
 }
 
 @media (max-width: 768px) {

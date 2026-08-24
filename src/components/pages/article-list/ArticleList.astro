@@ -215,6 +215,8 @@ const totalPostLabel = i18n(
 				"[data-article-list-view]",
 			),
 		);
+		const controller = new AbortController();
+		const { signal } = controller;
 
 		// 鼠标移入 3D 效果：四象限 zone 检测（从 HEAD Svelte 版迁移）
 		const cardRects = new Map<HTMLElement, DOMRect>();
@@ -272,8 +274,6 @@ const totalPostLabel = i18n(
 		const postsPerPage = Number(articleListRoot.dataset.articleListPostsPerPage) || 6;
 		const totalPages = Math.max(1, Math.ceil(cards.length / postsPerPage));
 		const mobileQuery = window.matchMedia("(max-width: 768px)");
-		const controller = new AbortController();
-		const { signal } = controller;
 		let disposed = false;
 		let currentPage = 1;
 		let sortMode: SortMode = "latest";

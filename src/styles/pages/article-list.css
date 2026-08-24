@@ -896,7 +896,7 @@
 
 /* ==== 布局切换（data-view: list/grid，从 HEAD 迁移，适配上游新 DOM 类名）==== */
 .article-list-card-grid[data-view="grid"] {
-	grid-template-columns: repeat(2, minmax(0, 1fr));
+	grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
 .article-list-card-grid[data-view="list"] {

@@ -882,7 +882,25 @@
 
 	.article-list-card-grid {
 		grid-template-columns: minmax(0, 1fr);
-		gap: var(--space-6);
+		gap: var(--space-5);
+	}
+
+	.article-list-toolbar__layout {
+		flex-shrink: 0;
+	}
+
+	.skull-switch {
+		transform: scale(0.82);
+		transform-origin: right center;
+		margin-left: -0.75rem;
+	}
+
+	.article-list-card-grid[data-view="list"] .article-list-card__content {
+		padding: var(--space-3) var(--space-2) var(--space-2);
+	}
+
+	.article-list-pinned-item:not([hidden]) {
+		gap: var(--space-3);
 	}
 
 	.article-list-pagination {

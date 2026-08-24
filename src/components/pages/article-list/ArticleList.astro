@@ -55,7 +55,7 @@ const totalPostLabel = i18n(
 	data-article-list-umami-api-base={umamiPageviews?.apiBase || ""}
 	data-article-list-umami-share-id={umamiPageviews?.shareId || ""}
 >
-	<PinnedArticleList posts={pinnedPosts} />
+	<PinnedArticleList posts={pinnedPosts} fallbackImageUrl={fallbackImageUrl} showCoverLoading={showCoverLoading} />
 
 	<header class="article-list-toolbar">
 		<div class="article-list-toolbar__summary">

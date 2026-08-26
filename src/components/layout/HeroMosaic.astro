@@ -12,6 +12,7 @@ interface Props {
 const { desktopImage, mobileImage, images, config } = Astro.props;
 const candidates = images && images.length > 0 ? images : [desktopImage];
 const tiles = createHeroTileLayout(config);
+const tileDepthRange = Math.max(1, config.idleVisible - 1);
 const mosaicStyle = [
 	`--home-hero-mosaic-image: url("${desktopImage}")`,
 	`--home-hero-mosaic-image-mobile: url("${mobileImage}")`,
@@ -53,7 +54,7 @@ const mosaicStyle = [
 					data-scale={tile.scale}
 					data-blur={tile.blur}
 					data-idle-visible={String(tile.initiallyVisible)}
-					style={`left: ${(tile.column / config.columns) * 100}%; top: ${(tile.row / config.rows) * 100}%; width: ${100 / config.columns}%; height: ${100 / config.rows}%; z-index: ${config.idleVisible - tile.idleDepth}; --home-hero-tile-column: ${tile.column}; --home-hero-tile-row: ${tile.row}; --home-hero-tile-bg-x: ${(tile.column / Math.max(1, config.columns - 1)) * 100}%; --home-hero-tile-bg-y: ${(tile.row / Math.max(1, config.rows - 1)) * 100}%; --home-hero-tile-x: ${tile.offsetX}%; --home-hero-tile-y: ${tile.offsetY}%; --home-hero-tile-rotation: ${tile.rotation}deg; --home-hero-tile-scale: ${tile.scale}; --home-hero-tile-blur: ${tile.blur}px;`}
+					style={`left: ${(tile.column / config.columns) * 100}%; top: ${(tile.row / config.rows) * 100}%; width: ${100 / config.columns}%; height: ${100 / config.rows}%; z-index: ${config.idleVisible - tile.idleDepth}; --home-hero-tile-column: ${tile.column}; --home-hero-tile-row: ${tile.row}; --home-hero-tile-bg-x: ${(tile.column / Math.max(1, config.columns - 1)) * 100}%; --home-hero-tile-bg-y: ${(tile.row / Math.max(1, config.rows - 1)) * 100}%; --home-hero-tile-x: ${tile.offsetX}%; --home-hero-tile-y: ${tile.offsetY}%; --home-hero-tile-rotation: ${tile.rotation}deg; --home-hero-tile-scale: ${tile.scale}; --home-hero-tile-blur: ${tile.blur}px; --home-hero-tile-z: ${Math.min(1, tile.idleDepth / tileDepthRange) * 24}px; --home-hero-tile-shadow-opacity: ${Math.min(1, tile.idleDepth / tileDepthRange) * 0.34};`}
 				>
 					<span class="home-hero__mosaic-tile-image"></span>
 				</span>
@@ -61,7 +62,7 @@ const mosaicStyle = [
 		</div>
 		<picture class="home-hero__mosaic-complete" data-hero-mosaic-complete>
 			<source media="(max-width: 768px)" srcset={mobileImage} />
-			<img src={desktopImage} alt="" width="3000" height="1500" decoding="async" />
+			<img src={desktopImage} alt="" width="3000" height="1500" loading="eager" fetchpriority="high" decoding="async" />
 		</picture>
 	</div>
 
@@ -75,14 +76,16 @@ const mosaicStyle = [
 				"--home-hero-mosaic-image",
 				`url("${picked}")`,
 			);
-			const backdropImage = visual.querySelector(
-				".home-hero__backdrop-image",
+			visual.style.setProperty(
+				"--home-hero-mosaic-image-mobile",
+				`url("${picked}")`,
 			);
-			if (backdropImage) backdropImage.src = picked;
-			const completeImage = visual.querySelector(
-				".home-hero__mosaic-complete img",
-			);
-			if (completeImage) completeImage.src = picked;
+			visual.querySelectorAll("picture source[srcset]").forEach((source) => {
+				source.setAttribute("srcset", picked);
+			});
+			visual.querySelectorAll("picture img[src]").forEach((image) => {
+				image.setAttribute("src", picked);
+			});
 		})();
 	</script>
 </div>

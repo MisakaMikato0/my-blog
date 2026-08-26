@@ -19,6 +19,69 @@ type HeroTileLayoutOptions = {
 	seed: number;
 };
 
+export const HeroMosaicScrollPhase = {
+	flatten: 0.1,
+	assemble: 0.4,
+	hold: 0.15,
+	zoom: 0.25,
+	exit: 0.1,
+} as const;
+
+type HeroMosaicPhase = keyof typeof HeroMosaicScrollPhase;
+
+export function getHeroMosaicPhase(progress: number): {
+	phase: HeroMosaicPhase;
+	localProgress: number;
+} {
+	const clampedProgress = Number.isNaN(progress) || progress === Number.NEGATIVE_INFINITY
+		? 0
+		: progress === Number.POSITIVE_INFINITY
+			? 1
+			: Math.min(1, Math.max(0, progress));
+	let phaseStart = 0;
+
+	for (const [phase, duration] of Object.entries(HeroMosaicScrollPhase) as [
+		HeroMosaicPhase,
+		number,
+	][]) {
+		const phaseEnd = phaseStart + duration;
+		if (clampedProgress < phaseEnd || phase === "exit") {
+			return {
+				phase,
+				localProgress: Number(
+					((clampedProgress - phaseStart) / duration).toFixed(12),
+				),
+			};
+		}
+		phaseStart = phaseEnd;
+	}
+
+	return { phase: "exit", localProgress: 1 };
+}
+
+export function getHeroRainOpacity(progress: number) {
+	const { phase, localProgress } = getHeroMosaicPhase(progress);
+	if (phase === "zoom") return 1 - localProgress;
+	if (phase === "exit") return 0;
+	return 1;
+}
+
+export function getHeroTileDepth(depth: number, amplitude: number) {
+	const safeDepth = Number.isFinite(depth)
+		? Math.max(0, depth)
+		: 0;
+	const safeAmplitude = Number.isFinite(amplitude)
+		? Math.max(0, amplitude)
+		: 0;
+
+	return {
+		z: safeDepth * safeAmplitude,
+		rotationX: safeDepth * 4,
+		rotationY: safeDepth * -4,
+		shadowOpacity: safeDepth * 0.34,
+	};
+}
+
 function createSeededRandom(seed: number) {
 	let value = seed >>> 0;
 	return () => {
@@ -109,8 +172,13 @@ export function getHeroPinEndDistance(
 	minimumViewports: number,
 ) {
 	const configured = Number.isFinite(configuredDistance)
-		? configuredDistance
+		? Math.max(0, configuredDistance)
 		: 0;
-	const viewport = Number.isFinite(viewportHeight) ? viewportHeight : 0;
-	return Math.max(0, configured, Math.round(viewport * minimumViewports));
+	const viewport = Number.isFinite(viewportHeight)
+		? Math.max(0, viewportHeight)
+		: 0;
+	const minViewports = Number.isFinite(minimumViewports)
+		? Math.max(0, minimumViewports)
+		: 0;
+	return Math.max(0, configured, Math.round(viewport * minViewports));
 }

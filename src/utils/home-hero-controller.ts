@@ -4,15 +4,17 @@ import type { HeroMosaicConfig } from "@/types/config";
 import { createFlyText, type FlyTextHandle } from "@/utils/home-hero-fly-text";
 import {
 	getHeroMosaicCompletionTransform,
+	getHeroMosaicPhase,
+	getHeroRainOpacity,
 	getHeroPinEndDistance,
+	getHeroTileDepth,
 } from "@/utils/home-hero-motion";
 import { initHomeHeroRain } from "@/utils/home-hero-rain";
 
 gsap.registerPlugin(ScrollTrigger);
 
-const RAIN_ACTIVATE_TIME = 0.99;
-const SIGNATURE_REVEAL_TIME = 1.02;
-const INTERACTION_HOLD_START = 2.35;
+const TILE_DEPTH_AMPLITUDE = 24;
+const SIGNATURE_REVEAL_TIME = 0.1;
 let initialReloadHandled = false;
 
 function resetHeroScrollOnReload() {
@@ -40,6 +42,7 @@ type HeroRuntimeConfig = {
 
 type TileState = {
 	element: HTMLElement;
+	image: HTMLElement | null;
 	row: number;
 	column: number;
 	order: number;
@@ -78,6 +81,7 @@ function getTileStates(hero: HTMLElement): TileState[] {
 	return Array.from(hero.querySelectorAll<HTMLElement>("[data-hero-tile]")).map(
 		(element) => ({
 			element,
+			image: element.querySelector<HTMLElement>(".home-hero__mosaic-tile-image"),
 			row: readNumber(element, "row", 0),
 			column: readNumber(element, "column", 0),
 			order: readNumber(element, "order", 0),
@@ -89,14 +93,6 @@ function getTileStates(hero: HTMLElement): TileState[] {
 			initiallyVisible: element.dataset.idleVisible === "true",
 		}),
 	);
-}
-
-function createSeededRandom(seed: number) {
-	let value = seed >>> 0;
-	return () => {
-		value = (Math.imul(value, 1664525) + 1013904223) >>> 0;
-		return value / 4294967296;
-	};
 }
 
 function setReducedMotionState(hero: HTMLElement) {
@@ -111,15 +107,17 @@ export function mountHomeHero() {
 	const hero = document.querySelector<HTMLElement>("[data-home-hero]");
 	if (!hero || hero.dataset.heroMounted === "true") return () => undefined;
 
-	// 移动端首页由 HomeMobile 渲染，桌面 Hero 隐藏时跳过挂载（马赛克/雨幕/字雨等）
-	if (
-		document.getElementById("home-mobile") &&
-		window.matchMedia("(max-width: 768px)").matches
-	) {
+	// 移动端只展示 CSS 提供的完整图，不创建 ScrollTrigger、雨幕、拼图或 pin。
+	const mobileQuery = window.matchMedia("(max-width: 768px)");
+	if (mobileQuery.matches) {
 		document
 			.querySelector(".home-page--motion-pending")
 			?.classList.remove("home-page--motion-pending");
-		return () => undefined;
+		const handleMobileChange = () => {
+			window.dispatchEvent(new Event("astro:page-load"));
+		};
+		mobileQuery.addEventListener("change", handleMobileChange);
+		return () => mobileQuery.removeEventListener("change", handleMobileChange);
 	}
 
 	const config = parseRuntimeConfig(hero);
@@ -131,15 +129,16 @@ export function mountHomeHero() {
 	const reducedMotionQuery = window.matchMedia(
 		"(prefers-reduced-motion: reduce)",
 	);
-	const mobileQuery = window.matchMedia("(max-width: 768px)");
 	const title = hero.querySelector<HTMLElement>("[data-hero-title]");
 	const contact = hero.querySelector<HTMLElement>("[data-hero-contact]");
+	const occupation = hero.querySelector<HTMLElement>(".home-hero__occupation");
 	const mosaic = hero.querySelector<HTMLElement>("[data-hero-mosaic]");
 	const mosaicComplete = hero.querySelector<HTMLElement>(
 		"[data-hero-mosaic-complete]",
 	);
 	const backdrop = hero.querySelector<HTMLElement>("[data-hero-backdrop]");
 	const signature = hero.querySelector<HTMLElement>("[data-hero-signature]");
+	const nextSection = hero.nextElementSibling as HTMLElement | null;
 	const tiles = getTileStates(hero);
 	let timeline: ReturnType<typeof gsap.timeline> | null = null;
 	let idleTimer = 0;
@@ -152,63 +151,67 @@ export function mountHomeHero() {
 	let flyLayoutTimer = 0;
 	let signatureHandle: FlyTextHandle | null = null;
 	let signatureRainTimeline: ReturnType<typeof gsap.timeline> | null = null;
+	let occupationTween: ReturnType<typeof gsap.to> | null = null;
+	let idleHandoffCaptured = false;
 	let activeTiles = new Set(
 		tiles.filter((tile) => tile.initiallyVisible).map((tile) => tile.element),
 	);
-	const random = createSeededRandom(config.mosaic.seed ^ 0x9e3779b9);
-
 	document
 		.querySelector(".home-page--motion-pending")
 		?.classList.remove("home-page--motion-pending");
+	const handleMobileChange = () => {
+		window.dispatchEvent(new Event("astro:page-load"));
+	};
+	mobileQuery.addEventListener("change", handleMobileChange);
 
 	const stopIdleRotation = () => {
-		window.clearInterval(idleTimer);
 		idleTimer = 0;
 		idleTween?.kill();
 		idleTween = null;
 	};
 
+	const getTileDepthProgress = (tile: TileState) => {
+		const idleVisible = Math.max(1, config.mosaic.idleVisible);
+		return idleVisible > 1
+			? Math.min(1, (tile.order % idleVisible) / (idleVisible - 1))
+			: 0;
+	};
+
+	const setTileDepth = (tile: TileState, depthProgress: number) => {
+		if (!tile.image) return;
+		const depth = getHeroTileDepth(depthProgress, TILE_DEPTH_AMPLITUDE);
+		gsap.set(tile.image, {
+			transform: `translateZ(${depth.z}px) rotateX(${depth.rotationX}deg) rotateY(${depth.rotationY}deg)`,
+			"--home-hero-tile-z": `${depth.z}px`,
+			"--home-hero-tile-shadow-opacity": depth.shadowOpacity,
+		});
+	};
+
 	const startIdleRotation = () => {
 		if (idleTimer || reducedMotionQuery.matches) return;
-		idleTimer = window.setInterval(() => {
-			const visible = tiles.filter((tile) => activeTiles.has(tile.element));
-			const hidden = tiles.filter((tile) => !activeTiles.has(tile.element));
-			if (visible.length === 0 || hidden.length === 0) return;
-			const leaving = visible[Math.floor(random() * visible.length)];
-			const entering = hidden[Math.floor(random() * hidden.length)];
-			const enteringTransform = getTileIdleTransform(entering);
-			activeTiles.delete(leaving.element);
-			activeTiles.add(entering.element);
-			idleTween?.kill();
-			idleTween = gsap.timeline();
-			idleTween.to(
-				leaving.element,
+		const visibleTiles = tiles.filter((tile) => activeTiles.has(tile.element));
+		if (visibleTiles.length === 0) return;
+		idleTimer = 1;
+		idleTween = gsap.timeline({
+		repeat: -1,
+		yoyo: true,
+		defaults: { duration: 1.8, ease: "sine.inOut" },
+		});
+		visibleTiles.forEach((tile, index) => {
+			if (!tile.image) return;
+			const baseDepth = getTileDepthProgress(tile);
+			const peakDepth = Math.min(1, baseDepth + 0.38);
+			const depth = getHeroTileDepth(peakDepth, TILE_DEPTH_AMPLITUDE);
+			idleTween?.to(
+				tile.image,
 				{
-					autoAlpha: 0,
-					duration: 0.38,
-					ease: "power2.inOut",
+					transform: `translateZ(${depth.z}px) rotateX(${depth.rotationX}deg) rotateY(${depth.rotationY}deg)`,
+					"--home-hero-tile-z": `${depth.z}px`,
+					"--home-hero-tile-shadow-opacity": depth.shadowOpacity,
 				},
-				0,
+				index * 0.08,
 			);
-			idleTween.fromTo(
-				entering.element,
-				{
-					x: enteringTransform.x,
-					y: enteringTransform.y,
-					rotation: enteringTransform.rotation,
-					scale: enteringTransform.scale * 0.88,
-					filter: `blur(${enteringTransform.blur}px)`,
-					autoAlpha: 0,
-				},
-				{
-					autoAlpha: 1,
-					scale: enteringTransform.scale,
-					duration: 0.48,
-					ease: "power3.out",
-				},
-				0.12,
-			);
-		}, config.mosaic.idleInterval);
+		});
 	};
 
 	const resetIdleTiles = () => {
@@ -227,6 +230,7 @@ export function mountHomeHero() {
 				filter: `blur(${transform.blur}px)`,
 				autoAlpha: tile.initiallyVisible ? 1 : 0,
 			});
+			setTileDepth(tile, getTileDepthProgress(tile));
 		});
 	};
 
@@ -244,16 +248,25 @@ export function mountHomeHero() {
 	};
 
 	const updateSceneState = (progress: number) => {
-		const timelineTime = progress * (timeline?.duration() ?? 1);
-		const rainActive = timelineTime >= RAIN_ACTIVATE_TIME;
-		const layerActive = timelineTime >= SIGNATURE_REVEAL_TIME;
+		const normalizedProgress = Math.min(1, Math.max(0, progress));
+		const { phase } = getHeroMosaicPhase(normalizedProgress);
+		const rainOpacity = getHeroRainOpacity(normalizedProgress);
+		const rainActive = rainOpacity > 0.001;
+		const layerActive = phase !== "flatten";
 		hero.dataset.layerActive = String(layerActive);
 		rain.setActive(rainActive && !reducedMotionQuery.matches);
-		if (progress > 0.002) {
+		rain.setOpacity(rainOpacity);
+		if (normalizedProgress > 0.0001) {
+			if (!idleHandoffCaptured) {
+				stopIdleRotation();
+				idleHandoffCaptured = true;
+				timeline?.invalidate();
+			}
 			stopIdleRotation();
 			completePendingIntros();
 		} else if (!idleTimer && tilesIntroDone) {
 			resetIdleTiles();
+			idleHandoffCaptured = false;
 			startIdleRotation();
 		}
 	};
@@ -309,11 +322,10 @@ export function mountHomeHero() {
 	};
 
 	const buildTimeline = () => {
-		if (!title || !mosaic || !backdrop || tiles.length === 0) return;
+		if (!title || !mosaic || tiles.length === 0) return;
 
 		gsap.set(mosaic, { xPercent: -50, y: 0, scale: 1 });
 		gsap.set(mosaicComplete, { autoAlpha: 0 });
-		gsap.set(backdrop, { autoAlpha: 0 });
 		if (signature) gsap.set(signature, { autoAlpha: 0 });
 		for (const tile of tiles) {
 			const transform = tile.initiallyVisible
@@ -327,6 +339,7 @@ export function mountHomeHero() {
 				filter: `blur(${transform.blur}px)`,
 				autoAlpha: tile.initiallyVisible ? 1 : 0,
 			});
+			setTileDepth(tile, getTileDepthProgress(tile));
 		}
 
 		timeline = gsap.timeline({
@@ -358,62 +371,55 @@ export function mountHomeHero() {
 			},
 		});
 
-		timeline.to({}, { duration: 1 });
-		timeline.to(
-			title,
-			{
-				yPercent: -20,
-				scale: 0.58,
-				transformOrigin: "0% 50%",
-				duration: 0.1,
-				ease: "power3.inOut",
-			},
-			0,
+		timeline.to({}, { duration: 0.1 });
+		timeline.to({}, { duration: 0.4 });
+		timeline.to({}, { duration: 0.15 });
+		timeline.to({}, { duration: 0.25 });
+		timeline.to({}, { duration: 0.1 });
+		for (const tile of tiles) {
+			if (!tile.image) continue;
+			timeline.to(
+				tile.image,
+				{
+					transform: "translateZ(0px) rotateX(0deg) rotateY(0deg)",
+					"--home-hero-tile-z": "0px",
+					"--home-hero-tile-shadow-opacity": 0,
+					duration: 0.1,
+					ease: "power2.inOut",
+				},
+				0,
+			);
+		}
+
+		const assemblyStagger = Math.min(
+			0.02,
+			0.22 / Math.max(1, tiles.length - 1),
 		);
-		// 右下角 contact 的退场不再整体渐隐，改为字符随风散落，
-		// 由 prepareFlyText() 在字体就绪后将 scatter 时间线挂载到 0.04 位置。
+		const assemblyDuration = Math.max(
+			0.08,
+			0.4 - assemblyStagger * Math.max(0, tiles.length - 1),
+		);
 		timeline.to(
 			tiles.map((tile) => tile.element),
 			{
-				autoAlpha: 0,
-				duration: 0.06,
-				ease: "power2.in",
+				x: 0,
+				y: 0,
+				rotation: 0,
+				scale: 1,
+				filter: "blur(0px)",
+				autoAlpha: 1,
+				duration: assemblyDuration,
+				ease: "power3.inOut",
+				stagger: assemblyStagger,
 			},
-			0.04,
+			0.1,
 		);
-
-		for (const tile of tiles) {
-			const start = 0.1 + tile.order * 0.02;
-			timeline.fromTo(
-				tile.element,
-				{
-					x: () => getTileEntranceTransform(tile).x,
-					y: () => getTileEntranceTransform(tile).y,
-					rotation: () => getTileEntranceTransform(tile).rotation,
-					scale: () => getTileEntranceTransform(tile).scale,
-					filter: () => `blur(${getTileEntranceTransform(tile).blur}px)`,
-					autoAlpha: 0,
-				},
-				{
-					x: 0,
-					y: 0,
-					rotation: 0,
-					scale: 1,
-					filter: "blur(0px)",
-					autoAlpha: 1,
-					duration: 0.09,
-					ease: "power3.inOut",
-					immediateRender: false,
-				},
-				start,
-			);
-		}
 
 		if (mosaicComplete) {
 			timeline.to(
 				mosaicComplete,
 				{ autoAlpha: 1, duration: 0.03, ease: "none" },
-				0.68,
+				0.5,
 			);
 		}
 
@@ -421,12 +427,19 @@ export function mountHomeHero() {
 			title,
 			{
 				autoAlpha: 0,
-				yPercent: -28,
-				duration: 0.08,
+				duration: 0.2,
 				ease: "power2.in",
 			},
-			0.72,
+			0.65,
 		);
+		for (const textLayer of [contact, signature]) {
+			if (!textLayer) continue;
+			timeline.to(
+				textLayer,
+				{ autoAlpha: 0, duration: 0.2, ease: "power2.in" },
+				0.65,
+			);
+		}
 
 		// 让拼合后的同一层图片连续放大到覆盖视口，不再在后段突然切换到另一张大图
 		const getCompletionTransform = () =>
@@ -442,17 +455,22 @@ export function mountHomeHero() {
 			{
 				y: () => getCompletionTransform().y,
 				scale: () => getCompletionTransform().scale,
-				duration: 0.28,
+				duration: 0.25,
 				ease: "power3.inOut",
 			},
-			0.68,
+			0.65,
 		);
 
-		timeline.to(
-			{},
-			{ duration: Math.max(0, config.mosaic.interactionHold) },
-			INTERACTION_HOLD_START,
-		);
+		// 最后 10% 不缩小图片，只让首屏整体淡出；下一段内容从下方平滑进入。
+		timeline.to(hero, { autoAlpha: 0, duration: 0.1, ease: "power1.inOut" }, 0.9);
+		if (nextSection) {
+			gsap.set(nextSection, { autoAlpha: 0, yPercent: 10 });
+			timeline.to(
+				nextSection,
+				{ autoAlpha: 1, yPercent: 0, duration: 0.1, ease: "power1.out" },
+				0.9,
+			);
+		}
 
 		updateSceneState(timeline.scrollTrigger?.progress ?? 0);
 		ScrollTrigger.refresh();
@@ -515,9 +533,6 @@ export function mountHomeHero() {
 			: [];
 		const hosts = [titleHost, ...contactHosts].filter(
 			(host): host is HTMLElement => host !== null,
-		);
-		const occupation = hero.querySelector<HTMLElement>(
-			".home-hero__occupation",
 		);
 		if (!hosts.length && !signature) return;
 
@@ -598,7 +613,7 @@ export function mountHomeHero() {
 			}
 
 			if (occupation) {
-				gsap.to(occupation, {
+				occupationTween = gsap.to(occupation, {
 					autoAlpha: 1,
 					y: 0,
 					duration: 0.7,
@@ -611,6 +626,7 @@ export function mountHomeHero() {
 
 	if (reducedMotionQuery.matches) {
 		setReducedMotionState(hero);
+		if (backdrop) gsap.set(backdrop, { autoAlpha: 1 });
 	} else {
 		buildTimeline();
 		playTilesIntro();
@@ -627,6 +643,30 @@ export function mountHomeHero() {
 		});
 	}
 
+	const restoreInitialState = () => {
+		const animatedElements = [
+			mosaic,
+			mosaicComplete,
+			backdrop,
+			title,
+			contact,
+			signature,
+			...tiles.map((tile) => tile.element),
+			...tiles.flatMap((tile) => (tile.image ? [tile.image] : [])),
+			occupation,
+			nextSection,
+		].filter((element): element is HTMLElement => element !== null);
+		gsap.killTweensOf(animatedElements);
+		if (mosaic) gsap.set(mosaic, { xPercent: -50, y: 0, scale: 1 });
+		if (mosaicComplete) gsap.set(mosaicComplete, { autoAlpha: 0 });
+		if (backdrop) gsap.set(backdrop, { clearProps: "opacity,visibility" });
+		if (title) gsap.set(title, { clearProps: "opacity,visibility" });
+		if (contact) gsap.set(contact, { clearProps: "opacity,visibility" });
+		if (signature) gsap.set(signature, { clearProps: "opacity,visibility" });
+		if (nextSection) gsap.set(nextSection, { clearProps: "opacity,visibility,transform" });
+		resetIdleTiles();
+	};
+
 	return () => {
 		stopIdleRotation();
 		window.clearTimeout(flyLayoutTimer);
@@ -634,17 +674,23 @@ export function mountHomeHero() {
 		tilesIntroTimeline = null;
 		textIntroTimeline?.kill();
 		textIntroTimeline = null;
+		occupationTween?.kill();
+		occupationTween = null;
 		for (const handle of flyHandles) handle.destroy();
 		flyHandles = [];
 		contactScatterTimeline = null;
 		signatureRainTimeline = null;
 		signatureHandle?.destroy();
 		signatureHandle = null;
+		rain.setActive(false);
 		rain.destroy();
 		timeline?.scrollTrigger?.kill();
 		timeline?.kill();
 		timeline = null;
+		restoreInitialState();
 		delete hero.dataset.heroMounted;
 		delete hero.dataset.layerActive;
+		delete hero.dataset.reducedMotion;
+		mobileQuery.removeEventListener("change", handleMobileChange);
 	};
 }

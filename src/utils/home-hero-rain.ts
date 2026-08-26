@@ -41,6 +41,7 @@ type HitEdge = {
 
 export type HomeHeroRainController = {
 	setActive: (active: boolean) => void;
+	setOpacity: (opacity: number) => void;
 	destroy: () => void;
 };
 
@@ -123,6 +124,7 @@ export function initHomeHeroRain(
 	if (!canvas || !context || config.enabled === false) {
 		return {
 			setActive: () => undefined,
+			setOpacity: () => undefined,
 			destroy: () => abortController.abort(),
 		};
 	}
@@ -284,6 +286,12 @@ export function initHomeHeroRain(
 			if (active) start();
 			else stop();
 		},
+		setOpacity(nextOpacity) {
+			const opacity = Number.isFinite(nextOpacity)
+				? Math.min(1, Math.max(0, nextOpacity))
+				: 0;
+			canvas.style.opacity = String(opacity);
+		},
 		destroy() {
 			active = false;
 			stop();
@@ -292,6 +300,7 @@ export function initHomeHeroRain(
 			drops = [];
 			splashes = [];
 			hitEdges = [];
+			canvas.style.removeProperty("opacity");
 			canvas.classList.remove("is-active");
 		},
 	};

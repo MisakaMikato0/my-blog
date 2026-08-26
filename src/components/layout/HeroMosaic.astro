@@ -5,12 +5,10 @@ import { createHeroTileLayout } from "@/utils/home-hero-motion";
 interface Props {
 	desktopImage: string;
 	mobileImage: string;
-	images?: string[];
 	config: HeroMosaicConfig;
 }
 
-const { desktopImage, mobileImage, images, config } = Astro.props;
-const candidates = images && images.length > 0 ? images : [desktopImage];
+const { desktopImage, mobileImage, config } = Astro.props;
 const tiles = createHeroTileLayout(config);
 const tileDepthRange = Math.max(1, config.idleVisible - 1);
 const mosaicStyle = [
@@ -65,27 +63,4 @@ const mosaicStyle = [
 			<img src={desktopImage} alt="" width="3000" height="1500" loading="eager" fetchpriority="high" decoding="async" />
 		</picture>
 	</div>
-
-	<script is:inline define:vars={{ images: candidates }}>
-		(function () {
-			const picked = images[Math.floor(Math.random() * images.length)];
-			const visual = document.currentScript?.parentElement;
-			if (!visual || !picked) return;
-			// 每次刷新随机换一张：马赛克碎片背景 + 完成图 + 兜底大图统一替换
-			visual.style.setProperty(
-				"--home-hero-mosaic-image",
-				`url("${picked}")`,
-			);
-			visual.style.setProperty(
-				"--home-hero-mosaic-image-mobile",
-				`url("${picked}")`,
-			);
-			visual.querySelectorAll("picture source[srcset]").forEach((source) => {
-				source.setAttribute("srcset", picked);
-			});
-			visual.querySelectorAll("picture img[src]").forEach((image) => {
-				image.setAttribute("src", picked);
-			});
-		})();
-	</script>
 </div>

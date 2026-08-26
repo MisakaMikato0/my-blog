@@ -5,8 +5,9 @@ import { createFlyText, type FlyTextHandle } from "@/utils/home-hero-fly-text";
 import {
 	getHeroMosaicCompletionTransform,
 	getHeroMosaicPhase,
-	getHeroRainOpacity,
 	getHeroPinEndDistance,
+	getHeroRainOpacity,
+	getHeroScrollProgress,
 	getHeroTileDepth,
 } from "@/utils/home-hero-motion";
 import { initHomeHeroRain } from "@/utils/home-hero-rain";
@@ -58,7 +59,8 @@ type TileEntranceTransform = {
 	x: number;
 	y: number;
 	rotation: number;
-	scale: number;
+	scaleX: number;
+	scaleY: number;
 	blur: number;
 };
 
@@ -81,7 +83,9 @@ function getTileStates(hero: HTMLElement): TileState[] {
 	return Array.from(hero.querySelectorAll<HTMLElement>("[data-hero-tile]")).map(
 		(element) => ({
 			element,
-			image: element.querySelector<HTMLElement>(".home-hero__mosaic-tile-image"),
+			image: element.querySelector<HTMLElement>(
+				".home-hero__mosaic-tile-image",
+			),
 			row: readNumber(element, "row", 0),
 			column: readNumber(element, "column", 0),
 			order: readNumber(element, "order", 0),
@@ -153,6 +157,8 @@ export function mountHomeHero() {
 	let signatureRainTimeline: ReturnType<typeof gsap.timeline> | null = null;
 	let occupationTween: ReturnType<typeof gsap.to> | null = null;
 	let idleHandoffCaptured = false;
+	let heroScrollTrigger: ReturnType<typeof ScrollTrigger.create> | null = null;
+	let scrollDriver: ReturnType<typeof gsap.to> | null = null;
 	let activeTiles = new Set(
 		tiles.filter((tile) => tile.initiallyVisible).map((tile) => tile.element),
 	);
@@ -193,9 +199,9 @@ export function mountHomeHero() {
 		if (visibleTiles.length === 0) return;
 		idleTimer = 1;
 		idleTween = gsap.timeline({
-		repeat: -1,
-		yoyo: true,
-		defaults: { duration: 1.8, ease: "sine.inOut" },
+			repeat: -1,
+			yoyo: true,
+			defaults: { duration: 1.8, ease: "sine.inOut" },
 		});
 		visibleTiles.forEach((tile, index) => {
 			if (!tile.image) return;
@@ -226,7 +232,8 @@ export function mountHomeHero() {
 				x: transform.x,
 				y: transform.y,
 				rotation: transform.rotation,
-				scale: transform.scale,
+				scaleX: transform.scaleX,
+				scaleY: transform.scaleY,
 				filter: `blur(${transform.blur}px)`,
 				autoAlpha: tile.initiallyVisible ? 1 : 0,
 			});
@@ -293,7 +300,8 @@ export function mountHomeHero() {
 			x: normalizedX * travelMultiplier * horizontalRange,
 			y: normalizedY * travelMultiplier * verticalRange,
 			rotation: tile.rotation * 0.12,
-			scale: 0.66 + Math.min(0.16, Math.max(0, (tile.scale - 0.72) * 0.48)),
+			scaleX: 0.66 + Math.min(0.16, Math.max(0, (tile.scale - 0.72) * 0.48)),
+			scaleY: 0.66 + Math.min(0.16, Math.max(0, (tile.scale - 0.72) * 0.48)),
 			blur: blurBase + (tile.blur / 5) * blurRange,
 		};
 	};
@@ -316,7 +324,8 @@ export function mountHomeHero() {
 			x: targetX - tileCenterX,
 			y: targetY - tileCenterY,
 			rotation: tile.rotation,
-			scale: 1.18 - depthProgress * 0.38,
+			scaleX: 1.18 - depthProgress * 0.38,
+			scaleY: 1.18 - depthProgress * 0.38,
 			blur: depthProgress * 7,
 		};
 	};
@@ -324,7 +333,7 @@ export function mountHomeHero() {
 	const buildTimeline = () => {
 		if (!title || !mosaic || tiles.length === 0) return;
 
-		gsap.set(mosaic, { xPercent: -50, y: 0, scale: 1 });
+		gsap.set(mosaic, { xPercent: -50, y: 0, scaleX: 1, scaleY: 1 });
 		gsap.set(mosaicComplete, { autoAlpha: 0 });
 		if (signature) gsap.set(signature, { autoAlpha: 0 });
 		for (const tile of tiles) {
@@ -335,7 +344,8 @@ export function mountHomeHero() {
 				x: transform.x,
 				y: transform.y,
 				rotation: transform.rotation,
-				scale: transform.scale,
+				scaleX: transform.scaleX,
+				scaleY: transform.scaleY,
 				filter: `blur(${transform.blur}px)`,
 				autoAlpha: tile.initiallyVisible ? 1 : 0,
 			});
@@ -344,31 +354,7 @@ export function mountHomeHero() {
 
 		timeline = gsap.timeline({
 			defaults: { ease: "none" },
-			scrollTrigger: {
-				id: "home-hero-two-layer",
-				trigger: hero,
-				start: "top top",
-				end: () => {
-					const distance = mobileQuery.matches
-						? getHeroPinEndDistance(
-								config.mosaic.mobileScrollDistance,
-								window.innerHeight,
-								config.mosaic.mobileMinViewports,
-							)
-						: getHeroPinEndDistance(
-								config.mosaic.desktopScrollDistance,
-								window.innerHeight,
-								config.mosaic.desktopMinViewports,
-							);
-					return `+=${distance}`;
-				},
-				pin: hero,
-				pinSpacing: true,
-				scrub: config.mosaic.scrub,
-				anticipatePin: 1,
-				invalidateOnRefresh: true,
-				onUpdate: (self) => updateSceneState(self.progress),
-			},
+			paused: true,
 		});
 
 		timeline.to({}, { duration: 0.1 });
@@ -405,7 +391,8 @@ export function mountHomeHero() {
 				x: 0,
 				y: 0,
 				rotation: 0,
-				scale: 1,
+				scaleX: 1,
+				scaleY: 1,
 				filter: "blur(0px)",
 				autoAlpha: 1,
 				duration: assemblyDuration,
@@ -454,7 +441,8 @@ export function mountHomeHero() {
 			mosaic,
 			{
 				y: () => getCompletionTransform().y,
-				scale: () => getCompletionTransform().scale,
+				scaleX: () => getCompletionTransform().scale,
+				scaleY: () => getCompletionTransform().scale,
 				duration: 0.25,
 				ease: "power3.inOut",
 			},
@@ -462,7 +450,11 @@ export function mountHomeHero() {
 		);
 
 		// 最后 10% 不缩小图片，只让首屏整体淡出；下一段内容从下方平滑进入。
-		timeline.to(hero, { autoAlpha: 0, duration: 0.1, ease: "power1.inOut" }, 0.9);
+		timeline.to(
+			hero,
+			{ autoAlpha: 0, duration: 0.1, ease: "power1.inOut" },
+			0.9,
+		);
 		if (nextSection) {
 			gsap.set(nextSection, { autoAlpha: 0, yPercent: 10 });
 			timeline.to(
@@ -472,7 +464,65 @@ export function mountHomeHero() {
 			);
 		}
 
-		updateSceneState(timeline.scrollTrigger?.progress ?? 0);
+		const getScrollDistance = () =>
+			mobileQuery.matches
+				? getHeroPinEndDistance(
+						config.mosaic.mobileScrollDistance,
+						window.innerHeight,
+						config.mosaic.mobileMinViewports,
+					)
+				: getHeroPinEndDistance(
+						config.mosaic.desktopScrollDistance,
+						window.innerHeight,
+						config.mosaic.desktopMinViewports,
+					);
+
+		const renderTimelineForScroll = (scrollProgress: number) => {
+			const progress = getHeroScrollProgress(scrollProgress);
+			timeline?.totalProgress(progress);
+			updateSceneState(progress);
+		};
+
+		const invalidateTimelineFromInitialState = () => {
+			if (!timeline) return;
+			const progress = timeline.totalProgress();
+			// GSAP 的 to tween 会以 invalidate 时的当前值作为起点，先回到初始帧才能保留原始起点。
+			timeline.totalProgress(0, true);
+			timeline.invalidate();
+			timeline.totalProgress(progress, true);
+		};
+
+		const scrollState = { progress: 0 };
+		scrollDriver = gsap.to(scrollState, {
+			progress: 1,
+			duration: 1,
+			ease: "none",
+			paused: true,
+			onUpdate: () => renderTimelineForScroll(scrollState.progress),
+		});
+
+		heroScrollTrigger = ScrollTrigger.create({
+			id: "home-hero-two-layer",
+			trigger: hero,
+			start: "top top",
+			end: () => `+=${getScrollDistance()}`,
+			pin: hero,
+			pinSpacing: true,
+			scrub: config.mosaic.scrub,
+			anticipatePin: 1,
+			animation: scrollDriver,
+			invalidateOnRefresh: true,
+			onRefreshInit: invalidateTimelineFromInitialState,
+			onRefresh: (self) => {
+				self.update();
+				renderTimelineForScroll(scrollDriver?.progress() ?? self.progress);
+			},
+			onUpdate: (self) => {
+				if (!scrollDriver) renderTimelineForScroll(self.progress);
+			},
+		});
+
+		renderTimelineForScroll(heroScrollTrigger.progress);
 		ScrollTrigger.refresh();
 	};
 
@@ -488,7 +538,7 @@ export function mountHomeHero() {
 				tilesIntroTimeline = null;
 				tilesIntroDone = true;
 				if (
-					(timeline?.scrollTrigger?.progress ?? 0) <= 0.002 &&
+					(heroScrollTrigger?.progress ?? 0) <= 0.002 &&
 					!reducedMotionQuery.matches &&
 					!idleTimer
 				) {
@@ -502,13 +552,15 @@ export function mountHomeHero() {
 				tile.element,
 				{
 					y: transform.y + 24,
-					scale: transform.scale * 0.92,
+					scaleX: transform.scaleX * 0.92,
+					scaleY: transform.scaleY * 0.92,
 					filter: `blur(${transform.blur + 5}px)`,
 					autoAlpha: 0,
 				},
 				{
 					y: transform.y,
-					scale: transform.scale,
+					scaleX: transform.scaleX,
+					scaleY: transform.scaleY,
 					filter: `blur(${transform.blur}px)`,
 					autoAlpha: 1,
 					duration: 0.85,
@@ -595,7 +647,7 @@ export function mountHomeHero() {
 			mountContactScatter();
 			mountSignatureRain();
 
-			const progress = timeline?.scrollTrigger?.progress ?? 0;
+			const progress = heroScrollTrigger?.progress ?? 0;
 			if (progress <= 0.01) {
 				const intro = gsap.timeline();
 				const titleEntrance = flyHandles[0]?.buildEntrance(0.8);
@@ -636,7 +688,8 @@ export function mountHomeHero() {
 	if (resetAfterReload) {
 		requestAnimationFrame(() => {
 			window.scrollTo(0, 0);
-			timeline?.progress(0);
+			timeline?.totalProgress(0);
+			scrollDriver?.progress(0);
 			updateSceneState(0);
 			ScrollTrigger.refresh();
 			history.scrollRestoration = "auto";
@@ -657,13 +710,14 @@ export function mountHomeHero() {
 			nextSection,
 		].filter((element): element is HTMLElement => element !== null);
 		gsap.killTweensOf(animatedElements);
-		if (mosaic) gsap.set(mosaic, { xPercent: -50, y: 0, scale: 1 });
+		if (mosaic) gsap.set(mosaic, { xPercent: -50, y: 0, scaleX: 1, scaleY: 1 });
 		if (mosaicComplete) gsap.set(mosaicComplete, { autoAlpha: 0 });
 		if (backdrop) gsap.set(backdrop, { clearProps: "opacity,visibility" });
 		if (title) gsap.set(title, { clearProps: "opacity,visibility" });
 		if (contact) gsap.set(contact, { clearProps: "opacity,visibility" });
 		if (signature) gsap.set(signature, { clearProps: "opacity,visibility" });
-		if (nextSection) gsap.set(nextSection, { clearProps: "opacity,visibility,transform" });
+		if (nextSection)
+			gsap.set(nextSection, { clearProps: "opacity,visibility,transform" });
 		resetIdleTiles();
 	};
 
@@ -684,7 +738,10 @@ export function mountHomeHero() {
 		signatureHandle = null;
 		rain.setActive(false);
 		rain.destroy();
-		timeline?.scrollTrigger?.kill();
+		heroScrollTrigger?.kill();
+		heroScrollTrigger = null;
+		scrollDriver?.kill();
+		scrollDriver = null;
 		timeline?.kill();
 		timeline = null;
 		restoreInitialState();

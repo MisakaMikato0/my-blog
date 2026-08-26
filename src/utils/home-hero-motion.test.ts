@@ -2,8 +2,9 @@ import { describe, expect, it } from "vitest";
 import {
 	getHeroMosaicCompletionTransform,
 	getHeroMosaicPhase,
-	getHeroRainOpacity,
 	getHeroPinEndDistance,
+	getHeroRainOpacity,
+	getHeroScrollProgress,
 	getHeroTileDepth,
 } from "@/utils/home-hero-motion";
 
@@ -30,6 +31,20 @@ describe("getHeroMosaicPhase", () => {
 	it("clamps finite progress before calculating the phase", () => {
 		expect(getHeroMosaicPhase(-1).localProgress).toBe(0);
 		expect(getHeroMosaicPhase(2).localProgress).toBe(1);
+	});
+});
+
+describe("getHeroScrollProgress", () => {
+	it("clamps the scroll driver progress before rendering the timeline", () => {
+		expect(getHeroScrollProgress(-0.2)).toBe(0);
+		expect(getHeroScrollProgress(0.35)).toBe(0.35);
+		expect(getHeroScrollProgress(1.2)).toBe(1);
+	});
+
+	it("normalizes non-finite driver progress safely", () => {
+		expect(getHeroScrollProgress(Number.NaN)).toBe(0);
+		expect(getHeroScrollProgress(Number.NEGATIVE_INFINITY)).toBe(0);
+		expect(getHeroScrollProgress(Number.POSITIVE_INFINITY)).toBe(1);
 	});
 });
 
@@ -73,17 +88,19 @@ describe("getHeroTileDepth", () => {
 		});
 	});
 
-	it.each([-24, Number.POSITIVE_INFINITY, Number.NEGATIVE_INFINITY, Number.NaN] as const)(
-		"normalizes invalid amplitude without changing depth values",
-		(amplitude) => {
-			expect(getHeroTileDepth(1, amplitude)).toEqual({
-				z: 0,
-				rotationX: 4,
-				rotationY: -4,
-				shadowOpacity: 0.34,
-				});
-		},
-	);
+	it.each([
+		-24,
+		Number.POSITIVE_INFINITY,
+		Number.NEGATIVE_INFINITY,
+		Number.NaN,
+	] as const)("normalizes invalid amplitude without changing depth values", (amplitude) => {
+		expect(getHeroTileDepth(1, amplitude)).toEqual({
+			z: 0,
+			rotationX: 4,
+			rotationY: -4,
+			shadowOpacity: 0.34,
+		});
+	});
 });
 
 describe("getHeroPinEndDistance", () => {

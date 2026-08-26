@@ -27,17 +27,19 @@ export const HeroMosaicScrollPhase = {
 	exit: 0.1,
 } as const;
 
+export function getHeroScrollProgress(progress: number) {
+	if (Number.isNaN(progress) || progress === Number.NEGATIVE_INFINITY) return 0;
+	if (progress === Number.POSITIVE_INFINITY) return 1;
+	return Math.min(1, Math.max(0, progress));
+}
+
 type HeroMosaicPhase = keyof typeof HeroMosaicScrollPhase;
 
 export function getHeroMosaicPhase(progress: number): {
 	phase: HeroMosaicPhase;
 	localProgress: number;
 } {
-	const clampedProgress = Number.isNaN(progress) || progress === Number.NEGATIVE_INFINITY
-		? 0
-		: progress === Number.POSITIVE_INFINITY
-			? 1
-			: Math.min(1, Math.max(0, progress));
+	const clampedProgress = getHeroScrollProgress(progress);
 	let phaseStart = 0;
 
 	for (const [phase, duration] of Object.entries(HeroMosaicScrollPhase) as [
@@ -67,12 +69,8 @@ export function getHeroRainOpacity(progress: number) {
 }
 
 export function getHeroTileDepth(depth: number, amplitude: number) {
-	const safeDepth = Number.isFinite(depth)
-		? Math.max(0, depth)
-		: 0;
-	const safeAmplitude = Number.isFinite(amplitude)
-		? Math.max(0, amplitude)
-		: 0;
+	const safeDepth = Number.isFinite(depth) ? Math.max(0, depth) : 0;
+	const safeAmplitude = Number.isFinite(amplitude) ? Math.max(0, amplitude) : 0;
 
 	return {
 		z: safeDepth * safeAmplitude,

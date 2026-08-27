@@ -2,14 +2,17 @@ import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import type { HeroMosaicConfig } from "@/types/config";
 import { createFlyText, type FlyTextHandle } from "@/utils/home-hero-fly-text";
-import { getHeroPinEndDistance } from "@/utils/home-hero-motion";
+import {
+	getHeroPinEndDistance,
+	getHeroTextFadeTargets,
+	HERO_INTERACTION_HOLD_START,
+} from "@/utils/home-hero-motion";
 import { initHomeHeroRain } from "@/utils/home-hero-rain";
 
 gsap.registerPlugin(ScrollTrigger);
 
 const RAIN_ACTIVATE_TIME = 0.99;
 const SIGNATURE_REVEAL_TIME = 1.02;
-const INTERACTION_HOLD_START = 2.35;
 let initialReloadHandled = false;
 
 function resetHeroScrollOnReload() {
@@ -469,7 +472,7 @@ export function mountHomeHero() {
 			},
 			0.72,
 		);
-		for (const textLayer of [contact, signature]) {
+		for (const textLayer of getHeroTextFadeTargets(contact, signature)) {
 			if (!textLayer) continue;
 			timeline.to(
 				textLayer,
@@ -503,7 +506,7 @@ export function mountHomeHero() {
 		timeline.to(
 			{},
 			{ duration: Math.max(0, config.mosaic.interactionHold) },
-			INTERACTION_HOLD_START,
+			HERO_INTERACTION_HOLD_START,
 		);
 
 		const getScrollDistance = () =>

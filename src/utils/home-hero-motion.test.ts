@@ -2,6 +2,8 @@ import { describe, expect, it } from "vitest";
 import {
 	createHeroTileLayout,
 	getHeroPinEndDistance,
+	getHeroTextFadeTargets,
+	HERO_INTERACTION_HOLD_START,
 } from "@/utils/home-hero-motion";
 
 describe("createHeroTileLayout", () => {
@@ -30,5 +32,21 @@ describe("getHeroPinEndDistance", () => {
 		expect(getHeroPinEndDistance(Number.NaN, 800, 2)).toBe(1600);
 		expect(getHeroPinEndDistance(500, Number.POSITIVE_INFINITY, 2)).toBe(500);
 		expect(getHeroPinEndDistance(500, 800, Number.NaN)).toBe(500);
+	});
+});
+
+describe("getHeroTextFadeTargets", () => {
+	it("fades contact text without hiding the signature before its rain entrance", () => {
+		const contact = { id: "contact" };
+		const signature = { id: "signature" };
+
+		expect(getHeroTextFadeTargets(contact, signature)).toEqual([contact]);
+	});
+});
+
+describe("HERO_INTERACTION_HOLD_START", () => {
+	it("starts shortly after the mosaic has completed", () => {
+		expect(HERO_INTERACTION_HOLD_START).toBeGreaterThan(0.99);
+		expect(HERO_INTERACTION_HOLD_START).toBeLessThan(1.3);
 	});
 });

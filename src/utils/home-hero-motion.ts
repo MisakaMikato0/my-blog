@@ -12,6 +12,8 @@ export type HeroTileLayout = {
 	initiallyVisible: boolean;
 };
 
+export const HERO_INTERACTION_HOLD_START = 1.05;
+
 type HeroTileLayoutOptions = {
 	rows: number;
 	columns: number;
@@ -95,4 +97,11 @@ export function getHeroPinEndDistance(
 		? Math.max(0, minimumViewports)
 		: 0;
 	return Math.max(0, configured, Math.round(viewport * minViewports));
+}
+
+export function getHeroTextFadeTargets<T>(
+	contact: T | null,
+	_signature: T | null,
+) {
+	return contact === null ? [] : [contact];
 }

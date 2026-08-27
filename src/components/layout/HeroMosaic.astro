@@ -10,7 +10,6 @@ interface Props {
 
 const { desktopImage, mobileImage, config } = Astro.props;
 const tiles = createHeroTileLayout(config);
-const tileDepthRange = Math.max(1, config.idleVisible - 1);
 const mosaicStyle = [
 	`--home-hero-mosaic-image: url("${desktopImage}")`,
 	`--home-hero-mosaic-image-mobile: url("${mobileImage}")`,
@@ -52,7 +51,7 @@ const mosaicStyle = [
 					data-scale={tile.scale}
 					data-blur={tile.blur}
 					data-idle-visible={String(tile.initiallyVisible)}
-					style={`left: ${(tile.column / config.columns) * 100}%; top: ${(tile.row / config.rows) * 100}%; width: ${100 / config.columns}%; height: ${100 / config.rows}%; z-index: ${config.idleVisible - tile.idleDepth}; --home-hero-tile-column: ${tile.column}; --home-hero-tile-row: ${tile.row}; --home-hero-tile-bg-x: ${(tile.column / Math.max(1, config.columns - 1)) * 100}%; --home-hero-tile-bg-y: ${(tile.row / Math.max(1, config.rows - 1)) * 100}%; --home-hero-tile-x: ${tile.offsetX}%; --home-hero-tile-y: ${tile.offsetY}%; --home-hero-tile-rotation: ${tile.rotation}deg; --home-hero-tile-scale: ${tile.scale}; --home-hero-tile-blur: ${tile.blur}px; --home-hero-tile-z: ${Math.min(1, tile.idleDepth / tileDepthRange) * 24}px; --home-hero-tile-shadow-opacity: ${Math.min(1, tile.idleDepth / tileDepthRange) * 0.34};`}
+					style={`left: ${(tile.column / config.columns) * 100}%; top: ${(tile.row / config.rows) * 100}%; width: ${100 / config.columns}%; height: ${100 / config.rows}%; z-index: ${config.idleVisible - tile.idleDepth}; --home-hero-tile-column: ${tile.column}; --home-hero-tile-row: ${tile.row}; --home-hero-tile-bg-x: ${(tile.column / Math.max(1, config.columns - 1)) * 100}%; --home-hero-tile-bg-y: ${(tile.row / Math.max(1, config.rows - 1)) * 100}%; --home-hero-tile-x: ${tile.offsetX}%; --home-hero-tile-y: ${tile.offsetY}%; --home-hero-tile-rotation: ${tile.rotation}deg; --home-hero-tile-scale: ${tile.scale}; --home-hero-tile-blur: ${tile.blur}px;`}
 				>
 					<span class="home-hero__mosaic-tile-image"></span>
 				</span>

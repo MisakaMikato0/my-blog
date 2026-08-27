@@ -2,20 +2,14 @@ import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import type { HeroMosaicConfig } from "@/types/config";
 import { createFlyText, type FlyTextHandle } from "@/utils/home-hero-fly-text";
-import {
-	getHeroMosaicCompletionTransform,
-	getHeroMosaicPhase,
-	getHeroPinEndDistance,
-	getHeroRainOpacity,
-	getHeroScrollProgress,
-	getHeroTileDepth,
-} from "@/utils/home-hero-motion";
+import { getHeroPinEndDistance } from "@/utils/home-hero-motion";
 import { initHomeHeroRain } from "@/utils/home-hero-rain";
 
 gsap.registerPlugin(ScrollTrigger);
 
-const TILE_DEPTH_AMPLITUDE = 24;
-const SIGNATURE_REVEAL_TIME = 0.1;
+const RAIN_ACTIVATE_TIME = 0.99;
+const SIGNATURE_REVEAL_TIME = 1.02;
+const INTERACTION_HOLD_START = 2.35;
 let initialReloadHandled = false;
 
 function resetHeroScrollOnReload() {
@@ -32,6 +26,14 @@ function resetHeroScrollOnReload() {
 	return true;
 }
 
+function createSeededRandom(seed: number) {
+	let value = seed >>> 0;
+	return () => {
+		value = (Math.imul(value, 1664525) + 1013904223) >>> 0;
+		return value / 4294967296;
+	};
+}
+
 type HeroRuntimeConfig = {
 	mosaic: HeroMosaicConfig;
 	rain: {
@@ -43,7 +45,6 @@ type HeroRuntimeConfig = {
 
 type TileState = {
 	element: HTMLElement;
-	image: HTMLElement | null;
 	row: number;
 	column: number;
 	order: number;
@@ -83,9 +84,6 @@ function getTileStates(hero: HTMLElement): TileState[] {
 	return Array.from(hero.querySelectorAll<HTMLElement>("[data-hero-tile]")).map(
 		(element) => ({
 			element,
-			image: element.querySelector<HTMLElement>(
-				".home-hero__mosaic-tile-image",
-			),
 			row: readNumber(element, "row", 0),
 			column: readNumber(element, "column", 0),
 			order: readNumber(element, "order", 0),
@@ -162,6 +160,7 @@ export function mountHomeHero() {
 	let activeTiles = new Set(
 		tiles.filter((tile) => tile.initiallyVisible).map((tile) => tile.element),
 	);
+	const random = createSeededRandom(config.mosaic.seed ^ 0x9e3779b9);
 	document
 		.querySelector(".home-page--motion-pending")
 		?.classList.remove("home-page--motion-pending");
@@ -171,53 +170,51 @@ export function mountHomeHero() {
 	mobileQuery.addEventListener("change", handleMobileChange);
 
 	const stopIdleRotation = () => {
+		window.clearInterval(idleTimer);
 		idleTimer = 0;
 		idleTween?.kill();
 		idleTween = null;
 	};
 
-	const getTileDepthProgress = (tile: TileState) => {
-		const idleVisible = Math.max(1, config.mosaic.idleVisible);
-		return idleVisible > 1
-			? Math.min(1, (tile.order % idleVisible) / (idleVisible - 1))
-			: 0;
-	};
-
-	const setTileDepth = (tile: TileState, depthProgress: number) => {
-		if (!tile.image) return;
-		const depth = getHeroTileDepth(depthProgress, TILE_DEPTH_AMPLITUDE);
-		gsap.set(tile.image, {
-			transform: `translateZ(${depth.z}px) rotateX(${depth.rotationX}deg) rotateY(${depth.rotationY}deg)`,
-			"--home-hero-tile-z": `${depth.z}px`,
-			"--home-hero-tile-shadow-opacity": depth.shadowOpacity,
-		});
-	};
-
 	const startIdleRotation = () => {
 		if (idleTimer || reducedMotionQuery.matches) return;
-		const visibleTiles = tiles.filter((tile) => activeTiles.has(tile.element));
-		if (visibleTiles.length === 0) return;
-		idleTimer = 1;
-		idleTween = gsap.timeline({
-			repeat: -1,
-			yoyo: true,
-			defaults: { duration: 1.8, ease: "sine.inOut" },
-		});
-		visibleTiles.forEach((tile, index) => {
-			if (!tile.image) return;
-			const baseDepth = getTileDepthProgress(tile);
-			const peakDepth = Math.min(1, baseDepth + 0.38);
-			const depth = getHeroTileDepth(peakDepth, TILE_DEPTH_AMPLITUDE);
-			idleTween?.to(
-				tile.image,
-				{
-					transform: `translateZ(${depth.z}px) rotateX(${depth.rotationX}deg) rotateY(${depth.rotationY}deg)`,
-					"--home-hero-tile-z": `${depth.z}px`,
-					"--home-hero-tile-shadow-opacity": depth.shadowOpacity,
-				},
-				index * 0.08,
+		idleTimer = window.setInterval(() => {
+			const visible = tiles.filter((tile) => activeTiles.has(tile.element));
+			const hidden = tiles.filter((tile) => !activeTiles.has(tile.element));
+			if (visible.length === 0 || hidden.length === 0) return;
+			const leaving = visible[Math.floor(random() * visible.length)];
+			const entering = hidden[Math.floor(random() * hidden.length)];
+			const enteringTransform = getTileIdleTransform(entering);
+			activeTiles.delete(leaving.element);
+			activeTiles.add(entering.element);
+			idleTween?.kill();
+			idleTween = gsap.timeline();
+			idleTween.to(
+				leaving.element,
+				{ autoAlpha: 0, duration: 0.38, ease: "power2.inOut" },
+				0,
 			);
-		});
+			idleTween.fromTo(
+				entering.element,
+				{
+					x: enteringTransform.x,
+					y: enteringTransform.y,
+					rotation: enteringTransform.rotation,
+					scaleX: enteringTransform.scaleX * 0.88,
+					scaleY: enteringTransform.scaleY * 0.88,
+					filter: `blur(${enteringTransform.blur}px)`,
+					autoAlpha: 0,
+				},
+				{
+					autoAlpha: 1,
+					scaleX: enteringTransform.scaleX,
+					scaleY: enteringTransform.scaleY,
+					duration: 0.48,
+					ease: "power3.out",
+				},
+				0.12,
+			);
+		}, config.mosaic.idleInterval);
 	};
 
 	const resetIdleTiles = () => {
@@ -226,7 +223,7 @@ export function mountHomeHero() {
 		);
 		tiles.forEach((tile) => {
 			const transform = tile.initiallyVisible
-				? getTileIdleTransform(tile)
+				? getTileInitialTransform(tile)
 				: getTileEntranceTransform(tile);
 			gsap.set(tile.element, {
 				x: transform.x,
@@ -237,7 +234,6 @@ export function mountHomeHero() {
 				filter: `blur(${transform.blur}px)`,
 				autoAlpha: tile.initiallyVisible ? 1 : 0,
 			});
-			setTileDepth(tile, getTileDepthProgress(tile));
 		});
 	};
 
@@ -256,14 +252,12 @@ export function mountHomeHero() {
 
 	const updateSceneState = (progress: number) => {
 		const normalizedProgress = Math.min(1, Math.max(0, progress));
-		const { phase } = getHeroMosaicPhase(normalizedProgress);
-		const rainOpacity = getHeroRainOpacity(normalizedProgress);
-		const rainActive = rainOpacity > 0.001;
-		const layerActive = phase !== "flatten";
+		const timelineTime = normalizedProgress * (timeline?.duration() ?? 1);
+		const rainActive = timelineTime >= RAIN_ACTIVATE_TIME;
+		const layerActive = timelineTime >= SIGNATURE_REVEAL_TIME;
 		hero.dataset.layerActive = String(layerActive);
 		rain.setActive(rainActive && !reducedMotionQuery.matches);
-		rain.setOpacity(rainOpacity);
-		if (normalizedProgress > 0.0001) {
+		if (normalizedProgress > 0.002) {
 			if (!idleHandoffCaptured) {
 				stopIdleRotation();
 				idleHandoffCaptured = true;
@@ -306,6 +300,23 @@ export function mountHomeHero() {
 		};
 	};
 
+	const getMosaicTransform = () => {
+		if (!mosaic) return { y: 0, scale: 1 };
+		const heroWidth = hero.clientWidth;
+		const heroHeight = hero.clientHeight;
+		const mosaicWidth = mosaic.offsetWidth;
+		const mosaicHeight = mosaic.offsetHeight;
+		const mosaicCenterY = mosaic.offsetTop + mosaicHeight / 2;
+		return {
+			y: heroHeight / 2 - mosaicCenterY,
+			scale:
+				Math.max(
+					heroWidth / Math.max(1, mosaicWidth),
+					heroHeight / Math.max(1, mosaicHeight),
+				) * 1.015,
+		};
+	};
+
 	const getTileIdleTransform = (tile: TileState): TileIdleTransform => {
 		const mosaicWidth = mosaic?.offsetWidth ?? hero.clientWidth * 0.84;
 		const mosaicHeight = mosaic?.offsetHeight ?? hero.clientHeight * 0.72;
@@ -330,15 +341,53 @@ export function mountHomeHero() {
 		};
 	};
 
+	// 首屏布局只服务于第一次静止展示；进入轮换后仍回到上面的随机布局。
+	const getTileInitialTransform = (tile: TileState): TileEntranceTransform => {
+		const layout = config.mosaic.initialLayout?.[tile.order];
+		if (mobileQuery.matches || !mosaic || !layout) {
+			return getTileIdleTransform(tile);
+		}
+
+		const mosaicWidth = Math.max(1, mosaic.offsetWidth);
+		const mosaicHeight = Math.max(1, mosaic.offsetHeight);
+		const columns = Math.max(1, config.mosaic.columns);
+		const rows = Math.max(1, config.mosaic.rows);
+		const clampRatio = (value: number, fallback: number) =>
+			Number.isFinite(value) ? Math.min(1, Math.max(0, value)) : fallback;
+		const centerX = clampRatio(layout.x, 0.5) * mosaicWidth;
+		const centerY = clampRatio(layout.y, 0.5) * mosaicHeight;
+		const tileCenterX = ((tile.column + 0.5) / columns) * mosaicWidth;
+		const tileCenterY = ((tile.row + 0.5) / rows) * mosaicHeight;
+		const width = Math.max(0.01, clampRatio(layout.width, 1 / columns));
+		const height = Math.max(0.01, clampRatio(layout.height, 1 / rows));
+		const rotation =
+			typeof layout.rotation === "number" && Number.isFinite(layout.rotation)
+				? layout.rotation
+				: 0;
+		const blur = Number.isFinite(layout.blur)
+			? Math.max(0, layout.blur ?? 0)
+			: 0;
+
+		return {
+			x: centerX - tileCenterX,
+			y: centerY - tileCenterY,
+			rotation,
+			scaleX: width * columns,
+			scaleY: height * rows,
+			blur,
+		};
+	};
+
 	const buildTimeline = () => {
-		if (!title || !mosaic || tiles.length === 0) return;
+		if (!title || !mosaic || !backdrop || tiles.length === 0) return;
 
 		gsap.set(mosaic, { xPercent: -50, y: 0, scaleX: 1, scaleY: 1 });
 		gsap.set(mosaicComplete, { autoAlpha: 0 });
+		gsap.set(backdrop, { autoAlpha: 0 });
 		if (signature) gsap.set(signature, { autoAlpha: 0 });
 		for (const tile of tiles) {
 			const transform = tile.initiallyVisible
-				? getTileIdleTransform(tile)
+				? getTileInitialTransform(tile)
 				: getTileEntranceTransform(tile);
 			gsap.set(tile.element, {
 				x: transform.x,
@@ -349,7 +398,6 @@ export function mountHomeHero() {
 				filter: `blur(${transform.blur}px)`,
 				autoAlpha: tile.initiallyVisible ? 1 : 0,
 			});
-			setTileDepth(tile, getTileDepthProgress(tile));
 		}
 
 		timeline = gsap.timeline({
@@ -357,56 +405,57 @@ export function mountHomeHero() {
 			paused: true,
 		});
 
-		timeline.to({}, { duration: 0.1 });
-		timeline.to({}, { duration: 0.4 });
-		timeline.to({}, { duration: 0.15 });
-		timeline.to({}, { duration: 0.25 });
-		timeline.to({}, { duration: 0.1 });
-		for (const tile of tiles) {
-			if (!tile.image) continue;
-			timeline.to(
-				tile.image,
-				{
-					transform: "translateZ(0px) rotateX(0deg) rotateY(0deg)",
-					"--home-hero-tile-z": "0px",
-					"--home-hero-tile-shadow-opacity": 0,
-					duration: 0.1,
-					ease: "power2.inOut",
-				},
-				0,
-			);
-		}
-
-		const assemblyStagger = Math.min(
-			0.02,
-			0.22 / Math.max(1, tiles.length - 1),
-		);
-		const assemblyDuration = Math.max(
-			0.08,
-			0.4 - assemblyStagger * Math.max(0, tiles.length - 1),
+		timeline.to({}, { duration: 1 });
+		timeline.to(
+			title,
+			{
+				yPercent: -20,
+				scale: 0.58,
+				transformOrigin: "0% 50%",
+				duration: 0.1,
+				ease: "power3.inOut",
+			},
+			0,
 		);
 		timeline.to(
 			tiles.map((tile) => tile.element),
-			{
-				x: 0,
-				y: 0,
-				rotation: 0,
-				scaleX: 1,
-				scaleY: 1,
-				filter: "blur(0px)",
-				autoAlpha: 1,
-				duration: assemblyDuration,
-				ease: "power3.inOut",
-				stagger: assemblyStagger,
-			},
-			0.1,
+			{ autoAlpha: 0, duration: 0.06, ease: "power2.in" },
+			0.04,
 		);
+		for (const tile of tiles) {
+			const start = 0.1 + tile.order * 0.02;
+			timeline.fromTo(
+				tile.element,
+				{
+					x: () => getTileEntranceTransform(tile).x,
+					y: () => getTileEntranceTransform(tile).y,
+					rotation: () => getTileEntranceTransform(tile).rotation,
+					scaleX: () => getTileEntranceTransform(tile).scaleX,
+					scaleY: () => getTileEntranceTransform(tile).scaleY,
+					filter: () => `blur(${getTileEntranceTransform(tile).blur}px)`,
+					autoAlpha: 0,
+				},
+				{
+					x: 0,
+					y: 0,
+					rotation: 0,
+					scaleX: 1,
+					scaleY: 1,
+					filter: "blur(0px)",
+					autoAlpha: 1,
+					duration: 0.09,
+					ease: "power3.inOut",
+					immediateRender: false,
+				},
+				start,
+			);
+		}
 
 		if (mosaicComplete) {
 			timeline.to(
 				mosaicComplete,
 				{ autoAlpha: 1, duration: 0.03, ease: "none" },
-				0.5,
+				0.72,
 			);
 		}
 
@@ -414,10 +463,11 @@ export function mountHomeHero() {
 			title,
 			{
 				autoAlpha: 0,
-				duration: 0.2,
+				yPercent: -28,
+				duration: 0.08,
 				ease: "power2.in",
 			},
-			0.65,
+			0.72,
 		);
 		for (const textLayer of [contact, signature]) {
 			if (!textLayer) continue;
@@ -429,40 +479,32 @@ export function mountHomeHero() {
 		}
 
 		// 让拼合后的同一层图片连续放大到覆盖视口，不再在后段突然切换到另一张大图
-		const getCompletionTransform = () =>
-			getHeroMosaicCompletionTransform({
-				heroWidth: hero.clientWidth,
-				heroHeight: hero.clientHeight,
-				mosaicWidth: mosaic.offsetWidth,
-				mosaicHeight: mosaic.offsetHeight,
-				mosaicTop: mosaic.offsetTop,
-			});
 		timeline.to(
 			mosaic,
 			{
-				y: () => getCompletionTransform().y,
-				scaleX: () => getCompletionTransform().scale,
-				scaleY: () => getCompletionTransform().scale,
-				duration: 0.25,
+				y: () => getMosaicTransform().y,
+				scaleX: () => getMosaicTransform().scale,
+				scaleY: () => getMosaicTransform().scale,
+				duration: 0.2,
 				ease: "power3.inOut",
 			},
-			0.65,
+			0.76,
 		);
-
-		// 最后 10% 不缩小图片，只让首屏整体淡出；下一段内容从下方平滑进入。
 		timeline.to(
-			hero,
-			{ autoAlpha: 0, duration: 0.1, ease: "power1.inOut" },
-			0.9,
+			backdrop,
+			{ autoAlpha: 1, duration: 0.1, ease: "power2.inOut" },
+			0.87,
 		);
-		if (nextSection) {
-			gsap.set(nextSection, { autoAlpha: 0, yPercent: 10 });
-			timeline.to(
-				nextSection,
-				{ autoAlpha: 1, yPercent: 0, duration: 0.1, ease: "power1.out" },
-				0.9,
-			);
-		}
+		timeline.to(
+			mosaic,
+			{ autoAlpha: 0, duration: 0.07, ease: "power2.in" },
+			0.92,
+		);
+		timeline.to(
+			{},
+			{ duration: Math.max(0, config.mosaic.interactionHold) },
+			INTERACTION_HOLD_START,
+		);
 
 		const getScrollDistance = () =>
 			mobileQuery.matches
@@ -478,7 +520,7 @@ export function mountHomeHero() {
 					);
 
 		const renderTimelineForScroll = (scrollProgress: number) => {
-			const progress = getHeroScrollProgress(scrollProgress);
+			const progress = Math.min(1, Math.max(0, scrollProgress));
 			timeline?.totalProgress(progress);
 			updateSceneState(progress);
 		};
@@ -547,7 +589,7 @@ export function mountHomeHero() {
 			},
 		});
 		for (const tile of idleTiles) {
-			const transform = getTileIdleTransform(tile);
+			const transform = getTileInitialTransform(tile);
 			tilesIntroTimeline.fromTo(
 				tile.element,
 				{
@@ -705,7 +747,6 @@ export function mountHomeHero() {
 			contact,
 			signature,
 			...tiles.map((tile) => tile.element),
-			...tiles.flatMap((tile) => (tile.image ? [tile.image] : [])),
 			occupation,
 			nextSection,
 		].filter((element): element is HTMLElement => element !== null);

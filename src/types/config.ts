@@ -277,12 +277,29 @@ export type HomeDisplayLayerConfig = {
 	emitterImage?: string;
 };
 
+export type HeroMosaicInitialTile = {
+	/** 碎片中心点在马赛克画布中的横向比例（0–1）。 */
+	x: number;
+	/** 碎片中心点在马赛克画布中的纵向比例（0–1）。 */
+	y: number;
+	/** 碎片宽度占马赛克画布的比例（0–1）。 */
+	width: number;
+	/** 碎片高度占马赛克画布的比例（0–1）。 */
+	height: number;
+	/** 初始旋转角度。 */
+	rotation?: number;
+	/** 初始模糊半径。 */
+	blur?: number;
+};
+
 export type HeroMosaicConfig = {
 	rows: number;
 	columns: number;
 	idleVisible: number;
 	idleInterval: number;
 	seed: number;
+	/** 仅用于首屏静止状态的碎片布局，后续轮换仍使用随机参数。 */
+	initialLayout?: HeroMosaicInitialTile[];
 	scrub: number;
 	desktopScrollDistance: number;
 	mobileScrollDistance: number;

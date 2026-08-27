@@ -19,67 +19,6 @@ type HeroTileLayoutOptions = {
 	seed: number;
 };
 
-export const HeroMosaicScrollPhase = {
-	flatten: 0.1,
-	assemble: 0.4,
-	hold: 0.15,
-	zoom: 0.25,
-	exit: 0.1,
-} as const;
-
-export function getHeroScrollProgress(progress: number) {
-	if (Number.isNaN(progress) || progress === Number.NEGATIVE_INFINITY) return 0;
-	if (progress === Number.POSITIVE_INFINITY) return 1;
-	return Math.min(1, Math.max(0, progress));
-}
-
-type HeroMosaicPhase = keyof typeof HeroMosaicScrollPhase;
-
-export function getHeroMosaicPhase(progress: number): {
-	phase: HeroMosaicPhase;
-	localProgress: number;
-} {
-	const clampedProgress = getHeroScrollProgress(progress);
-	let phaseStart = 0;
-
-	for (const [phase, duration] of Object.entries(HeroMosaicScrollPhase) as [
-		HeroMosaicPhase,
-		number,
-	][]) {
-		const phaseEnd = phaseStart + duration;
-		if (clampedProgress < phaseEnd || phase === "exit") {
-			return {
-				phase,
-				localProgress: Number(
-					((clampedProgress - phaseStart) / duration).toFixed(12),
-				),
-			};
-		}
-		phaseStart = phaseEnd;
-	}
-
-	return { phase: "exit", localProgress: 1 };
-}
-
-export function getHeroRainOpacity(progress: number) {
-	const { phase, localProgress } = getHeroMosaicPhase(progress);
-	if (phase === "zoom") return 1 - localProgress;
-	if (phase === "exit") return 0;
-	return 1;
-}
-
-export function getHeroTileDepth(depth: number, amplitude: number) {
-	const safeDepth = Number.isFinite(depth) ? Math.max(0, depth) : 0;
-	const safeAmplitude = Number.isFinite(amplitude) ? Math.max(0, amplitude) : 0;
-
-	return {
-		z: safeDepth * safeAmplitude,
-		rotationX: safeDepth * 4,
-		rotationY: safeDepth * -4,
-		shadowOpacity: safeDepth * 0.34,
-	};
-}
-
 function createSeededRandom(seed: number) {
 	let value = seed >>> 0;
 	return () => {
@@ -139,29 +78,6 @@ export function createHeroTileLayout({
 			initiallyVisible,
 		};
 	});
-}
-
-export type HeroMosaicCompletionMetrics = {
-	heroWidth: number;
-	heroHeight: number;
-	mosaicWidth: number;
-	mosaicHeight: number;
-	mosaicTop: number;
-};
-
-export function getHeroMosaicCompletionTransform({
-	heroWidth,
-	heroHeight,
-	mosaicWidth,
-	mosaicHeight,
-	mosaicTop,
-}: HeroMosaicCompletionMetrics) {
-	const safeMosaicWidth = Math.max(1, mosaicWidth);
-	const safeMosaicHeight = Math.max(1, mosaicHeight);
-	return {
-		y: heroHeight / 2 - (mosaicTop + safeMosaicHeight / 2),
-		scale: Math.max(heroWidth / safeMosaicWidth, heroHeight / safeMosaicHeight),
-	};
 }
 
 export function getHeroPinEndDistance(

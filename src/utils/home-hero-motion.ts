@@ -99,6 +99,17 @@ export function getHeroPinEndDistance(
 	return Math.max(0, configured, Math.round(viewport * minViewports));
 }
 
+export function getHeroMosaicAspectRatio(
+	configuredRatio: number | undefined,
+	fallback = 2,
+) {
+	return typeof configuredRatio === "number" &&
+		Number.isFinite(configuredRatio) &&
+		configuredRatio > 0
+		? configuredRatio
+		: fallback;
+}
+
 export function getHeroTextFadeTargets<T>(
 	contact: T | null,
 	_signature: T | null,

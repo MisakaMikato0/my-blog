@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
 	createHeroTileLayout,
+	getHeroMosaicAspectRatio,
 	getHeroPinEndDistance,
 	getHeroTextFadeTargets,
 	HERO_INTERACTION_HOLD_START,
@@ -32,6 +33,14 @@ describe("getHeroPinEndDistance", () => {
 		expect(getHeroPinEndDistance(Number.NaN, 800, 2)).toBe(1600);
 		expect(getHeroPinEndDistance(500, Number.POSITIVE_INFINITY, 2)).toBe(500);
 		expect(getHeroPinEndDistance(500, 800, Number.NaN)).toBe(500);
+	});
+});
+
+describe("getHeroMosaicAspectRatio", () => {
+	it("keeps the source image ratio and falls back for invalid values", () => {
+		expect(getHeroMosaicAspectRatio(827 / 472)).toBeCloseTo(827 / 472);
+		expect(getHeroMosaicAspectRatio(Number.NaN)).toBe(2);
+		expect(getHeroMosaicAspectRatio(0)).toBe(2);
 	});
 });
 

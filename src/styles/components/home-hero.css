@@ -61,7 +61,7 @@ html:has(.home-hero) #top-row {
 	bottom: clamp(1rem, 3vh, 2.75rem);
 	z-index: 1;
 	width: min(84vw, 90rem);
-	aspect-ratio: 2 / 1;
+	aspect-ratio: var(--home-hero-mosaic-aspect-ratio, 2 / 1);
 	transform: translateX(-50%);
 	transform-origin: 50% 50%;
 	will-change: transform, opacity;

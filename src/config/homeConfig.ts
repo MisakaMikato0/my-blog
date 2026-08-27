@@ -26,6 +26,7 @@ export const homeConfig: HomeConfig = {
 		mosaic: {
 			rows: 4,
 			columns: 6,
+			aspectRatio: 827 / 472,
 			idleVisible: 6,
 			idleInterval: 900,
 			seed: 20260814,

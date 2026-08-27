@@ -295,6 +295,8 @@ export type HeroMosaicInitialTile = {
 export type HeroMosaicConfig = {
 	rows: number;
 	columns: number;
+	/** 桌面拼图容器比例，默认与桌面 Hero 原图保持一致。 */
+	aspectRatio?: number;
 	idleVisible: number;
 	idleInterval: number;
 	seed: number;

@@ -1,3 +1,4 @@
+import matter from "gray-matter";
 import { describe, expect, it } from "vitest";
 import {
 	createJsonResponse,
@@ -107,10 +108,16 @@ describe("Wiki conversion", () => {
 		expect(index.articles[0]).toMatchObject({
 			id: "notes/example",
 			title: "Example",
+			description: "描述",
+			published: "2026-01-02T00:00:00.000Z",
+			updated: "2026-01-03T00:00:00.000Z",
+			category: "技术",
+			tags: ["Astro", "wiki"],
 			url: "https://example.com/notes/example/",
 			jsonUrl: "https://example.com/wiki/articles/notes/example.json",
 			markdownUrl: "https://example.com/wiki/articles/notes/example.md",
 			headings: ["Intro"],
+			excerpt: "描述",
 			characterCount: 8,
 		});
 	});
@@ -147,12 +154,20 @@ describe("Wiki responses", () => {
 			"public, max-age=3600, stale-while-revalidate=86400",
 		);
 		const markdownText = await markdown.text();
-		expect(markdownText).toContain('title: "Example"');
-		expect(markdownText).toContain('description: "描述"');
-		expect(markdownText).toContain("published: 2026-01-02T00:00:00.000Z");
-		expect(markdownText).toContain('tags: ["Astro","wiki"]');
-		expect(markdownText).toContain("canonical: https://example.com/notes/example/");
-		expect(markdownText).toContain("# Intro");
-		expect(markdownText).toContain("正文");
+		const parsedMarkdown = matter(markdownText);
+		expect(parsedMarkdown.data).toMatchObject({
+			title: "Example",
+			description: "描述",
+			category: "技术",
+			tags: ["Astro", "wiki"],
+			canonical: "https://example.com/notes/example/",
+		});
+		expect(new Date(parsedMarkdown.data.published).toISOString()).toBe(
+			"2026-01-02T00:00:00.000Z",
+		);
+		expect(new Date(parsedMarkdown.data.updated).toISOString()).toBe(
+			"2026-01-03T00:00:00.000Z",
+		);
+		expect(parsedMarkdown.content.trimEnd()).toBe("# Intro\n\n正文");
 	});
 });

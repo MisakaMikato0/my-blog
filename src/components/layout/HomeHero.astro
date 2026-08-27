@@ -14,6 +14,7 @@ const signatureText =
 		: homeConfig.bio?.[0] || "");
 const runtimeConfig = {
 	mosaic: hero.mosaic,
+	images: hero.backgroundImages ?? [hero.backgroundImage],
 	rain: {
 		enabled: hero.rain?.enabled ?? true,
 		intensity: hero.rain?.intensity ?? 0.6,

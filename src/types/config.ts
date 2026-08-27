@@ -330,6 +330,8 @@ export type HomeConfig = {
 	bio?: string | string[];
 	hero: {
 		backgroundImage: string;
+		/** 每次刷新随机挑选的备选背景图列表（不含则固定使用 backgroundImage）。 */
+		backgroundImages?: string[];
 		backgroundImageMobile?: string;
 		mosaic: HeroMosaicConfig;
 		contact?: HeroContactConfig;

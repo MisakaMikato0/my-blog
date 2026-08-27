@@ -14,6 +14,21 @@ export type HeroTileLayout = {
 
 export const HERO_INTERACTION_HOLD_START = 1.05;
 
+export function pickHeroImage(
+	images: readonly string[],
+	random: () => number = Math.random,
+) {
+	const candidates = images.filter((image) => image.trim().length > 0);
+	if (candidates.length === 0) return "";
+	const value = random();
+	const randomValue = Number.isFinite(value) ? value : 0;
+	const index = Math.min(
+		candidates.length - 1,
+		Math.max(0, Math.floor(randomValue * candidates.length)),
+	);
+	return candidates[index] ?? "";
+}
+
 type HeroTileLayoutOptions = {
 	rows: number;
 	columns: number;

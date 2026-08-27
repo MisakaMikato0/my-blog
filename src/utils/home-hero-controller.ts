@@ -6,6 +6,7 @@ import {
 	getHeroPinEndDistance,
 	getHeroTextFadeTargets,
 	HERO_INTERACTION_HOLD_START,
+	pickHeroImage,
 } from "@/utils/home-hero-motion";
 import { initHomeHeroRain } from "@/utils/home-hero-rain";
 
@@ -39,6 +40,7 @@ function createSeededRandom(seed: number) {
 
 type HeroRuntimeConfig = {
 	mosaic: HeroMosaicConfig;
+	images?: string[];
 	rain: {
 		enabled?: boolean;
 		intensity?: number;
@@ -142,6 +144,22 @@ export function mountHomeHero() {
 		"[data-hero-mosaic-complete]",
 	);
 	const backdrop = hero.querySelector<HTMLElement>("[data-hero-backdrop]");
+	const visual = mosaic?.parentElement;
+	const selectedImage = pickHeroImage(config.images ?? []);
+	if (visual && selectedImage) {
+		visual.style.setProperty(
+			"--home-hero-mosaic-image",
+			`url(${JSON.stringify(selectedImage)})`,
+		);
+		const backdropImage = visual.querySelector<HTMLImageElement>(
+			".home-hero__backdrop-image",
+		);
+		if (backdropImage) backdropImage.src = selectedImage;
+		const completeImage = visual.querySelector<HTMLImageElement>(
+			".home-hero__mosaic-complete img",
+		);
+		if (completeImage) completeImage.src = selectedImage;
+	}
 	const signature = hero.querySelector<HTMLElement>("[data-hero-signature]");
 	const nextSection = hero.nextElementSibling as HTMLElement | null;
 	const tiles = getTileStates(hero);

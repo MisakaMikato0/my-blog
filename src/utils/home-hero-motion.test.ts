@@ -5,6 +5,7 @@ import {
 	getHeroPinEndDistance,
 	getHeroTextFadeTargets,
 	HERO_INTERACTION_HOLD_START,
+	pickHeroImage,
 } from "@/utils/home-hero-motion";
 
 describe("createHeroTileLayout", () => {
@@ -19,6 +20,16 @@ describe("createHeroTileLayout", () => {
 		expect(tiles).toHaveLength(24);
 		expect(new Set(tiles.map((tile) => tile.order)).size).toBe(24);
 		expect(tiles.filter((tile) => tile.initiallyVisible)).toHaveLength(6);
+	});
+});
+
+describe("pickHeroImage", () => {
+	it("selects a candidate image for each refresh and ignores empty candidates", () => {
+		const images = ["", "/hero-a.webp", "/hero-b.webp"];
+
+		expect(pickHeroImage(images, () => 0)).toBe("/hero-a.webp");
+		expect(pickHeroImage(images, () => 0.99)).toBe("/hero-b.webp");
+		expect(pickHeroImage([], () => 0.5)).toBe("");
 	});
 });
 

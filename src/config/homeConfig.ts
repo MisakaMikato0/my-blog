@@ -22,6 +22,14 @@ export const homeConfig: HomeConfig = {
 
 	hero: {
 		backgroundImage: "/assets/images/home/hero-home.webp",
+		// 每次刷新随机换一张作为马赛克拼合图。
+		backgroundImages: [
+			"/assets/images/home/hero-home.webp",
+			"/assets/images/home/hero-home1.png",
+			"/assets/images/home/hero-home2.jpg",
+			"/assets/images/home/hero-home3.jpg",
+			"/assets/images/home/hero-home4.jpg",
+		],
 		backgroundImageMobile: "/assets/images/home/home-mobile.avif",
 		mosaic: {
 			rows: 4,

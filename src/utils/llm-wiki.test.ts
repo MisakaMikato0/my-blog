@@ -45,11 +45,27 @@ describe("Wiki visibility", () => {
 
 describe("Wiki conversion", () => {
 	it("strips presentation-only Markdown and keeps semantic text", () => {
-		expect(
-			stripMarkdown(
-				"# 标题\n\n[链接](https://example.com)\n\n[inline code]\n\n[code block]",
-			),
-		).toBe("标题 链接 inline code code block");
+		const markdown = [
+			"# 标题",
+			"",
+			"![封面](cover.png)",
+			"",
+			"[链接](https://example.com) 与 `inline code`",
+			"",
+			"```ts",
+			"const hidden = true;",
+			"```",
+			"",
+			"<div>HTML 文本</div>",
+			"",
+			"- 列表项",
+			"1. 第二项",
+		].join("\n");
+
+		expect(stripMarkdown(markdown)).toBe(
+			"标题 封面 链接 与 inline code HTML 文本 列表项 第二项",
+		);
+		expect(stripMarkdown(markdown)).not.toContain("const hidden = true;");
 	});
 
 	it("creates sections, stable heading ids, URLs, and character counts", () => {
@@ -71,7 +87,7 @@ describe("Wiki conversion", () => {
 			"setup",
 			"setup-1",
 		]);
-		expect(article.characterCount).toBeGreaterThan(0);
+		expect(article.characterCount).toBe(23);
 	});
 
 	it("creates an index using only the supplied public posts", () => {
@@ -88,6 +104,15 @@ describe("Wiki conversion", () => {
 			generatedAt: "2026-01-04T00:00:00.000Z",
 		});
 		expect(index.articles).toHaveLength(1);
+		expect(index.articles[0]).toMatchObject({
+			id: "notes/example",
+			title: "Example",
+			url: "https://example.com/notes/example/",
+			jsonUrl: "https://example.com/wiki/articles/notes/example.json",
+			markdownUrl: "https://example.com/wiki/articles/notes/example.md",
+			headings: ["Intro"],
+			characterCount: 8,
+		});
 	});
 });
 
@@ -100,12 +125,34 @@ describe("Wiki responses", () => {
 		expect(json.headers.get("Content-Type")).toBe(
 			"application/json; charset=utf-8",
 		);
-		expect(await json.json()).toMatchObject({ id: "notes/example" });
+		expect(json.headers.get("Cache-Control")).toBe(
+			"public, max-age=3600, stale-while-revalidate=86400",
+		);
+		const jsonBody = await json.json();
+		expect(jsonBody).toMatchObject({
+			id: "notes/example",
+			description: "描述",
+			published: "2026-01-02T00:00:00.000Z",
+			tags: ["Astro", "wiki"],
+			url: "https://example.com/notes/example/",
+			sections: [
+				{ id: "intro", heading: "Intro", content: "正文" },
+			],
+			content: "# Intro\n\n正文",
+		});
 		expect(markdown.headers.get("Content-Type")).toBe(
 			"text/markdown; charset=utf-8",
 		);
+		expect(markdown.headers.get("Cache-Control")).toBe(
+			"public, max-age=3600, stale-while-revalidate=86400",
+		);
 		const markdownText = await markdown.text();
 		expect(markdownText).toContain('title: "Example"');
+		expect(markdownText).toContain('description: "描述"');
+		expect(markdownText).toContain("published: 2026-01-02T00:00:00.000Z");
+		expect(markdownText).toContain('tags: ["Astro","wiki"]');
+		expect(markdownText).toContain("canonical: https://example.com/notes/example/");
 		expect(markdownText).toContain("# Intro");
+		expect(markdownText).toContain("正文");
 	});
 });

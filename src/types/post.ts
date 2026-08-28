@@ -4,6 +4,7 @@ export interface PostData {
 	published: Date;
 	updated?: Date;
 	draft?: boolean;
+	wikiExclude?: boolean;
 	description?: string;
 	image?: string;
 	tags?: string[];

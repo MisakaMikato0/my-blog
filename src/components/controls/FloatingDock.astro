@@ -18,11 +18,6 @@ const tags = await getTagList();
 ---
 
 <div class="floating-dock" id="floating-dock">
-	<button class="dock-btn dock-btn-ai-search" id="dock-ai-search-btn" aria-label="AI 搜索" type="button" data-tooltip="AI 搜索">
-		<span class="dock-btn-icon"><Icon name="ri:ai" class="text-3xl" /></span>
-		<span class="dock-btn-label">AI 搜索</span>
-	</button>
-
 	{musicPlayerConfig.showInNavbar !== false && (
 		<button class="dock-btn dock-btn-music" id="dock-music-btn" aria-label={i18n(I18nKey.music)} type="button" data-tooltip={i18n(I18nKey.music)}>
 			<span class="dock-btn-icon"><Icon name="material-symbols:music-note-rounded" class="text-3xl" /></span>
@@ -341,14 +336,6 @@ const tags = await getTagList();
 		document.getElementById("dock-comment-btn")?.addEventListener("click", (e) => {
 			e.stopPropagation();
 			document.getElementById("post-comments")?.scrollIntoView({ behavior: "smooth", block: "start" });
-		});
-
-		// AI 搜索
-		document.getElementById("dock-ai-search-btn")?.addEventListener("click", (e) => {
-			e.stopPropagation();
-			window.dispatchEvent(new CustomEvent("toggle-ai-search"));
-			closeAllDrawers();
-			collapseDock();
 		});
 
 		function updateScrollDependent() {

@@ -504,7 +504,6 @@ export const en: Translation = {
 	[Key.copyTemplate]: "Copy template",
 
 	// ===== 悬浮坞 / 导航 / 主题 =====
-	[Key.aiSearch]: "AI Search",
 	[Key.switchToDark]: "Switch to dark mode",
 	[Key.switchToLight]: "Switch to light mode",
 	[Key.spineModel]: "Spine model",
@@ -519,8 +518,6 @@ export const en: Translation = {
 	[Key.searchPlaceholder2]: "Type a keyword to start searching",
 	[Key.searchPlaceholder3]: "Try searching for 'Astro' or 'Svelte'",
 	[Key.searchPlaceholder4]: "Press ESC to close the search panel",
-	[Key.searchPlaceholder5]:
-		"Ctrl+K switches between AI search and normal search",
 	[Key.searchViewAllPrefix]: "View all",
 	[Key.searchViewAllSuffix]: "results →",
 	[Key.searchHintClose]: "ESC to close",

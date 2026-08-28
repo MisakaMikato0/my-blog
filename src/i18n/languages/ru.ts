@@ -504,7 +504,6 @@ export const ru: Translation = {
 	[Key.copyTemplate]: "Копировать шаблон",
 
 	// ===== 悬浮坞 / 导航 / 主题 =====
-	[Key.aiSearch]: "ИИ-поиск",
 	[Key.switchToDark]: "Включить тёмную тему",
 	[Key.switchToLight]: "Включить светлую тему",
 	[Key.spineModel]: "Модель Spine",
@@ -519,7 +518,6 @@ export const ru: Translation = {
 	[Key.searchPlaceholder2]: "Введите ключевое слово",
 	[Key.searchPlaceholder3]: "Попробуйте «Astro» или «Svelte»",
 	[Key.searchPlaceholder4]: "ESC — закрыть панель поиска",
-	[Key.searchPlaceholder5]: "Ctrl+K — переключить ИИ-поиск / обычный поиск",
 	[Key.searchViewAllPrefix]: "Все",
 	[Key.searchViewAllSuffix]: "результатов →",
 	[Key.searchHintClose]: "ESC закрыть",

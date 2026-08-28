@@ -491,7 +491,6 @@ export const zh_CN: Translation = {
 	[Key.copyTemplate]: "复制模板",
 
 	// ===== 悬浮坞 / 导航 / 主题 =====
-	[Key.aiSearch]: "AI 搜索",
 	[Key.switchToDark]: "暗色",
 	[Key.switchToLight]: "亮色",
 	[Key.spineModel]: "Spine 模型",
@@ -506,7 +505,6 @@ export const zh_CN: Translation = {
 	[Key.searchPlaceholder2]: "输入关键词开始搜索",
 	[Key.searchPlaceholder3]: "试试搜索「Astro」或「Svelte」",
 	[Key.searchPlaceholder4]: "按 ESC 关闭搜索面板",
-	[Key.searchPlaceholder5]: "Ctrl+K 快速切换AI搜索/普通搜索",
 	[Key.searchViewAllPrefix]: "查看全部",
 	[Key.searchViewAllSuffix]: "条结果 →",
 	[Key.searchHintClose]: "ESC 关闭",

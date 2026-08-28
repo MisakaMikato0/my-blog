@@ -530,7 +530,6 @@ enum I18nKey {
 
 	// ===== 上游 1497c35 补齐键 =====
 	copyTemplate = "copyTemplate",
-	aiSearch = "aiSearch",
 	switchToDark = "switchToDark",
 	switchToLight = "switchToLight",
 	spineModel = "spineModel",
@@ -543,7 +542,6 @@ enum I18nKey {
 	searchPlaceholder2 = "searchPlaceholder2",
 	searchPlaceholder3 = "searchPlaceholder3",
 	searchPlaceholder4 = "searchPlaceholder4",
-	searchPlaceholder5 = "searchPlaceholder5",
 	searchViewAllPrefix = "searchViewAllPrefix",
 	searchViewAllSuffix = "searchViewAllSuffix",
 	searchHintClose = "searchHintClose",

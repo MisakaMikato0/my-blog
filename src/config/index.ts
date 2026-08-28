@@ -48,7 +48,6 @@ export type {
 	MermaidThemeName,
 } from "../types/mermaidConfig";
 // 核心配置
-export { aiSearchConfig } from "./aiSearchConfig"; // AI 搜索配置
 export { announcementConfig } from "./announcementConfig"; // 公告配置
 export { calendarConfig } from "./calendarConfig"; // 日历配置
 export { collectionsApiConfig } from "./collectionsApiConfig"; // 收藏API配置

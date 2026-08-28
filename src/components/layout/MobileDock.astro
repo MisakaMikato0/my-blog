@@ -62,10 +62,6 @@ const showSpine = !!spineModelConfig?.enable;
 <div class="mobile-dock__sheet" id="mobile-dock-sheet">
 	<div class="mobile-dock__sheet-title">工具</div>
 	<div class="mobile-dock__sheet-grid" id="mobile-dock-sheet-grid">
-		<button class="mobile-dock__sheet-item" id="md-ai-search-btn" aria-label="AI 搜索" type="button">
-			<span class="mobile-dock__sheet-item-icon"><Icon name="ri:ai" is:inline /></span>
-			<span class="mobile-dock__sheet-item-label">AI 搜索</span>
-		</button>
 		{showMusic && (
 			<button class="mobile-dock__sheet-item" id="md-music-btn" aria-label="音乐" type="button">
 				<span class="mobile-dock__sheet-item-icon"><Icon name="material-symbols:music-note-rounded" is:inline /></span>
@@ -325,13 +321,6 @@ const showSpine = !!spineModelConfig?.enable;
 					document.getElementById(dockBtnId)?.click();
 				}, 50);
 			});
-		});
-
-		// AI 搜索：直接 dispatch 事件
-		document.getElementById("md-ai-search-btn")?.addEventListener("click", (e) => {
-			e.stopPropagation();
-			closeSheet();
-			window.dispatchEvent(new CustomEvent("toggle-ai-search"));
 		});
 
 		// 日历：在 sheet 内切换到日历小组件视图

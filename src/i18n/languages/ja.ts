@@ -501,7 +501,6 @@ export const ja: Translation = {
 	[Key.copyTemplate]: "テンプレートをコピー",
 
 	// ===== 悬浮坞 / 导航 / 主题 =====
-	[Key.aiSearch]: "AI検索",
 	[Key.switchToDark]: "ダークモードに切替",
 	[Key.switchToLight]: "ライトモードに切替",
 	[Key.spineModel]: "Spineモデル",
@@ -516,7 +515,6 @@ export const ja: Translation = {
 	[Key.searchPlaceholder2]: "キーワードを入力して検索",
 	[Key.searchPlaceholder3]: "「Astro」や「Svelte」を試してみて",
 	[Key.searchPlaceholder4]: "ESCで検索パネルを閉じる",
-	[Key.searchPlaceholder5]: "Ctrl+KでAI検索と通常検索を切替",
 	[Key.searchViewAllPrefix]: "すべて見る",
 	[Key.searchViewAllSuffix]: "件の結果 →",
 	[Key.searchHintClose]: "ESC 閉じる",

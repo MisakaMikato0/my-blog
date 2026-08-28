@@ -1,9 +1,14 @@
-import { readFileSync } from "node:fs";
-import { existsSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 
 const readSource = (path: string) =>
-	readFileSync(new URL(`./${path.slice(4)}`, import.meta.url), "utf8");
+	readFileSync(
+		new URL(
+			path.startsWith("src/") ? `./${path.slice(4)}` : `../${path}`,
+			import.meta.url,
+		),
+		"utf8",
+	);
 
 describe("AI search removal", () => {
 	it("keeps the ordinary Pagefind search flow wired", () => {
@@ -22,7 +27,7 @@ describe("AI search removal", () => {
 		expect(mobileDock).toContain("requestSearchModalToggle()");
 	});
 
-		it("removes AI search entry points, lazy loading, and shared symbols", () => {
+	it("removes AI search entry points, lazy loading, and shared symbols", () => {
 		const files = [
 			"src/components/controls/FloatingDock.astro",
 			"src/components/layout/MobileDock.astro",

@@ -154,6 +154,9 @@ export default defineConfig({
 		}),
 		svelte(),
 		sitemap({
+			customPages: [
+				new URL("/wiki/index.json", siteConfig.site_url).toString(),
+			],
 			filter: (page) => {
 				// 根据页面开关配置过滤sitemap
 				const url = new URL(page);

@@ -57,7 +57,7 @@ function jsonResponse(payload: unknown, status: number): Response {
 	});
 }
 
-/** 从 Env 解析 AI 配置：优先 DEEPSEEK_*，回退 AI_API_KEY + aiSearchConfig */
+/** 从 Env 解析解卦 AI 配置：优先 DEEPSEEK_*，回退 AI_API_KEY */
 function resolveAiConfig(env: Env) {
 	const apiKey = env.DEEPSEEK_API_KEY ?? env.AI_API_KEY;
 	const apiUrl =

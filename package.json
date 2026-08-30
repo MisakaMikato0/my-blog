@@ -16,8 +16,6 @@
 		"preinstall": "npx only-allow pnpm",
 		"icons": "node scripts/generate-icons.js",
 		"deploy": "git add . && (git commit -m \"auto deploy\" --allow-empty || true) && git push origin master",
-		"build-index": "tsx scripts/ai-search/build-index.ts",
-		"build-index:dry-run": "tsx scripts/ai-search/build-index.ts --dry-run",
 		"indexnow": "tsx scripts/indexnow.ts",
 		"worker:types": "wrangler types",
 		"test": "vitest run",

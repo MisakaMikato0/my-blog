@@ -7,7 +7,6 @@ const FIXED_DATE = new Date("2026-08-20T13:30:00+08:00");
 function buildEnv(overrides: Partial<Env> = {}): Env {
 	return {
 		AI: {} as Ai,
-		VECTORIZE: {} as VectorizeIndex,
 		ASSETS: {} as Fetcher,
 		...overrides,
 	} as Env;

@@ -2,8 +2,6 @@
 
 declare global {
 	interface Env {
-		AI: Ai;
-		VECTORIZE: VectorizeIndex;
 		ASSETS: Fetcher;
 		GITHUB_TOKEN?: string;
 		AI_API_KEY?: string;

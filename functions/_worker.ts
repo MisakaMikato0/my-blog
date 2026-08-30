@@ -1,4 +1,3 @@
-import { handleCloudflareAiSearch } from "../src/workers/cloudflare/ai-search/runtime";
 import { handleDivinationInterpret } from "../src/workers/cloudflare/divination-ai/handler";
 import { handleDynamic } from "../src/workers/cloudflare/dynamic/handler";
 import { handleGithubContributions } from "../src/workers/cloudflare/github-contributions/handler";
@@ -44,9 +43,6 @@ export default {
 	async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
 		const url = new URL(request.url);
 
-		if (url.pathname === "/api/ai-chat") {
-			return handleCloudflareAiSearch(request, env);
-		}
 		if (url.pathname === "/api/divination/interpret") {
 			return handleDivinationInterpret(request, env);
 		}

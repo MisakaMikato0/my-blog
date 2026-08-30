@@ -5,7 +5,6 @@ declare global {
 		ASSETS: Fetcher;
 		GITHUB_TOKEN?: string;
 		AI_API_KEY?: string;
-		ALLOWED_ORIGINS?: string;
 		PUBLIC_SITE_URL?: string;
 		GALLERY_ADMIN_TOKEN?: string;
 		DYNAMIC_ADMIN_TOKEN?: string;

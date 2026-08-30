@@ -1,5 +1,10 @@
 import matter from "gray-matter";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
+
+vi.mock("@/utils/content-utils", () => ({
+	getSortedPosts: vi.fn(),
+}));
+
 import {
 	createJsonResponse,
 	createMarkdownResponse,
@@ -75,7 +80,7 @@ describe("Wiki conversion", () => {
 			"https://example.com/",
 		);
 
-		expect(article.url).toBe("https://example.com/notes/example/");
+		expect(article.url).toBe("https://example.com/posts/notes/example/");
 		expect(article.jsonUrl).toBe(
 			"https://example.com/wiki/articles/notes/example.json",
 		);
@@ -84,7 +89,7 @@ describe("Wiki conversion", () => {
 		);
 		expect(article.headings).toEqual(["Setup", "Setup"]);
 		expect(article.sections.map(({ id }) => id)).toEqual([
-			"intro",
+			"example",
 			"setup",
 			"setup-1",
 		]);
@@ -113,7 +118,7 @@ describe("Wiki conversion", () => {
 			updated: "2026-01-03T00:00:00.000Z",
 			category: "技术",
 			tags: ["Astro", "wiki"],
-			url: "https://example.com/notes/example/",
+			url: "https://example.com/posts/notes/example/",
 			jsonUrl: "https://example.com/wiki/articles/notes/example.json",
 			markdownUrl: "https://example.com/wiki/articles/notes/example.md",
 			headings: ["Intro"],
@@ -141,10 +146,8 @@ describe("Wiki responses", () => {
 			description: "描述",
 			published: "2026-01-02T00:00:00.000Z",
 			tags: ["Astro", "wiki"],
-			url: "https://example.com/notes/example/",
-			sections: [
-				{ id: "intro", heading: "Intro", content: "正文" },
-			],
+			url: "https://example.com/posts/notes/example/",
+			sections: [{ id: "intro", heading: "Intro", content: "正文" }],
 			content: "# Intro\n\n正文",
 		});
 		expect(markdown.headers.get("Content-Type")).toBe(
@@ -160,7 +163,7 @@ describe("Wiki responses", () => {
 			description: "描述",
 			category: "技术",
 			tags: ["Astro", "wiki"],
-			canonical: "https://example.com/notes/example/",
+			canonical: "https://example.com/posts/notes/example/",
 		});
 		expect(new Date(parsedMarkdown.data.published).toISOString()).toBe(
 			"2026-01-02T00:00:00.000Z",

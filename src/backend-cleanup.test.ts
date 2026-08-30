@@ -1,7 +1,7 @@
 import {
 	existsSync,
-	mkdtempSync,
 	mkdirSync,
+	mkdtempSync,
 	readFileSync,
 	rmSync,
 	writeFileSync,
@@ -11,10 +11,10 @@ import path from "node:path";
 import { describe, expect, it } from "vitest";
 import { loadPostFiles } from "../scripts/post-loader";
 
-const root = new URL("../", import.meta.url);
+const root = process.cwd();
 
 function readRootFile(relativePath: string): string {
-	return readFileSync(new URL(relativePath, root), "utf8");
+	return readFileSync(path.join(root, relativePath), "utf8");
 }
 
 describe("AI search backend cleanup", () => {
@@ -37,12 +37,16 @@ describe("AI search backend cleanup", () => {
 		const indexnow = readRootFile("scripts/indexnow.ts");
 		const workerTypes = readRootFile("worker-configuration.d.ts");
 
-		expect(existsSync(new URL("src/worker.ts", root))).toBe(false);
-		expect(existsSync(new URL("src/server/ai-search", root))).toBe(false);
-		expect(existsSync(new URL("src/workers/cloudflare/ai-search", root))).toBe(false);
-		expect(existsSync(new URL("scripts/ai-search", root))).toBe(false);
-		expect(existsSync(new URL("src/config/aiSearchConfig.ts", root))).toBe(false);
-		expect(existsSync(new URL("src/types/ai-search.ts", root))).toBe(false);
+		expect(existsSync(path.join(root, "src/worker.ts"))).toBe(false);
+		expect(existsSync(path.join(root, "src/server/ai-search"))).toBe(false);
+		expect(
+			existsSync(path.join(root, "src/workers/cloudflare/ai-search")),
+		).toBe(false);
+		expect(existsSync(path.join(root, "scripts/ai-search"))).toBe(false);
+		expect(existsSync(path.join(root, "src/config/aiSearchConfig.ts"))).toBe(
+			false,
+		);
+		expect(existsSync(path.join(root, "src/types/ai-search.ts"))).toBe(false);
 		expect(packageJson).not.toContain("build-index");
 		expect(packageJson).not.toContain("scripts/ai-search");
 		expect(tsconfig).not.toContain("scripts/ai-search");
@@ -51,7 +55,9 @@ describe("AI search backend cleanup", () => {
 		expect(workerTypes).not.toContain("VECTORIZE");
 		expect(workerTypes).not.toContain("AI: Ai");
 		expect(packageJson).toContain('"worker:types": "wrangler types"');
-		expect(packageJson).toContain('"test:worker": "vitest run --config vitest.config.ts"');
+		expect(packageJson).toContain(
+			'"test:worker": "vitest run --config vitest.config.ts"',
+		);
 		expect(packageJson).toContain('"wrangler": "4.110.0"');
 	});
 

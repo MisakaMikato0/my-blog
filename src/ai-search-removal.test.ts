@@ -14,7 +14,9 @@ describe("AI search removal", () => {
 	it("keeps the ordinary Pagefind search flow wired", () => {
 		const layout = readSource("src/layouts/Layout.astro");
 		const modal = readSource("src/components/controls/SearchModal.svelte");
-		const floatingDock = readSource("src/components/controls/FloatingDock.astro");
+		const floatingDock = readSource(
+			"src/components/controls/FloatingDock.astro",
+		);
 		const mobileDock = readSource("src/components/layout/MobileDock.astro");
 
 		expect(layout).toContain("@/components/controls/SearchModal.svelte");
@@ -58,7 +60,11 @@ describe("AI search removal", () => {
 			expect(source).not.toContain(token);
 		}
 
-		expect(existsSync(new URL("./components/controls/ai-search", import.meta.url))).toBe(false);
-		expect(existsSync(new URL("./styles/components/ai-search.css", import.meta.url))).toBe(false);
+		expect(
+			existsSync(new URL("./components/controls/ai-search", import.meta.url)),
+		).toBe(false);
+		expect(
+			existsSync(new URL("./styles/components/ai-search.css", import.meta.url)),
+		).toBe(false);
 	});
 });

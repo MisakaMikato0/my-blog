@@ -20,3 +20,21 @@ export function getDisplayPinEndDistance(
 
 	return Math.max(Number.isFinite(configured) ? configured : 0, fallback);
 }
+
+/**
+ * Convert a scroll boundary into the GSAP timeline time required to make it
+ * occur at that boundary when the timeline has a fixed duration after the
+ * boundary. The result solves:
+ *   boundary / totalScroll = start / (start + trailingDuration)
+ */
+export function getTimelineOffsetForScrollBoundary(
+	boundaryDistance,
+	totalScrollDistance,
+	trailingDuration,
+) {
+	const boundary = Math.max(0, Number(boundaryDistance) || 0);
+	const total = Math.max(boundary, Number(totalScrollDistance) || 0);
+	const trailing = Math.max(0, Number(trailingDuration) || 0);
+	if (total <= boundary || trailing === 0) return boundary === 0 ? 0 : trailing;
+	return (boundary * trailing) / (total - boundary);
+}

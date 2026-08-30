@@ -322,6 +322,42 @@ export type HeroSignatureConfig = {
 	text: string;
 };
 
+export type HomeBlindsSceneItem = {
+	eyebrow: string;
+	title: string;
+	description: string;
+	image: string;
+	alt: string;
+};
+
+export type HomeBlindsHeadlineConfig = {
+	title: string;
+	messages: string[];
+	enterDuration?: number;
+	messageHold?: number;
+	messageFlipDuration?: number;
+};
+
+export type HomeBlindsConfig = {
+	enabled: boolean;
+	reveal: {
+		backgroundImage: string;
+		foregroundImage: string;
+		foregroundAlt: string;
+		foregroundOpacity: number;
+		pointerTravel: number;
+		headline: HomeBlindsHeadlineConfig;
+	};
+	scenes: {
+		scrollDistance: number;
+		cycleImages: string[];
+		cycleDuration: number;
+		composite: Omit<HomeBlindsSceneItem, "image" | "alt"> & { alt: string };
+		items: HomeBlindsSceneItem[];
+		standImages: string[];
+	};
+};
+
 export type HomeConfig = {
 	avatar?: string;
 	name: string;
@@ -351,6 +387,7 @@ export type HomeConfig = {
 		archiveImage: string;
 		contactImage: string;
 	};
+	homeBlinds: HomeBlindsConfig;
 	/** 展示层：垂直线 → 长柱 → 字体显隐 → 柱子扩全屏，衔接百叶窗 */
 	displayLayer: HomeDisplayLayerConfig;
 	portfolioShutter: HomePortfolioShutterConfig;

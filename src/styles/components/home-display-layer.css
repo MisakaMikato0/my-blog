@@ -100,10 +100,7 @@
 	position: absolute;
 	inset: 0;
 	z-index: 3;
-	display: grid;
-	grid-template-columns: 1fr var(--display-pillar-final-width, 18vw) 1fr;
-	align-items: center;
-	justify-items: center;
+	overflow: hidden;
 	pointer-events: none;
 }
 

@@ -33,6 +33,17 @@
 	margin: 0 auto;
 }
 
+@media (min-width: 769px) {
+	.home-data-layer {
+		--guide-row-height: clamp(9rem, min(14vw, 18svh), 14rem);
+		box-sizing: border-box;
+		display: flex;
+		align-items: center;
+		min-height: 100vh;
+		min-height: 100svh;
+	}
+}
+
 .home-data-layer__heading {
 	display: flex;
 	flex-direction: column;
@@ -67,9 +78,31 @@
 	letter-spacing: 0;
 }
 
-.home-data-layer[data-guide-opening="playing"] .home-data-layer__title-matrix,
+@media (min-width: 769px) and (prefers-reduced-motion: no-preference) {
+	.home-data-layer[data-guide-opening="pending"] .home-data-layer__kicker,
+	.home-data-layer[data-guide-opening="pending"] .home-data-layer__title-main,
+	.home-data-layer[data-guide-opening="pending"] .home-data-layer__title-matrix,
+	.home-data-layer[data-guide-opening="pending"] .home-data-layer__top-grid > .data-card,
+	.home-data-layer[data-guide-opening="pending"] .home-guide-grid > .guide-card {
+		visibility: hidden;
+	}
+}
+
+.home-data-layer[data-guide-opening="playing"] .home-data-layer__kicker,
+.home-data-layer[data-guide-opening="playing"] .home-data-layer__title-main,
+.home-data-layer[data-guide-opening="playing"] .home-data-layer__title-matrix {
+	will-change: opacity, filter;
+}
+
 .home-data-layer[data-guide-opening="playing"] .data-card,
-.home-data-layer[data-guide-opening="playing"] .guide-card,
+.home-data-layer[data-guide-opening="playing"] .guide-card {
+	will-change: transform, opacity;
+}
+
+.home-data-layer[data-guide-opening="playing"] .guide-card {
+	transition: none;
+}
+
 .home-data-layer[data-guide-opening="playing"] .weather-widget {
 	will-change: transform, opacity, clip-path, filter;
 }
@@ -77,7 +110,8 @@
 .home-guide-grid {
 	display: grid;
 	grid-template-columns: repeat(3, minmax(0, 1fr));
-	grid-template-rows: repeat(2, var(--guide-row-height));
+	/* 行高只作为最小值：内容较多时允许卡片撑高，避免标签/分类被裁切。 */
+	grid-template-rows: repeat(2, minmax(var(--guide-row-height), auto));
 	gap: var(--guide-gap);
 	min-height: 0;
 }
@@ -295,12 +329,12 @@
 	transition: opacity 180ms ease, transform 180ms ease, color 180ms ease;
 }
 
-.guide-rotator__title-row:hover,
+.guide-rotator__slide:hover .guide-rotator__title-row,
 .guide-rotator__title-row:focus-within {
 	transform: translateY(-0.3rem);
 }
 
-.guide-rotator__title-row:hover .guide-card__article-action,
+.guide-rotator__slide:hover .guide-card__article-action,
 .guide-rotator__title-row:focus-within .guide-card__article-action {
 	opacity: 1;
 	transform: translateX(0);
@@ -319,6 +353,7 @@
 	position: absolute;
 	inset: 0;
 	justify-content: center;
+	cursor: pointer;
 }
 
 .guide-card--pinned .guide-rotator__slides {
@@ -335,8 +370,13 @@
 }
 
 .guide-card--pinned .guide-rotator__dots button {
-	width: 0.6rem;
-	height: 0.6rem;
+	width: 0.5rem;
+	height: 0.5rem;
+}
+
+.guide-card--pinned .guide-rotator__dots button[aria-current="true"] {
+	width: 0.5rem;
+	height: 1.45rem;
 }
 
 .guide-card__topline {
@@ -410,10 +450,10 @@
 	font-weight: 700;
 	line-height: 1.4;
 	color: var(--guide-muted);
-	display: -webkit-box;
-	-webkit-box-orient: vertical;
-	-webkit-line-clamp: 2;
+	display: block;
 	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
 }
 
 .guide-rotator__meta {
@@ -428,25 +468,43 @@
 	margin-top: auto;
 }
 
+/* 分页圆点：默认纯色小圆点（无边框），当前项动效延展为小长条 */
 .guide-rotator__dots button {
-	width: 0.55rem;
-	height: 0.55rem;
+	width: 0.5rem;
+	height: 0.5rem;
 	padding: 0;
-	border: 1px solid currentColor;
-	border-radius: 50%;
-	background: transparent;
+	border: 0;
+	border-radius: 999px;
+	background: var(--guide-fg);
+	opacity: 0.32;
 	cursor: pointer;
-	transition: transform 160ms ease, background-color 160ms ease;
+	transition:
+		width 280ms cubic-bezier(0.16, 1, 0.3, 1),
+		height 280ms cubic-bezier(0.16, 1, 0.3, 1),
+		opacity 180ms ease;
+}
+
+.guide-rotator__dots button:hover {
+	opacity: 0.6;
+}
+
+.guide-rotator__dots button[aria-current="true"],
+.guide-rotator__dots button[aria-current="true"]:hover {
+	opacity: 1;
 }
 
 .guide-rotator__dots button[aria-current="true"] {
-	background: var(--guide-fg);
-	transform: scale(1.25);
+	width: 1.45rem;
 }
 
 .guide-card--categories,
 .guide-card--tags {
 	padding-bottom: 1rem;
+}
+
+/* 标签胶囊的散落姿态带向下的位移与旋转，会超出布局盒被裁切，底部多留余量 */
+.guide-card--tags {
+	padding-bottom: 3rem;
 }
 
 .guide-link-list {
@@ -469,13 +527,12 @@
 
 .guide-link-list a {
 	padding: 0.2rem 0;
-	border-bottom: 1px solid color-mix(in srgb, var(--guide-fg) 20%, transparent);
-	transition: color 240ms ease, border-color 240ms ease, transform 240ms ease;
+	transition: color 240ms ease, transform 240ms ease;
 }
 
 .guide-card--categories .guide-link-list a {
 	padding-inline: 0.55rem;
-	transition: background-color 180ms ease, border-color 180ms ease, color 0ms, transform 180ms ease;
+	transition: none;
 }
 
 .guide-link-list a:hover {
@@ -485,25 +542,6 @@
 .guide-link-list strong {
 	font-family: var(--font-mono, monospace);
 	font-size: 0.72rem;
-}
-
-.guide-card--categories:hover .guide-link-list a,
-.guide-card--categories:focus-within .guide-link-list a {
-	border-color: color-mix(in srgb, var(--guide-bg) 28%, transparent);
-	color: var(--guide-bg);
-}
-
-.guide-card--categories:hover .guide-link-list a:nth-child(1),
-.guide-card--categories:focus-within .guide-link-list a:nth-child(1) { transition-delay: 70ms; }
-.guide-card--categories:hover .guide-link-list a:nth-child(2),
-.guide-card--categories:focus-within .guide-link-list a:nth-child(2) { transition-delay: 110ms; }
-.guide-card--categories:hover .guide-link-list a:nth-child(3),
-.guide-card--categories:focus-within .guide-link-list a:nth-child(3) { transition-delay: 150ms; }
-
-.guide-card--categories:hover .guide-link-list a:hover,
-.guide-card--categories:focus-within .guide-link-list a:hover {
-	color: var(--guide-accent);
-	transform: translateX(0.2rem);
 }
 
 .guide-tag-list {
@@ -555,10 +593,6 @@
 	background: color-mix(in srgb, var(--guide-bg) 24%, transparent);
 }
 
-.guide-tag-list__all svg {
-	font-size: 0.9rem;
-}
-
 /* 索引卡仅保留颜色反馈，避免 Swup 回到首页时重放遮罩动效。 */
 .guide-card--index::after {
 	display: none;
@@ -566,7 +600,6 @@
 
 .guide-card--index:hover .guide-link-list a,
 .guide-card--index:focus-within .guide-link-list a {
-	border-color: color-mix(in srgb, var(--guide-fg) 20%, transparent);
 	color: var(--guide-fg);
 	transform: none;
 	transition-delay: 0;
@@ -575,87 +608,31 @@
 .guide-card--index:hover .guide-link-list a:hover,
 .guide-card--index:focus-within .guide-link-list a:hover,
 .guide-card--index .guide-link-list a:focus-visible {
-	border-color: var(--guide-fg);
 	background: var(--guide-fg);
 	color: var(--guide-bg);
 	transform: none;
 }
 
-.guide-card--categories .guide-link-list a:hover strong,
-.guide-card--categories .guide-link-list a:focus-visible strong {
-	font-size: 0;
-	color: transparent;
-}
-
-.guide-card--categories .guide-link-list a:hover strong::after,
-.guide-card--categories .guide-link-list a:focus-visible strong::after {
-	content: "→";
-	font-size: 1.05rem;
-	font-weight: 900;
-	color: var(--guide-bg);
-}
-
-/* 分类行采用独立合成层遮罩，避免直接变更字体尺寸和背景造成抖动。 */
+/* 分类行悬停直接显示高亮背景，不做遮罩过渡动画，避免行间切换时的消失/重绘开销。 */
 .guide-card--categories .guide-link-list a {
-	position: relative;
-	isolation: isolate;
-	overflow: hidden;
-	transition: border-color 160ms ease;
+	border-radius: 0.65rem;
 }
 
-.guide-card--categories .guide-link-list a::before {
+/* 书本目录式点状引导线：连接名称与数量 */
+.guide-card--categories .guide-link-list a > span {
+	display: flex;
+	align-items: center;
+	flex: 1;
+	min-width: 0;
+}
+
+.guide-card--categories .guide-link-list a > span::after {
 	content: "";
-	position: absolute;
-	inset: 0;
-	z-index: 0;
-	background: var(--guide-fg);
-	transform: scaleX(0);
-	transform-origin: left center;
-	transition: transform 180ms cubic-bezier(0.16, 1, 0.3, 1);
-	will-change: transform;
-}
-
-.guide-card--categories .guide-link-list a > span,
-.guide-card--categories .guide-link-list a > strong {
-	position: relative;
-	z-index: 1;
-	transition: color 0ms;
-}
-
-.guide-card--categories .guide-link-list a:hover,
-.guide-card--categories .guide-link-list a:focus-visible {
-	border-color: var(--guide-fg);
-	background: transparent;
-	color: var(--guide-bg);
-}
-
-.guide-card--categories .guide-link-list a:hover::before,
-.guide-card--categories .guide-link-list a:focus-visible::before {
-	transform: scaleX(1);
-}
-
-.guide-card--categories .guide-link-list a:hover strong,
-.guide-card--categories .guide-link-list a:focus-visible strong {
-	font-size: 0.72rem;
-	color: transparent;
-}
-
-.guide-card--categories .guide-link-list a strong::after {
-	position: absolute;
-	top: 50%;
-	right: 0;
-	font-size: 1.05rem;
-	font-weight: 900;
-	color: var(--guide-bg);
-	opacity: 0;
-	transform: translateY(-50%) translateX(-0.25rem);
-	transition: opacity 120ms ease, transform 160ms ease;
-}
-
-.guide-card--categories .guide-link-list a:hover strong::after,
-.guide-card--categories .guide-link-list a:focus-visible strong::after {
-	opacity: 1;
-	transform: translateY(-50%) translateX(0);
+	flex: 1;
+	min-width: 1rem;
+	height: 0;
+	margin-left: 0.45rem;
+	border-bottom: 2px dotted color-mix(in srgb, var(--guide-fg) 32%, transparent);
 }
 
 .guide-tag-list {
@@ -801,7 +778,7 @@
 
 @media (max-width: 900px) {
 	.home-guide-grid {
-		grid-template-rows: repeat(2, var(--guide-row-height));
+		grid-template-rows: repeat(2, minmax(var(--guide-row-height), auto));
 	}
 
 	.home-data-layer__top-grid {
@@ -864,9 +841,6 @@
 		pointer-events: auto;
 	}
 
-	.guide-card--contact[data-guide-contact] {
-		cursor: pointer;
-	}
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -874,6 +848,7 @@
 	.guide-card::after,
 	.guide-card__visual img,
 	.guide-rotator__slide,
+	.guide-rotator__dots button,
 	.guide-contact__region {
 		animation: none !important;
 		transition: none !important;

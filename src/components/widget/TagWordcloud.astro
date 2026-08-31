@@ -288,7 +288,7 @@ const chartData = topTags.map((t, i) => ({
     });
     observer.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
 
-    document.addEventListener("swup:willReplaceContent", function() {
+    document.addEventListener("astro:before-swap", function() {
       window.removeEventListener("resize", resizeHandler);
       observer.disconnect();
     }, { once: true });
@@ -296,6 +296,5 @@ const chartData = topTags.map((t, i) => ({
 
   initTagWordcloud();
   document.addEventListener("astro:page-load", initTagWordcloud);
-  document.addEventListener("swup:contentReplaced", initTagWordcloud);
 })();
 </script>

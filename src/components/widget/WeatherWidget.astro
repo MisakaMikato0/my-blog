@@ -1258,5 +1258,5 @@ const extendedItems: ExtendedItem[] = [
 
 	initWeatherWidgets();
 	document.addEventListener("astro:page-load", initWeatherWidgets);
-	document.addEventListener("swup:willReplaceContent", cleanupWeatherWidgets);
+	document.addEventListener("astro:before-swap", cleanupWeatherWidgets);
 </script>

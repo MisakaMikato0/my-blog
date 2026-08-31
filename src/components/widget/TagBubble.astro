@@ -196,7 +196,7 @@ const chartData = tags.map((t) => ({
       observer.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
 
       // Swup 清理
-      document.addEventListener("swup:willReplaceContent", function() {
+      document.addEventListener("astro:before-swap", function() {
         window.removeEventListener("resize", resizeHandler);
         observer.disconnect();
         chart.dispose();
@@ -207,6 +207,5 @@ const chartData = tags.map((t) => ({
 
   initTagBubble();
   document.addEventListener("astro:page-load", initTagBubble);
-  document.addEventListener("swup:contentReplaced", initTagBubble);
 })();
 </script>

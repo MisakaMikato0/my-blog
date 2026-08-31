@@ -677,5 +677,5 @@ const statsShareId = umamiConfig?.shareId ?? "";
 
 	initHomeMobile();
 	document.addEventListener("astro:page-load", initHomeMobile);
-	document.addEventListener("swup:willReplaceContent", cleanupHomeMobile);
+	document.addEventListener("astro:before-swap", cleanupHomeMobile);
 </script>

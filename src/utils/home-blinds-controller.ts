@@ -580,8 +580,7 @@ function bindMediaWatchers() {
 	const restart = () => {
 		const root = activeRoot ?? document.getElementById("home-blinds");
 		const viewport = activeViewport;
-		activeRoot = null;
-		activeViewport = null;
+		teardownHomeBlinds();
 		bootHomeBlinds({
 			root: root ?? undefined,
 			viewport: viewport ?? undefined,
@@ -1951,20 +1950,36 @@ async function initializeHomeBlinds(
 		config,
 		signal: abortController.signal,
 	};
-	const revealCleanup = setupReveal(context);
-	const headlineCleanup = setupHeadline(context);
-	const scenesCleanup = setupScenes(context);
+	const cleanups: Array<() => void> = [];
+	const teardown = () => {
+		abortController.abort();
+		while (cleanups.length > 0) cleanups.pop()?.();
+	};
+
+	try {
+		cleanups.push(setupReveal(context));
+		cleanups.push(setupHeadline(context));
+		cleanups.push(setupScenes(context));
+	} catch (error) {
+		teardown();
+		throw error;
+	}
 
 	root.dataset.homeBlindsReady = "ready";
 	ScrollTrigger.refresh();
 
 	return () => {
-		abortController.abort();
-		revealCleanup();
-		headlineCleanup();
-		scenesCleanup();
+		teardown();
 		delete root.dataset.homeBlindsReady;
 	};
+}
+
+export function teardownHomeBlinds() {
+	bootGeneration += 1;
+	activeCleanup?.();
+	activeCleanup = null;
+	activeRoot = null;
+	activeViewport = null;
 }
 
 export function bootHomeBlinds(options: BootHomeBlindsOptions = {}) {

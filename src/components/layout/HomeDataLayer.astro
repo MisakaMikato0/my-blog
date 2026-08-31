@@ -817,5 +817,5 @@ const statsShareId = umamiConfig?.shareId ?? "";
 
 	initHomeDataLayer();
 	document.addEventListener("astro:page-load", initHomeDataLayer);
-	document.addEventListener("swup:willReplaceContent", cleanupHomeDataLayer);
+	document.addEventListener("astro:before-swap", cleanupHomeDataLayer);
 </script>

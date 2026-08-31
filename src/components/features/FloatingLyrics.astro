@@ -186,10 +186,8 @@ import { i18n } from "@/i18n/translation";
 	};
 	document.addEventListener("visibilitychange", onVisibilityChange);
 
-	// Swup page transition: re-sync after navigation.
-	// Per CLAUDE.md 4.4, only listen to `astro:page-load` — it fires once
-	// per navigation incl. first load. Subscribing to `swup:contentReplaced`
-	// as well would double-fire `syncFromManager` on every page change.
+	// Swup page transition: re-sync after navigation. astro:page-load fires once
+	// per navigation, including the first load.
 	document.addEventListener("astro:page-load", syncFromManager);
 
 	// Initial sync if manager already initialized
@@ -207,7 +205,6 @@ import { i18n } from "@/i18n/translation";
 					window.removeEventListener("fm:track", onTrack);
 					window.removeEventListener("fm:toggle-floating-lyrics", onToggleFloatingLyrics);
 					document.removeEventListener("astro:page-load", syncFromManager);
-					document.removeEventListener("swup:contentReplaced", syncFromManager);
 					document.removeEventListener("visibilitychange", onVisibilityChange);
 					observer.disconnect();
 					return;

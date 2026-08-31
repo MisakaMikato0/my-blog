@@ -13,7 +13,7 @@ describe("bindHomeLayer", () => {
 
 		const firstRoot = document.createElement("main");
 		firstRoot.className = "home-page";
-		document.body.append(firstRoot);
+		document.body.appendChild(firstRoot);
 		document.dispatchEvent(new Event("astro:page-load"));
 		document.dispatchEvent(new Event("astro:page-load"));
 
@@ -25,7 +25,7 @@ describe("bindHomeLayer", () => {
 		firstRoot.remove();
 		const secondRoot = document.createElement("main");
 		secondRoot.className = "home-page";
-		document.body.append(secondRoot);
+		document.body.appendChild(secondRoot);
 		document.dispatchEvent(new Event("astro:page-load"));
 
 		expect(boot).toHaveBeenCalledTimes(2);

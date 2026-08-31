@@ -116,7 +116,7 @@ const statsShareId = umamiConfig?.shareId ?? "";
 							<span class="guide-rotator__meta">{post.data.category || i18n(I18nKey.uncategorized)} / {formatDateI18n(post.data.published)}</span>
 							<div class="guide-rotator__title-row">
 								<a class="guide-rotator__article-link" href={getPostUrlBySlug(post.id)}><strong>{post.data.title}</strong></a>
-								<a class="guide-card__article-action" href={getPostUrlBySlug(post.id)} aria-label={`${i18n(I18nKey.openPostPrefix)}${post.data.title}`} title={i18n(I18nKey.openPost)}><Icon name="material-symbols:arrow-forward-rounded" is:inline /></a>
+								<a class="guide-card__article-action" href={getPostUrlBySlug(post.id)} aria-label={`${i18n(I18nKey.viewLatestPostPrefix)}${post.data.title}`} title={i18n(I18nKey.openPost)}><Icon name="material-symbols:arrow-forward-rounded" is:inline /></a>
 							</div>
 						</article>
 					)) : <p class="guide-card__detail">{i18n(I18nKey.noPosts)}</p>}

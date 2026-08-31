@@ -38,4 +38,11 @@ describe("home guide card structure and layout contracts", () => {
 			/\.guide-card--tags\s*\{[^}]*padding-bottom:\s*3rem;/,
 		);
 	});
+
+	it("uses an existing localized key for the latest-post action", () => {
+		const source = readSource("src/components/layout/HomeDataLayer.astro");
+
+		expect(source).not.toContain("I18nKey.openPostPrefix");
+		expect(source).toContain("I18nKey.viewLatestPostPrefix");
+	});
 });

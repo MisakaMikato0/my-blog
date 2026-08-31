@@ -53,6 +53,9 @@ const buildNavBarConfig = (): NavBarConfig => {
 	if (siteConfig.pages.books) {
 		hobbyChildren.push(LinkPreset.Books);
 	}
+	if (siteConfig.pages.divination) {
+		hobbyChildren.push(LinkPreset.Divination);
+	}
 
 	const hobbyNav: NavBarLink = {
 		...LinkPresets[LinkPreset.Hobby],
@@ -82,7 +85,6 @@ const buildNavBarConfig = (): NavBarConfig => {
 		LinkPreset.Home,
 		LinkPreset.Feibichi,
 		...(siteConfig.pages.collections ? [LinkPreset.Collections] : []),
-		...(siteConfig.pages.divination ? [LinkPreset.Divination] : []),
 		postsNav,
 		hobbyNav,
 		...(contactNav ? [contactNav] : []),

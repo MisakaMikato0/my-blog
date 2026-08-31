@@ -610,6 +610,8 @@ export const zh_TW: Translation = {
 	[Key.kgPlay]: "播放",
 	[Key.kgPause]: "暫停",
 	[Key.kgResetView]: "重設視圖",
+	[Key.kgCollapsePanel]: "收起控制面板",
+	[Key.kgExpandPanel]: "展開控制面板",
 	[Key.kgStats]: "{visible} / {total} 節點 · {links} 連線",
 	[Key.kgRelations]: "關聯 {count} 個節點",
 	[Key.kgLoaded]: "知識圖譜已載入",

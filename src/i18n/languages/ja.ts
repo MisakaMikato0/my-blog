@@ -618,6 +618,8 @@ export const ja: Translation = {
 	[Key.kgPlay]: "再生",
 	[Key.kgPause]: "一時停止",
 	[Key.kgResetView]: "ビューをリセット",
+	[Key.kgCollapsePanel]: "設定パネルをたたむ",
+	[Key.kgExpandPanel]: "設定パネルを開く",
 	[Key.kgStats]: "{visible} / {total} ノード · {links} リンク",
 	[Key.kgRelations]: "{count} 件の関連",
 	[Key.kgLoaded]: "ナレッジグラフを読み込みました",

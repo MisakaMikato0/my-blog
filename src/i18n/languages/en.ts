@@ -621,6 +621,8 @@ export const en: Translation = {
 	[Key.kgPlay]: "Play",
 	[Key.kgPause]: "Pause",
 	[Key.kgResetView]: "Reset view",
+	[Key.kgCollapsePanel]: "Collapse controls",
+	[Key.kgExpandPanel]: "Expand controls",
 	[Key.kgStats]: "{visible} / {total} nodes · {links} links",
 	[Key.kgRelations]: "{count} connections",
 	[Key.kgLoaded]: "Knowledge graph loaded",

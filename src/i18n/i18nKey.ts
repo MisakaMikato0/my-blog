@@ -129,6 +129,8 @@ enum I18nKey {
 	kgPlay = "kgPlay",
 	kgPause = "kgPause",
 	kgResetView = "kgResetView",
+	kgCollapsePanel = "kgCollapsePanel",
+	kgExpandPanel = "kgExpandPanel",
 	kgStats = "kgStats",
 	kgRelations = "kgRelations",
 	kgLoaded = "kgLoaded",

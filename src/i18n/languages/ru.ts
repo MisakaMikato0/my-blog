@@ -621,6 +621,8 @@ export const ru: Translation = {
 	[Key.kgPlay]: "Воспроизвести",
 	[Key.kgPause]: "Пауза",
 	[Key.kgResetView]: "Сбросить вид",
+	[Key.kgCollapsePanel]: "Свернуть панель",
+	[Key.kgExpandPanel]: "Развернуть панель",
 	[Key.kgStats]: "{visible} / {total} узлов · {links} связей",
 	[Key.kgRelations]: "{count} связей",
 	[Key.kgLoaded]: "Граф знаний загружен",

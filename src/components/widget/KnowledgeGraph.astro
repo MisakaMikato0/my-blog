@@ -240,6 +240,7 @@ const detailGroups = [
       if (action === "play") ctrl.playback.toggle();
       else if (action === "reset-view") ctrl.resetView();
       else if (action === "deselect") ctrl.select(null);
+      else if (action === "toggle-panel") togglePanel(root);
     };
 
     const onPlayback = (event: Event) => {
@@ -322,6 +323,19 @@ const detailGroups = [
       root.removeEventListener("kg:stats", onStats);
       root.removeEventListener("kg:select", onSelect);
     };
+  }
+
+  /** Toggle the graph control panel and restore focus to the visible control. */
+  function togglePanel(root: HTMLElement): void {
+    const collapsed = root.toggleAttribute("data-kg-panel-collapsed");
+    const collapseBtn = root.querySelector<HTMLElement>(
+      '[data-kg-panel] [data-kg-action="toggle-panel"]',
+    );
+    const handle = root.querySelector<HTMLElement>("[data-kg-panel-handle]");
+    collapseBtn?.setAttribute("aria-expanded", String(!collapsed));
+    handle?.setAttribute("aria-expanded", String(!collapsed));
+    const next = collapsed ? handle : collapseBtn;
+    requestAnimationFrame(() => next?.focus({ preventScroll: true }));
   }
 
   bindKnowledgeGraphLifecycle({ mount: () => init(), teardown });

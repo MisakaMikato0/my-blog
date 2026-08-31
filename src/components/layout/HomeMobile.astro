@@ -285,6 +285,7 @@ const statsShareId = umamiConfig?.shareId ?? "";
 
 <script>
 	import { createCache } from "@/utils/cache-utils";
+	import { bindHomeLayer } from "@/utils/home-lifecycle";
 	import { formatCompactNumber } from "@/utils/home-data-layer.js";
 
 	type Cleanup = () => void;
@@ -675,7 +676,5 @@ const statsShareId = umamiConfig?.shareId ?? "";
 		initDeck(root);
 	}
 
-	initHomeMobile();
-	document.addEventListener("astro:page-load", initHomeMobile);
-	document.addEventListener("astro:before-swap", cleanupHomeMobile);
+	bindHomeLayer({ boot: initHomeMobile, teardown: cleanupHomeMobile });
 </script>

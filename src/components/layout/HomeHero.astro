@@ -82,20 +82,18 @@ const runtimeConfig = {
 
 <script>
 	import { mountHomeHero } from "@/utils/home-hero-controller";
+	import { bindHomeLayer } from "@/utils/home-lifecycle";
 
 	let cleanupHomeHero: (() => void) | null = null;
 
-	function bootHomeHero() {
-		cleanupHomeHero?.();
-		cleanupHomeHero = mountHomeHero();
-	}
-
-	function teardownHomeHero() {
-		cleanupHomeHero?.();
-		cleanupHomeHero = null;
-	}
-
-	bootHomeHero();
-	document.addEventListener("astro:page-load", bootHomeHero);
-	document.addEventListener("astro:before-swap", teardownHomeHero);
+	bindHomeLayer({
+		boot: () => {
+			cleanupHomeHero?.();
+			cleanupHomeHero = mountHomeHero();
+		},
+		teardown: () => {
+			cleanupHomeHero?.();
+			cleanupHomeHero = null;
+		},
+	});
 </script>

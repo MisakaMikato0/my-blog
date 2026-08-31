@@ -38,20 +38,21 @@ describe("Swup 4 lifecycle contracts", () => {
 			"src/components/widget/TagBubble.astro",
 		]) {
 			const source = readSource(file);
-			expect(source, file).toContain(
-				'document.addEventListener("astro:before-swap"',
-			);
+			if (file.startsWith("src/components/layout/Home")) {
+				expect(source, file).toContain("bindHomeLayer");
+				expect(source, file).toContain("teardown:");
+			} else {
+				expect(source, file).toContain(
+					'document.addEventListener("astro:before-swap"',
+				);
+			}
 		}
 	});
 
 	it("tears down HomeBlinds before swap and boots after page load", () => {
 		const source = readSource("src/components/layout/HomeBlinds.astro");
 		expect(source).toContain("teardownHomeBlinds");
-		expect(source).toContain(
-			'document.addEventListener("astro:before-swap", teardownHomeBlinds)',
-		);
-		expect(source).toContain(
-			'document.addEventListener("astro:page-load", boot)',
-		);
+		expect(source).toContain("bindHomeLayer");
+		expect(source).toContain("teardown: teardownHomeBlinds");
 	});
 });

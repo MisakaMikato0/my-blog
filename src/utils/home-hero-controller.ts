@@ -9,12 +9,26 @@ import {
 	pickHeroImage,
 } from "@/utils/home-hero-motion";
 import { initHomeHeroRain } from "@/utils/home-hero-rain";
+import {
+	cancelScrollTriggerRefresh,
+	requestScrollTriggerRefresh,
+} from "@/utils/scroll-trigger-refresh";
 
 gsap.registerPlugin(ScrollTrigger);
 
 const RAIN_ACTIVATE_TIME = 0.99;
 const SIGNATURE_REVEAL_TIME = 1.02;
 let initialReloadHandled = false;
+
+function isInitialDocumentPath(navigationName: string) {
+	try {
+		return (
+			new URL(navigationName, location.href).pathname === location.pathname
+		);
+	} catch {
+		return false;
+	}
+}
 
 function resetHeroScrollOnReload() {
 	if (initialReloadHandled) return false;
@@ -23,6 +37,7 @@ function resetHeroScrollOnReload() {
 		| PerformanceNavigationTiming
 		| undefined;
 	if (navigation?.type !== "reload") return false;
+	if (!isInitialDocumentPath(navigation.name)) return false;
 
 	history.scrollRestoration = "manual";
 	ScrollTrigger.clearScrollMemory("manual");
@@ -110,6 +125,12 @@ function setReducedMotionState(hero: HTMLElement) {
 		?.classList.remove("home-page--motion-pending");
 }
 
+function clearMotionPending() {
+	document
+		.querySelector(".home-page--motion-pending")
+		?.classList.remove("home-page--motion-pending");
+}
+
 export function mountHomeHero() {
 	const hero = document.querySelector<HTMLElement>("[data-home-hero]");
 	if (!hero || hero.dataset.heroMounted === "true") return () => undefined;
@@ -117,9 +138,7 @@ export function mountHomeHero() {
 	// 移动端只展示 CSS 提供的完整图，不创建 ScrollTrigger、雨幕、拼图或 pin。
 	const mobileQuery = window.matchMedia("(max-width: 768px)");
 	if (mobileQuery.matches) {
-		document
-			.querySelector(".home-page--motion-pending")
-			?.classList.remove("home-page--motion-pending");
+		clearMotionPending();
 		const handleMobileChange = () => {
 			window.dispatchEvent(new Event("astro:page-load"));
 		};
@@ -128,10 +147,14 @@ export function mountHomeHero() {
 	}
 
 	const config = parseRuntimeConfig(hero);
-	if (!config) return () => undefined;
+	if (!config) {
+		clearMotionPending();
+		return () => undefined;
+	}
 	const resetAfterReload = resetHeroScrollOnReload();
 
 	hero.dataset.heroMounted = "true";
+	let disposed = false;
 	const rain = initHomeHeroRain(hero, config.rain);
 	const reducedMotionQuery = window.matchMedia(
 		"(prefers-reduced-motion: reduce)",
@@ -182,9 +205,7 @@ export function mountHomeHero() {
 		tiles.filter((tile) => tile.initiallyVisible).map((tile) => tile.element),
 	);
 	const random = createSeededRandom(config.mosaic.seed ^ 0x9e3779b9);
-	document
-		.querySelector(".home-page--motion-pending")
-		?.classList.remove("home-page--motion-pending");
+	clearMotionPending();
 	const handleMobileChange = () => {
 		window.dispatchEvent(new Event("astro:page-load"));
 	};
@@ -586,7 +607,7 @@ export function mountHomeHero() {
 		});
 
 		renderTimelineForScroll(heroScrollTrigger.progress);
-		ScrollTrigger.refresh();
+		requestScrollTriggerRefresh(ScrollTrigger);
 	};
 
 	// 初始可见碎片改为渐入，完成后进入常规 idle 轮换
@@ -681,7 +702,7 @@ export function mountHomeHero() {
 		const handleFlyLayoutChange = () => {
 			window.clearTimeout(flyLayoutTimer);
 			flyLayoutTimer = window.setTimeout(() => {
-				if (hero.dataset.heroMounted !== "true") return;
+				if (disposed) return;
 				for (const handle of flyHandles) handle.rebuild();
 				flyHandles[0]?.setNatural();
 				mountContactScatter();
@@ -691,7 +712,7 @@ export function mountHomeHero() {
 		};
 
 		document.fonts.ready.then(() => {
-			if (hero.dataset.heroMounted !== "true") return;
+			if (disposed) return;
 			flyHandles = hosts.map((host) => createFlyText(host));
 			for (const handle of flyHandles) {
 				handle.prepare();
@@ -754,7 +775,7 @@ export function mountHomeHero() {
 			timeline?.totalProgress(0);
 			scrollDriver?.progress(0);
 			updateSceneState(0);
-			ScrollTrigger.refresh();
+			requestScrollTriggerRefresh(ScrollTrigger);
 			history.scrollRestoration = "auto";
 		});
 	}
@@ -784,6 +805,8 @@ export function mountHomeHero() {
 	};
 
 	return () => {
+		disposed = true;
+		cancelScrollTriggerRefresh();
 		stopIdleRotation();
 		window.clearTimeout(flyLayoutTimer);
 		tilesIntroTimeline?.kill();

@@ -264,13 +264,13 @@ const runtimeConfig = {
 		bootHomeBlinds,
 		teardownHomeBlinds,
 	} from "@/utils/home-blinds-controller";
+	import { bindHomeLayer } from "@/utils/home-lifecycle";
 
-	const boot = () => {
-		const root = document.getElementById("home-blinds");
-		bootHomeBlinds({ root: root ?? undefined, viewport: root ?? undefined });
-	};
-
-	boot();
-	document.addEventListener("astro:page-load", boot);
-	document.addEventListener("astro:before-swap", teardownHomeBlinds);
+	bindHomeLayer({
+		boot: () => {
+			const root = document.getElementById("home-blinds");
+			bootHomeBlinds({ root: root ?? undefined, viewport: root ?? undefined });
+		},
+		teardown: teardownHomeBlinds,
+	});
 </script>

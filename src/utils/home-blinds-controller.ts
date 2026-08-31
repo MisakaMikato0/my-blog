@@ -1,3 +1,5 @@
+import { requestScrollTriggerRefresh } from "@/utils/scroll-trigger-refresh";
+
 type Gsap = typeof import("gsap")["gsap"];
 type ScrollTriggerPlugin = typeof import("gsap/ScrollTrigger")["ScrollTrigger"];
 type ScrollTriggerInstance = ReturnType<ScrollTriggerPlugin["create"]>;
@@ -1966,7 +1968,7 @@ async function initializeHomeBlinds(
 	}
 
 	root.dataset.homeBlindsReady = "ready";
-	ScrollTrigger.refresh();
+	requestScrollTriggerRefresh(ScrollTrigger);
 
 	return () => {
 		teardown();

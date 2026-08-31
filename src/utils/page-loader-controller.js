@@ -1,5 +1,6 @@
 const DEFAULT_HIDE_DELAY = 0;
 const DEFAULT_MAX_WAIT = 8000;
+const DEFAULT_HIDDEN_WAIT = 10000;
 
 export const LOADER_READY_EVENT = "firefly:page-loader-ready";
 export const LOADER_HIDDEN_EVENT = "firefly:page-loader-hidden";
@@ -203,10 +204,18 @@ export function isPageLoaderVisible({ document: documentRef = document } = {}) {
 
 export function waitForPageLoaderHidden({
 	document: documentRef = document,
+	timeout = DEFAULT_HIDDEN_WAIT,
 } = {}) {
 	if (!isPageLoaderVisible({ document: documentRef })) return Promise.resolve();
 	return new Promise((resolve) => {
-		documentRef.addEventListener(LOADER_HIDDEN_EVENT, resolve, { once: true });
+		let timer;
+		const settle = () => {
+			documentRef.removeEventListener(LOADER_HIDDEN_EVENT, settle);
+			if (timer !== undefined) clearTimeout(timer);
+			resolve();
+		};
+		documentRef.addEventListener(LOADER_HIDDEN_EVENT, settle);
+		timer = setTimeout(settle, timeout);
 	});
 }
 

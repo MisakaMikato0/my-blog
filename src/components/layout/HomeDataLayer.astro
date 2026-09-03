@@ -997,5 +997,5 @@ const statsShareId = umamiConfig?.shareId ?? "";
 		void initGuideOpening(layer, token);
 	}
 
-	bindHomeLayer({ boot: initHomeDataLayer, teardown: cleanupHomeDataLayer });
+	bindHomeLayer({ id: "data", boot: initHomeDataLayer, teardown: cleanupHomeDataLayer });
 </script>

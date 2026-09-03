@@ -267,6 +267,7 @@ const runtimeConfig = {
 	import { bindHomeLayer } from "@/utils/home-lifecycle";
 
 	bindHomeLayer({
+		id: "blinds",
 		boot: () => {
 			const root = document.getElementById("home-blinds");
 			bootHomeBlinds({ root: root ?? undefined, viewport: root ?? undefined });

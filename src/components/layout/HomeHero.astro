@@ -87,6 +87,7 @@ const runtimeConfig = {
 	let cleanupHomeHero: (() => void) | null = null;
 
 	bindHomeLayer({
+		id: "hero",
 		boot: () => {
 			cleanupHomeHero?.();
 			cleanupHomeHero = mountHomeHero();

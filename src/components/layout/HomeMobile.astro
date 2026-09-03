@@ -676,5 +676,5 @@ const statsShareId = umamiConfig?.shareId ?? "";
 		initDeck(root);
 	}
 
-	bindHomeLayer({ boot: initHomeMobile, teardown: cleanupHomeMobile });
+	bindHomeLayer({ id: "mobile", boot: initHomeMobile, teardown: cleanupHomeMobile });
 </script>

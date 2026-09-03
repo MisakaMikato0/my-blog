@@ -9,7 +9,7 @@ describe("bindHomeLayer", () => {
 	it("mounts each home root once and remounts after before-swap", () => {
 		const boot = vi.fn();
 		const teardown = vi.fn();
-		bindHomeLayer({ boot, teardown });
+		bindHomeLayer({ id: "test", boot, teardown });
 
 		const firstRoot = document.createElement("main");
 		firstRoot.className = "home-page";

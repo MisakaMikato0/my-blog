@@ -1,0 +1,16 @@
+---
+/** 首页 Lenis 控制器挂载壳，不渲染 DOM。 */
+---
+
+<script>
+	import { bindHomeLayer } from "@/utils/home-lifecycle";
+	import {
+		bootHomeSmoothScroll,
+		teardownHomeSmoothScroll,
+	} from "@/utils/home-smooth-scroll";
+
+	bindHomeLayer({
+		boot: bootHomeSmoothScroll,
+		teardown: teardownHomeSmoothScroll,
+	});
+</script>

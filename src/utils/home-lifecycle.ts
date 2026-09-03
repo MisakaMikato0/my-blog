@@ -6,6 +6,12 @@ export type HomeLayerHooks = {
 };
 
 export function bindHomeLayer({ boot, teardown }: HomeLayerHooks): void {
+	const key = "__home_layer_bound";
+	// Astro may re-evaluate a persistent script after a Swup navigation. Keep
+	// one controller per layer rather than accumulating document listeners.
+	const globalState = window as typeof window & { [key: string]: boolean };
+	if (globalState[key]) return;
+	globalState[key] = true;
 	let bootedRoot: Element | null = null;
 
 	const mount = () => {

@@ -31,11 +31,9 @@ export function bootHomeSmoothScroll(): void {
 	let dispose: (() => void) | null = null;
 
 	void (async () => {
-		const [{ default: Lenis }, { gsap }, { ScrollTrigger }] = await Promise.all([
-			import("lenis"),
-			import("gsap"),
-			import("gsap/ScrollTrigger"),
-		]);
+		const [{ default: Lenis }, { gsap }, { ScrollTrigger }] = await Promise.all(
+			[import("lenis"), import("gsap"), import("gsap/ScrollTrigger")],
+		);
 		if (cancelled || generation !== bootGeneration) return;
 
 		gsap.registerPlugin(ScrollTrigger);

@@ -29,6 +29,12 @@ import { homeConfig } from "@/config/homeConfig";
 import { siteConfig } from "@/config/siteConfig";
 import { formatDateI18n, formatDateToYYYYMMDD } from "@/utils/date-utils";
 import { getApiUrlList, processCoverImageSync } from "@/utils/image-utils";
+import {
+	buildOrganizationEntity,
+	buildPersonEntity,
+	buildWebSiteEntity,
+	serializeJsonLd,
+} from "@/utils/schema-utils";
 import { url } from "@/utils/url-utils";
 
 export async function getStaticPaths() {
@@ -143,75 +149,62 @@ const structuredImageUrl = posterCoverUrl
 	? new URL(posterCoverUrl, Astro.site).href
 	: defaultStructuredImageUrl;
 
+const siteRoot = new URL("/", Astro.site).href;
+const breadcrumbItems: { name: string; url: string }[] = [
+	{ name: siteConfig.title, url: siteRoot },
+];
+if (entry.data.category) {
+	breadcrumbItems.push({
+		name: entry.data.category,
+		url: new URL("/categories/", Astro.site).href,
+	});
+}
+breadcrumbItems.push({ name: entry.data.title, url: canonicalUrl });
+
 const jsonLd = {
 	"@context": "https://schema.org",
-	"@type": ["BlogPosting", "TechArticle"],
-	"@id": canonicalUrl,
-	headline: entry.data.title,
-	description: entry.data.description || entry.data.title,
-	keywords: entry.data.tags,
-	articleSection: entry.data.category || i18n(I18nKey.uncategorized),
-	wordCount: remarkPluginFrontmatter.words,
-	image: structuredImageUrl,
-	author: { "@id": `${Astro.site}#person` },
-	url: canonicalUrl,
-	isPartOf: { "@id": `${Astro.site}#website` },
-	publisher: {
-		"@type": "Organization",
-		"@id": `${Astro.site}#organization`,
-		name: siteConfig.title,
-		url: new URL("/", Astro.site).href,
-		logo: {
-			"@type": "ImageObject",
-			"@id": `${Astro.site}#logo`,
-			url: defaultStructuredImageUrl,
-		},
-	},
-	datePublished: formatDateToYYYYMMDD(entry.data.published),
-	...(entry.data.updated && {
-		dateModified: formatDateToYYYYMMDD(entry.data.updated),
-	}),
-	mainEntityOfPage: {
-		"@type": "WebPage",
-		"@id": canonicalUrl,
-	},
-	inLanguage: entry.data.lang
-		? entry.data.lang.replace("_", "-")
-		: siteConfig.lang.replace("_", "-"),
-};
-
-const serializedJsonLd = JSON.stringify(jsonLd).replace(/</g, "\\u003c");
-const breadcrumbJsonLd = {
-	"@context": "https://schema.org",
-	"@type": "BreadcrumbList",
-	itemListElement: [
+	"@graph": [
 		{
-			"@type": "ListItem",
-			position: 1,
-			name: siteConfig.title,
-			item: new URL("/", Astro.site).href,
+			"@type": ["BlogPosting", "TechArticle"],
+			"@id": `${canonicalUrl}#article`,
+			headline: entry.data.title,
+			description: entry.data.description || entry.data.title,
+			keywords: entry.data.tags,
+			articleSection: entry.data.category || i18n(I18nKey.uncategorized),
+			wordCount: remarkPluginFrontmatter.words,
+			image: structuredImageUrl,
+			author: { "@id": `${siteRoot}#person` },
+			publisher: { "@id": `${siteRoot}#organization` },
+			isPartOf: { "@id": `${siteRoot}#website` },
+			url: canonicalUrl,
+			datePublished: formatDateToYYYYMMDD(entry.data.published),
+			...(entry.data.updated && {
+				dateModified: formatDateToYYYYMMDD(entry.data.updated),
+			}),
+			mainEntityOfPage: {
+				"@type": "WebPage",
+				"@id": canonicalUrl,
+			},
+			inLanguage: entry.data.lang
+				? entry.data.lang.replace("_", "-")
+				: siteConfig.lang.replace("_", "-"),
 		},
+		buildPersonEntity(Astro.site),
+		buildOrganizationEntity(Astro.site),
+		buildWebSiteEntity(Astro.site),
 		{
-			"@type": "ListItem",
-			position: 2,
-			name: entry.data.category || i18n(I18nKey.navPosts),
-			item: new URL(
-				`/archive/?category=${encodeURIComponent(entry.data.category || "")}`,
-				Astro.site,
-			).href,
-		},
-		{
-			"@type": "ListItem",
-			position: 3,
-			name: entry.data.title,
-			item: canonicalUrl,
+			"@type": "BreadcrumbList",
+			"@id": `${canonicalUrl}#breadcrumb`,
+			itemListElement: breadcrumbItems.map((item, index) => ({
+				"@type": "ListItem",
+				position: index + 1,
+				name: item.name,
+				item: item.url,
+			})),
 		},
 	],
 };
-const serializedBreadcrumbJsonLd = JSON.stringify(breadcrumbJsonLd).replace(
-	/</g,
-	"\\u003c",
-);
+const serializedJsonLd = serializeJsonLd(jsonLd);
 ---
 
 <MainGridLayout
@@ -240,12 +233,6 @@ const serializedBreadcrumbJsonLd = JSON.stringify(breadcrumbJsonLd).replace(
     type="application/ld+json"
     set:html={serializedJsonLd}
   />
-	<script
-		slot="head"
-		is:inline
-		type="application/ld+json"
-		set:html={serializedBreadcrumbJsonLd}
-	/>
   <!-- Layer 1: Title + meta -->
   <div class="post-hero rounded-(--radius-large) mb-2 onload-animation">
     <div class="post-hero__content">

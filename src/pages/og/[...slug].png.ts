@@ -2,8 +2,9 @@ import type { CollectionEntry } from "astro:content";
 import { getCollection } from "astro:content";
 import * as fs from "node:fs";
 import type { APIContext, GetStaticPaths } from "astro";
-import type { FontLoader, ImagesInput } from "takumi-js";
+import type { ImagesInput } from "takumi-js";
 import { setGlyphCacheMaxBytes } from "takumi-js";
+import { type FontSubset, googleFonts } from "takumi-js/helpers";
 import { ImageResponse } from "takumi-js/response";
 import { homeConfig, siteConfig } from "@/config";
 import { defaultFavicons } from "@/constants/icon";
@@ -20,8 +21,7 @@ const OG_HEIGHT = 630;
 const ICON_KEY = "og-icon";
 const AVATAR_KEY = "og-avatar";
 
-const FONT_FAMILY = "AaZongYiYuan";
-const FONT_PATH = "./public/fonts/AaZongYiYuan/AaZongYiYuan-2.ttf";
+const OG_FONT_FAMILY = "Noto Sans SC";
 
 // 字形缓存默认 8 MiB，按 takumi 官方说明只够容纳约一千个 CJK 字形，
 // 批量渲染中文标题会不断重栅格化刚被淘汰的字形。必须在首次 render 之前调用。
@@ -109,28 +109,28 @@ function resolveIconSource(): string {
 	return fallback.src;
 }
 
-// 惰性描述符：takumi 的 FontRegistry 按 name 去重，整次构建只解析一次 data()。
-// generic 让模板 fontFamily 末尾的 sans-serif 也能兜到这个字体——
-// 构建期没有系统字体，中间那串 -apple-system / Segoe UI 都是解析不到的。
-function buildFontLoaders(): FontLoader[] {
-	if (!fs.existsSync(FONT_PATH)) {
-		console.warn(
-			`[OG] 字体 "${FONT_PATH}" 不存在，将回退到 takumi 内置字体，中文可能显示为空白`,
-		);
-		return [];
-	}
-	return [
-		{
-			name: FONT_FAMILY,
-			weight: 400,
-			style: "normal",
-			generic: "sans-serif",
-			data: () => fs.promises.readFile(FONT_PATH),
-		},
-	];
-}
+// 只请求模板使用的 600/700 字重。若构建环境无法访问 Google Fonts，
+// 降级为 takumi 内置字体，避免单个 OG 图片阻断整次站点构建。
+let ogFontsPromise: Promise<FontSubset[]> | undefined;
 
-const ogFonts = buildFontLoaders();
+function getOgFonts(): Promise<FontSubset[]> {
+	ogFontsPromise ??= googleFonts({
+		families: [
+			{
+				name: OG_FONT_FAMILY,
+				weight: [600, 700],
+				style: "normal",
+				generic: "sans-serif",
+			},
+		],
+	}).catch((error: unknown) => {
+		const reason = error instanceof Error ? error.message : String(error);
+		console.warn(`[OG] Google Fonts 加载失败，已回退到内置字体：${reason}`);
+		return [];
+	});
+
+	return ogFontsPromise;
+}
 
 const ogImages: ImagesInput = {
 	cache: "auto",
@@ -171,7 +171,7 @@ export async function GET({
 					display: "flex",
 					flexDirection: "column",
 					backgroundColor: backgroundColor,
-					fontFamily: `"${FONT_FAMILY}", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif`,
+					fontFamily: `"${OG_FONT_FAMILY}", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif`,
 					padding: "60px",
 				},
 				children: [
@@ -352,7 +352,7 @@ export async function GET({
 			format: "png",
 			// BCP-47，交给 takumi 做 CJK 排版决策
 			lang: siteConfig.lang.replace("_", "-"),
-			fonts: ogFonts,
+			fonts: await getOgFonts(),
 			images: ogImages,
 			headers: {
 				"Content-Type": "image/png",

@@ -241,6 +241,7 @@ const description =
 
         function hide(): void {
           preview.classList.remove("is-visible");
+          previewImg.removeAttribute("src");
         }
 
         document.addEventListener("mouseover", (e) => {

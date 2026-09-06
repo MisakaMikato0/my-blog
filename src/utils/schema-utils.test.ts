@@ -16,7 +16,9 @@ describe("schema utilities", () => {
 	it("builds site entities with stable IDs sharing one site root", () => {
 		const site = "https://example.com/blog/";
 
-		expect(buildWebSiteEntity(site)["@id"]).toBe("https://example.com/#website");
+		expect(buildWebSiteEntity(site)["@id"]).toBe(
+			"https://example.com/#website",
+		);
 		expect(buildPersonEntity(site)["@id"]).toBe("https://example.com/#person");
 		expect(buildOrganizationEntity(site)["@id"]).toBe(
 			"https://example.com/#organization",

@@ -3,6 +3,11 @@
 .custom-md {
   overflow-wrap: break-word;
 
+  /* 文章标题与文本装饰色 */
+  --md-heading-accent: oklch(0.72 0.13 210);
+  --md-italic-wavy: oklch(0.6 0.15 285);
+  --md-del-line: oklch(0.58 0.21 27);
+
   body.sticky-navbar & {
     [id] {
       scroll-margin-top: 5.5rem;
@@ -10,7 +15,91 @@
   }
 
   h1 {
-    @apply text-3xl;
+    @apply text-3xl text-center;
+
+    &::after {
+      @apply content-[''] block rounded-full;
+      width: 3.5rem;
+      height: 0.3rem;
+      margin: 0.6rem auto 0;
+      background: var(--md-heading-accent);
+    }
+  }
+
+  h2 {
+    @apply relative;
+    padding-left: 1.1rem;
+
+    &::before {
+      @apply content-[''] absolute top-1/2 -translate-y-1/2 left-0;
+      width: 0.3rem;
+      height: 1.2em;
+      border-radius: 0.15rem;
+      background: var(--md-heading-accent);
+    }
+
+    &::after {
+      @apply content-[''] absolute top-1/2 -translate-y-1/2 left-[0.6rem];
+      width: 0.3rem;
+      height: 0.72em;
+      border-radius: 0.15rem;
+      background: color-mix(in oklab, var(--md-heading-accent) 45%, transparent);
+    }
+  }
+
+  h3 {
+    @apply relative;
+    padding-left: 0.85rem;
+
+    &::before {
+      @apply content-[''] absolute top-1/2 -translate-y-1/2 left-0;
+      width: 0.3rem;
+      height: 1.05em;
+      border-radius: 0.15rem;
+      background: var(--md-heading-accent);
+    }
+  }
+
+  h4,
+  h5,
+  h6 {
+    @apply relative;
+    padding-left: 1.15rem;
+  }
+
+  h4::before,
+  h5::before,
+  h6::before {
+    @apply content-[''] absolute top-1/2 -translate-y-1/2 left-[0.15rem];
+  }
+
+  h4::before,
+  h5::before {
+    width: 0.55rem;
+    height: 0.55rem;
+    border-radius: 50%;
+  }
+
+  h4::before {
+    background: var(--md-heading-accent);
+  }
+
+  h5::before {
+    border: 2px solid var(--md-heading-accent);
+  }
+
+  h6::before {
+    left: 0;
+    width: 0.6rem;
+    height: 0.18rem;
+    border-radius: 0.09rem;
+    background: var(--md-heading-accent);
+  }
+
+  :root.dark & {
+    --md-heading-accent: oklch(0.8 0.11 210);
+    --md-italic-wavy: oklch(0.75 0.12 285);
+    --md-del-line: oklch(0.7 0.19 25);
   }
 
   h1,
@@ -86,6 +175,30 @@
         display: none;
       }
     }
+  }
+
+  strong,
+  b {
+    @apply font-bold text-(--strong-color);
+
+    :root.dark & {
+      color: var(--md-heading-accent);
+    }
+  }
+
+  em,
+  i {
+    text-decoration: underline wavy;
+    text-decoration-color: var(--md-italic-wavy);
+    text-decoration-thickness: 1.5px;
+    text-underline-offset: 4px;
+  }
+
+  del,
+  s {
+    text-decoration: line-through;
+    text-decoration-color: var(--md-del-line);
+    text-decoration-thickness: 2px;
   }
 
   .expressive-code {
@@ -165,6 +278,16 @@
       }
     }
   }
+}
+
+/* Callout 提示框（[!NOTE] 等引用块） */
+.custom-md .callout {
+  border-radius: calc(var(--radius-large) - 0.5rem);
+  background: color-mix(in oklab, var(--rc-color-light, var(--rc-color-default, #888)) 12%, transparent);
+}
+
+:root.dark .custom-md .callout {
+  background: color-mix(in oklab, var(--rc-color-dark, var(--rc-color-default, #888)) 18%, transparent);
 }
 
 

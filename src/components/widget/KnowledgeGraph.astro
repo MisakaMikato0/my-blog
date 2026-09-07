@@ -134,7 +134,7 @@ const detailGroups = [
     GraphTier,
     KGSelection,
   } from "@/utils/graph/types";
-  import { definePageIsland } from "@/utils/swup-lifecycle";
+  import { bindKnowledgeGraphLifecycle } from "@/utils/knowledge-graph-lifecycle";
   import { url } from "@/utils/url-utils";
 
   let controller: GraphController | null = null;
@@ -322,5 +322,5 @@ const detailGroups = [
     };
   }
 
-  definePageIsland({ name: "knowledge-graph", mount: init, unmount: teardown });
+  bindKnowledgeGraphLifecycle({ mount: () => init(), teardown });
 </script>

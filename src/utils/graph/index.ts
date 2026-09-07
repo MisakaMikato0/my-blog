@@ -1,7 +1,6 @@
 import { type Quadtree, quadtree, select, zoom, zoomIdentity } from "d3";
 import type { KGData } from "@/utils/knowledge-graph-data";
 import { navigateToPage } from "@/utils/navigation-utils";
-import { preloadUrl } from "@/utils/swup-lifecycle";
 import { clamp, type Point } from "./geometry";
 import { createPlayback } from "./playback";
 import { createRenderer } from "./renderer";
@@ -25,6 +24,10 @@ const MIN_ZOOM = 0.35;
 const MAX_ZOOM = 6;
 /** 悬停多久后预载目标页 */
 const PRELOAD_DELAY = 400;
+
+function preloadUrl(url: string): void {
+	window.swup?.preload?.(url);
+}
 
 /**
  * 详情面板的下钻数据：按选中节点的层级给出相邻层列表。

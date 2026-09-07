@@ -46,3 +46,4 @@ CLAUDE.md
 
 # local tool caches
 .fetch/
+.worktrees/

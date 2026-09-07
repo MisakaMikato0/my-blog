@@ -18,12 +18,7 @@ const buildNavBarConfig = (): NavBarConfig => {
 	// 1. 构建文章下拉菜单
 	const postsNav: NavBarLink = {
 		...LinkPresets[LinkPreset.NavPosts],
-		children: [
-			LinkPreset.Archive,
-			LinkPreset.Categories,
-			LinkPreset.PostList,
-			LinkPreset.WritePost,
-		],
+		children: [LinkPreset.PostList, LinkPreset.Archive, LinkPreset.Categories],
 	};
 
 	// 2. 构建联系我下拉菜单

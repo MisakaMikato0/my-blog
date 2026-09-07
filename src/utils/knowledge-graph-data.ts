@@ -7,7 +7,7 @@
  * 用 github-slugger 复算 —— rehype-slug 的去重后缀（`-1`/`-2`）、标题里的
  * inline code 与 KaTeX 都会让复算结果漂移，那会静默产出跳不到位置的 404 锚点。
  *
- * 与 `content-utils.ts` 的分层关系沿用 `buildTagGraphData` ← `getTagGraphData()`
+ * 与 `content-utils.ts` 保持构建函数与页面数据加载函数分层。
  * 的既有约定：这里只做纯计算，Astro 侧负责取数据和拼 URL。
  */
 
@@ -123,7 +123,7 @@ function toTimestamp(value: Date | string): number {
 	return value instanceof Date ? value.getTime() : new Date(value).getTime();
 }
 
-/** 去空白、去重、排序，与 tag-graph-data.ts 的同名函数保持一致的语义 */
+/** 去空白、去重并排序标签名称。 */
 function normalizeTags(tags: string[] | undefined): string[] {
 	const seen = new Set<string>();
 	for (const tag of tags ?? []) {
@@ -394,7 +394,7 @@ export function buildKnowledgeGraphData(
 		}
 	}
 
-	// 标签共现：沿用 buildTagGraphData:92-101 的成对计数。
+	// 标签共现：对每篇文章中的标签对进行计数。
 	// 数据里始终生成，客户端默认不喂给 forceLink（面板可开）。
 	if (includeTagCooccurrence) {
 		const pairs = new Map<string, number>();

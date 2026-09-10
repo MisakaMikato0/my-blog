@@ -1,22 +1,149 @@
 .page-title {
+	--pt-tail-delay: 0.6s;
 	display: flex;
 	align-items: center;
 	gap: 0.875rem;
 	min-width: 0;
 }
 
+.page-title__body {
+	min-width: 0;
+	flex: 1;
+}
+
+.page-title__eyebrow {
+	display: block;
+	margin-bottom: 0.4rem;
+	font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+	font-size: 0.78rem;
+	font-weight: 700;
+	letter-spacing: 0.18em;
+	text-transform: uppercase;
+	color: var(--content-meta);
+	animation: page-title-fade 0.7s ease-out both;
+}
+
+.page-title__text {
+	--pt-size: clamp(1.85rem, 4vw, 2.5rem);
+	--pt-weight: 800;
+	position: relative;
+	min-width: 0;
+	margin: 0;
+	color: var(--deep-text);
+	font-size: var(--pt-size);
+	font-weight: var(--pt-weight);
+	line-height: 1.14;
+	letter-spacing: 0;
+}
+
+.page-title__measure {
+	display: block;
+	visibility: hidden;
+	overflow-wrap: anywhere;
+}
+
+.page-title__svg {
+	position: absolute;
+	inset: 0;
+	width: 100%;
+	height: 100%;
+	overflow: visible;
+}
+
+.page-title__ink,
+.page-title__solid {
+	font-family: inherit;
+	font-size: var(--pt-size);
+	font-weight: var(--pt-weight);
+	letter-spacing: 0;
+}
+
+.page-title__ink {
+	fill: none;
+	stroke: var(--deep-text);
+	stroke-width: 0.9;
+	stroke-linejoin: round;
+	stroke-dasharray: 2400;
+	stroke-dashoffset: 2400;
+	animation: page-title-write 1.9s cubic-bezier(0.5, 0, 0.2, 1) both;
+}
+
+.page-title__solid {
+	fill: var(--deep-text);
+	opacity: 0;
+	animation: page-title-ink 0.85s ease-out 0.95s both;
+}
+
+@keyframes page-title-write {
+	from {
+		stroke-dashoffset: 2400;
+	}
+	to {
+		stroke-dashoffset: 0;
+	}
+}
+
+@keyframes page-title-ink {
+	to {
+		opacity: 1;
+	}
+}
+
+@keyframes page-title-fade {
+	from {
+		opacity: 0;
+		translate: 0 0.5rem;
+	}
+	to {
+		opacity: 1;
+		translate: none;
+	}
+}
+
+.page-title__desc {
+	max-width: 46rem;
+	margin: 0.9rem 0 0;
+	color: var(--content-meta);
+	font-size: 0.95rem;
+	line-height: 1.75;
+	animation: page-title-fade 0.9s ease-out var(--pt-tail-delay) both;
+}
+
+.page-title__desc::before,
+.page-title__desc::after {
+	color: var(--deep-text);
+	font-family: Georgia, "Times New Roman", serif;
+	font-size: 1.55em;
+	line-height: 0;
+	opacity: 0.42;
+	vertical-align: -0.3em;
+}
+
+.page-title__desc::before {
+	margin-right: 0.14em;
+	content: "\201C";
+}
+
+.page-title__desc::after {
+	margin-left: 0.08em;
+	content: "\201D";
+}
+
 .page-title__icon {
-	display: inline-flex;
-	align-items: center;
-	justify-content: center;
 	width: 3rem;
 	height: 3rem;
+	display: inline-flex;
 	flex-shrink: 0;
+	align-items: center;
+	justify-content: center;
 	border: 2px solid var(--deep-text);
 	border-radius: var(--radius-large);
-	color: var(--deep-text);
 	background: var(--page-bg);
-	transition: color 150ms ease, background-color 150ms ease, border-color 150ms ease;
+	color: var(--deep-text);
+	transition:
+		color 150ms ease,
+		background-color 150ms ease,
+		border-color 150ms ease;
 }
 
 .page-title__icon svg {
@@ -24,46 +151,19 @@
 	height: 1.65rem;
 }
 
-.page-title__body {
-	min-width: 0;
-}
-
-.page-title__eyebrow {
-	display: block;
-	margin-bottom: 0.125rem;
-	font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
-	font-size: 0.75rem;
-	font-weight: 700;
-	letter-spacing: 0.12em;
-	text-transform: uppercase;
-	color: var(--content-meta);
-}
-
-.page-title__text {
-	margin: 0;
-	color: var(--deep-text);
-	font-size: clamp(1.85rem, 4vw, 2.5rem);
-	font-weight: 800;
-	line-height: 1.1;
-	letter-spacing: 0;
-	overflow-wrap: anywhere;
-}
-
 .page-title--stacked {
 	display: block;
 }
 
-.page-title--stacked .page-title__eyebrow {
-	margin-bottom: 0.35rem;
-	font-size: clamp(0.78rem, 1.5vw, 0.95rem);
-	font-weight: 800;
-	letter-spacing: 0;
+.page-title--stacked .page-title__text {
+	--pt-size: clamp(2rem, 4vw, 2.85rem);
+	--pt-weight: 900;
+	line-height: 1.06;
 }
 
-.page-title--stacked .page-title__text {
-	font-size: clamp(2rem, 4vw, 2.85rem);
-	font-weight: 900;
-	line-height: 1;
+.page-title--stacked .page-title__eyebrow {
+	font-size: clamp(0.8rem, 1.5vw, 0.95rem);
+	letter-spacing: 0.16em;
 }
 
 @media (max-width: 768px) {
@@ -85,7 +185,31 @@
 	}
 
 	.page-title--stacked .page-title__text {
-		font-size: clamp(1.85rem, 9vw, 2.45rem);
-		line-height: 1;
+		--pt-size: clamp(1.85rem, 9vw, 2.45rem);
+	}
+
+	.page-title__eyebrow {
+		font-size: 0.72rem;
+	}
+
+	.page-title__desc {
+		font-size: 0.9rem;
+		line-height: 1.7;
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.page-title__ink {
+		display: none;
+	}
+
+	.page-title__solid {
+		opacity: 1;
+		animation: none;
+	}
+
+	.page-title__eyebrow,
+	.page-title__desc {
+		animation: none;
 	}
 }

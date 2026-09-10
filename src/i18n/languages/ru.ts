@@ -503,6 +503,7 @@ export const ru: Translation = {
 	[Key.dynamicUploadFail]: "Ошибка загрузки",
 	[Key.copyPrefix]: "Копировать",
 	[Key.copyTemplate]: "Копировать шаблон",
+	[Key.copyNotice]: "Скопировано. При перепечатке укажите ссылку на эту статью",
 
 	// ===== 悬浮坞 / 导航 / 主题 =====
 	[Key.switchToDark]: "Включить тёмную тему",

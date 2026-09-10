@@ -503,6 +503,7 @@ export const en: Translation = {
 	[Key.dynamicUploadFail]: "Upload failed",
 	[Key.copyPrefix]: "Copy",
 	[Key.copyTemplate]: "Copy template",
+	[Key.copyNotice]: "Copied. Please credit this article's URL when reposting.",
 
 	// ===== 悬浮坞 / 导航 / 主题 =====
 	[Key.switchToDark]: "Switch to dark mode",

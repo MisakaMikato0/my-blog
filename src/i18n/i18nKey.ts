@@ -570,6 +570,7 @@ enum I18nKey {
 
 	// ===== 上游 1497c35 补齐键 =====
 	copyTemplate = "copyTemplate",
+	copyNotice = "copyNotice",
 	switchToDark = "switchToDark",
 	switchToLight = "switchToLight",
 	spineModel = "spineModel",

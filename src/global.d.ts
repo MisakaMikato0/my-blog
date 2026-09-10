@@ -1,3 +1,4 @@
+import type { SwupRuntimeState } from "@/types/swup";
 import type { ArticleOutlineRailRuntime } from "@/utils/article-outline-controller";
 import type { TOCManager } from "@/utils/toc-utils";
 
@@ -15,6 +16,8 @@ declare global {
 	interface Window {
 		// biome-ignore lint/suspicious/noExplicitAny: External library
 		swup: any;
+		/** swup-lifecycle 的运行时状态，只应由该模块读写 */
+		__fireflySwupRuntime?: SwupRuntimeState;
 		live2dModelInitialized?: boolean;
 		// biome-ignore lint/suspicious/noExplicitAny: External library (PIXI live2d)
 		_live2dApp?: any;

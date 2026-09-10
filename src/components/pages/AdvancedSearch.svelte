@@ -117,14 +117,17 @@ const handleInput = () => {
         <div class="page-title page-title--stacked">
             <div class="page-title__body">
                 <span class="page-title__eyebrow">Search</span>
-                <h1 class="page-title__text">{title}</h1>
+                <h1 class="page-title__text">
+                    <span class="page-title__measure" aria-hidden="true" data-pagefind-ignore>{title}</span>
+                    <svg class="page-title__svg" aria-hidden="true" focusable="false" data-pagefind-ignore>
+                        <text class="page-title__ink" x="0" y="0" dominant-baseline="text-before-edge">{title}</text>
+                        <text class="page-title__solid" x="0" y="0" dominant-baseline="text-before-edge">{title}</text>
+                    </svg>
+                    <span class="sr-only">{title}</span>
+                </h1>
+                <p class="page-title__desc">{i18n(I18nKey.searchMotto)}</p>
             </div>
         </div>
-        {#if description}
-            <p class="text-base text-50 leading-relaxed mt-3">
-                {description}
-            </p>
-        {/if}
     </div>
 
     <!-- Search Bar -->

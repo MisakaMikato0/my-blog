@@ -623,6 +623,23 @@ export const en: Translation = {
 	[Key.kgResetView]: "Reset view",
 	[Key.kgCollapsePanel]: "Collapse controls",
 	[Key.kgExpandPanel]: "Expand controls",
+	[Key.postNavBack]: "Back",
+	[Key.postNavCategory]: "Switch category",
+	[Key.archiveMotto]:
+		"Time never turns back, yet it leaves every road it walked right here.",
+	[Key.collectionsMotto]:
+		"Good tools never shout; they simply bring you closer to what you meant to do.",
+	[Key.aboutMotto]:
+		"Who I am is a question only the things I have written can slowly answer.",
+	[Key.friendsMotto]:
+		"Night lies between one lamp and the next, and that is how they come to see each other.",
+	[Key.sponsorMotto]:
+		"Passion asks for nothing in return, but passion that is seen travels further.",
+	[Key.galleryMotto]: "Only when the shutter falls does time take on a shape.",
+	[Key.rssMotto]: "No need to chase the tide; let it flow to you on its own.",
+	[Key.postsMotto]:
+		"We write things down so the thoughts we once had are not scattered by the wind.",
+	[Key.searchMotto]: "Every answer is hidden in the way the question is asked.",
 	[Key.kgStats]: "{visible} / {total} nodes · {links} links",
 	[Key.kgRelations]: "{count} connections",
 	[Key.kgLoaded]: "Knowledge graph loaded",
@@ -647,4 +664,14 @@ export const en: Translation = {
 	[Key.switchPinnedAria]: "Switch pinned posts",
 	[Key.postIntroLabel]: "Intro",
 	[Key.coverImageAltSuffix]: " cover image",
+
+	[Key.readingProgress]: "Reading progress",
+	[Key.viewDetails]: "View details",
+	[Key.backToTop]: "Back to top",
+	[Key.top]: "Top",
+	[Key.menu]: "Menu",
+	[Key.theme]: "Theme",
+	[Key.playModeList]: "List loop",
+	[Key.playModeSingle]: "Single loop",
+	[Key.playModeShuffle]: "Shuffle",
 };

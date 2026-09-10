@@ -50,8 +50,7 @@ const chatMessages = friendsPageConfig.chat ?? [];
 
 // 页面标题和描述（描述仅用于 SEO meta，不再在页面内显示）
 const title = friendsPageConfig.title || i18n(I18nKey.friends);
-const description =
-	friendsPageConfig.description || i18n(I18nKey.friendsDescription);
+const description = friendsPageConfig.description || i18n(I18nKey.friendsMotto);
 ---
 
 <MainGridLayout title={title} description={description} hasOwnH1={true}>
@@ -59,7 +58,9 @@ const description =
     <div class="card-base z-10 px-4 sm:px-6 lg:px-9 py-6 relative w-full">
       <!-- 页面标题 -->
       <div class="mb-8">
-        <PageTitle title={title} variant="stacked" />
+        <PageTitle title={title} eyebrow="Friends"
+          description={i18n(I18nKey.friendsMotto)}
+          variant="stacked" />
       </div>
 
       <!-- 折叠分类列表 -->
@@ -345,7 +346,7 @@ const items = getEnabledFriends();
 
 const title = friendsPageConfig.title || i18n(I18nKey.friends);
 const description =
-	friendsPageConfig.description || i18n(I18nKey.friendsDescription);
+	friendsPageConfig.description || i18n(I18nKey.friendsMotto);
 ---
 
 <MainGridLayout title={title} description={description}>
@@ -353,7 +354,9 @@ const description =
     <div class="card-base z-10 px-4 sm:px-6 lg:px-9 py-6 relative w-full">
       [!-- 页面标题和描述 --]
       <div class="mb-5">
-        <PageTitle title={title} variant="stacked" />
+        <PageTitle title={title} eyebrow="Friends"
+          description={i18n(I18nKey.friendsMotto)}
+          variant="stacked" />
         <p class="mt-2 max-w-2xl text-sm leading-6 text-(--content-meta)">{description}</p>
       </div>
 

@@ -620,6 +620,24 @@ export const ja: Translation = {
 	[Key.kgResetView]: "ビューをリセット",
 	[Key.kgCollapsePanel]: "設定パネルをたたむ",
 	[Key.kgExpandPanel]: "設定パネルを開く",
+	[Key.postNavBack]: "前のページへ",
+	[Key.postNavCategory]: "カテゴリを切替",
+	[Key.archiveMotto]:
+		"時は振り返らない。それでも歩いた道は、すべてここに残している。",
+	[Key.collectionsMotto]:
+		"よい道具は騒がない。ただ、やりたいことへ少しだけ近づけてくれる。",
+	[Key.aboutMotto]:
+		"私が誰なのかは、書き残したものがゆっくり答えてくれるのだろう。",
+	[Key.friendsMotto]:
+		"灯と灯のあいだには夜がある。だからこそ、互いを見つけられる。",
+	[Key.sponsorMotto]:
+		"情熱は見返りを求めない。けれど見られた情熱は、遠くまで行ける。",
+	[Key.galleryMotto]: "シャッターが落ちた瞬間、時間ははじめて形を持つ。",
+	[Key.rssMotto]:
+		"潮を追いかけなくていい。向こうから流れてくるのを待てばいい。",
+	[Key.postsMotto]:
+		"書き留めるのは、かつて考えたことが風に散ってしまわないように。",
+	[Key.searchMotto]: "すべての答えは、問いかけ方のなかに隠れている。",
 	[Key.kgStats]: "{visible} / {total} ノード · {links} リンク",
 	[Key.kgRelations]: "{count} 件の関連",
 	[Key.kgLoaded]: "ナレッジグラフを読み込みました",
@@ -643,4 +661,14 @@ export const ja: Translation = {
 	[Key.switchPinnedAria]: "ピン留め記事を切替",
 	[Key.postIntroLabel]: "概要",
 	[Key.coverImageAltSuffix]: "のカバー画像",
+
+	[Key.readingProgress]: "読書の進捗",
+	[Key.viewDetails]: "詳細を見る",
+	[Key.backToTop]: "トップへ戻る",
+	[Key.top]: "トップ",
+	[Key.menu]: "メニュー",
+	[Key.theme]: "テーマ",
+	[Key.playModeList]: "リストループ",
+	[Key.playModeSingle]: "一曲ループ",
+	[Key.playModeShuffle]: "シャッフル",
 };

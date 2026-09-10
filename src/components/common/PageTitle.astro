@@ -3,7 +3,9 @@ import Icon from "@/components/common/Icon.astro";
 
 interface Props {
 	title: string;
+	/** 标题上方的英文小标题 */
 	eyebrow?: string;
+	/** 标题下方的介绍，渲染时自动加弯引号 */
 	description?: string;
 	icon?: string;
 	variant?: "compact" | "stacked";
@@ -20,6 +22,10 @@ const {
 } = Astro.props;
 ---
 
+{/* 标题用 SVG <text> 双层绘制：描边层跑 stroke-dashoffset 做签写动效，
+    实心层随后淡入。SVG 无法按文字内容自动定宽，所以用一个同字号的隐藏
+    span 撑出盒子、SVG 绝对定位铺满，右侧渐变线才能紧接文字末尾。
+    可见层全部 aria-hidden，读屏只念 sr-only 那一份，避免重复播报 */}
 <div class:list={["page-title", `page-title--${variant}`, className]}>
 	{variant === "compact" && icon && (
 		<span class="page-title__icon" aria-hidden="true">

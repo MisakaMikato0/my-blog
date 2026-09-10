@@ -76,7 +76,8 @@
 	position: absolute;
 	top: 100%;
 	left: 0;
-	padding-top: 0.75rem;
+	/* 与导航栏拉开距离，保留悬停过渡区防止菜单收起 */
+	padding-top: 1.25rem;
 	opacity: 0;
 	visibility: hidden;
 	pointer-events: none;
@@ -100,17 +101,31 @@
 	rotate: 180deg;
 }
 
-.dropdown-content-wrapper {
+.navbar-nav .dropdown-content-wrapper {
+	position: relative;
 	min-width: 12rem;
 	border-radius: 0.75rem;
 	padding: 0.5rem;
-	background: color-mix(in oklch, var(--float-panel-bg) 85%, transparent);
-	backdrop-filter: blur(16px) saturate(180%);
-	-webkit-backdrop-filter: blur(16px) saturate(180%);
-	border: 1px solid var(--line-divider);
+	border: 1.5px solid var(--deep-text);
+	background: var(--float-panel-bg);
+	box-shadow: none;
+	color: var(--deep-text);
 }
 
-/* 禁用 dropdown item 的 expand-animation 背景，只保留边框效果 */
+.navbar-nav .dropdown-content-wrapper::before {
+	position: absolute;
+	top: -0.45rem;
+	left: 1.75rem;
+	width: 0.75rem;
+	height: 0.75rem;
+	border-top: 1.5px solid var(--deep-text);
+	border-left: 1.5px solid var(--deep-text);
+	background: var(--float-panel-bg);
+	content: "";
+	transform: rotate(45deg);
+}
+
+/* 禁用 dropdown item 的 expand-animation 背景，悬停高亮由灰色背景接管 */
 .dropdown-content-wrapper .dropdown-item::before,
 .dropdown-content-wrapper .dropdown-item:hover::before,
 .dropdown-content-wrapper .dropdown-item:active::before {

@@ -78,9 +78,6 @@ export type SiteConfig = {
 		divination: boolean; // 卜筮页面开关
 	};
 
-	// 分类导航栏开关
-	categoryBar?: boolean;
-
 	// 文章列表布局配置
 	postListLayout?: {
 		defaultMode: "list" | "grid";

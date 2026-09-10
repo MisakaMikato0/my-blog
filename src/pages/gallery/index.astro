@@ -24,7 +24,7 @@ if (!siteConfig.pages.gallery) {
 }
 
 const title = i18n(I18nKey.gallery);
-const description = i18n(I18nKey.galleryDescription);
+const description = i18n(I18nKey.galleryMotto);
 
 const albums = galleryConfig.albums.map((album) => {
 	const photos = scanAlbumPhotos(album.id);
@@ -79,7 +79,9 @@ const tabs = [
   <div class="flex w-full rounded-(--radius-large) overflow-hidden relative min-h-32">
     <div class="gallery-panel z-10 px-9 py-6 relative w-full">
       <div class="mb-4 flex items-center justify-between gap-4">
-        <PageTitle title={title} variant="stacked" />
+        <PageTitle title={title} eyebrow="Gallery"
+          description={i18n(I18nKey.galleryMotto)}
+          variant="stacked" />
         <a
           href={url("/gallery/admin/")}
           class="gallery-admin-entry inline-flex shrink-0 items-center justify-center rounded-lg w-9 h-9 text-neutral-500 hover:text-(--primary) dark:text-neutral-400 dark:hover:text-(--primary) transition-colors"

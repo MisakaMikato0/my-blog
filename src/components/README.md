@@ -8,7 +8,6 @@ Firefly 项目中所有可复用组件的集中管理。组件按照功能和职
 
 负责整体页面框架和布局结构的组件。
 
-- `CategoryBar.astro` - 分类栏组件
 - `ConfigCarrier.astro` - 配置载体组件
 - `DropdownMenu.astro` - 下拉菜单组件
 - `Footer.astro` - 页脚组件
@@ -36,6 +35,10 @@ Firefly 项目中所有可复用组件的集中管理。组件按照功能和职
 - `LightDarkSwitch.svelte` - 主题切换组件
 - `Search.svelte` - 搜索功能组件
 - `WallpaperSwitch.svelte` - 壁纸模式切换组件
+
+### 🧩 misc/ - 页面辅助组件
+
+- PostHeaderNav.astro - 文章页返回与分类导航组件
 
 ### 🔧 common/ - 公共可复用组件
 
@@ -143,3 +146,4 @@ Firefly 项目中所有可复用组件的集中管理。组件按照功能和职
 | **comment/** | 评论系统 | 第三方服务集成 |
 | **analytics/** | 数据统计 | 分析和统计服务 |
 | **misc/** | 工具和辅助 | 其他杂项功能 |
+

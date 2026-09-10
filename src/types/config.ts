@@ -202,6 +202,7 @@ export enum LinkPreset {
 	Hobby = 22,
 	Books = 23,
 	Divination = 24,
+	NavTools = 25,
 }
 
 export type NavBarLink = {

@@ -419,6 +419,7 @@ export const zh_CN: Translation = {
 
 	// 日历页面
 	[Key.calendar]: "日历",
+	[Key.tools]: "工具",
 	[Key.feibichi]: "THBWiki",
 	[Key.contactMe]: "联系我",
 	[Key.qqGroup]: "QQ群",

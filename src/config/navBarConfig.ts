@@ -15,13 +15,22 @@ import { siteConfig } from "./siteConfig";
  * - 先依次构建各导航项，再统一组装到 links 数组
  */
 const buildNavBarConfig = (): NavBarConfig => {
-	// 1. 构建文章下拉菜单
+	// 1. 构建工具下拉菜单
+	const toolsNav: NavBarLink = {
+		...LinkPresets[LinkPreset.NavTools],
+		children: [
+			...(siteConfig.pages.collections ? [LinkPreset.Collections] : []),
+			LinkPreset.Feibichi,
+		],
+	};
+
+	// 2. 构建文章下拉菜单
 	const postsNav: NavBarLink = {
 		...LinkPresets[LinkPreset.NavPosts],
 		children: [LinkPreset.PostList, LinkPreset.Archive, LinkPreset.Categories],
 	};
 
-	// 2. 构建联系我下拉菜单
+	// 3. 构建联系我下拉菜单
 	const contactChildren: (NavBarLink | LinkPreset)[] = [];
 	if (siteConfig.pages.friends) {
 		contactChildren.push(LinkPreset.Friends);
@@ -39,7 +48,7 @@ const buildNavBarConfig = (): NavBarConfig => {
 				}
 			: null;
 
-	// 3. 构建爱好下拉菜单
+	// 4. 构建爱好下拉菜单
 	const hobbyChildren: (NavBarLink | LinkPreset)[] = [];
 	if (siteConfig.pages.bangumi) {
 		hobbyChildren.push(LinkPreset.Bangumi);
@@ -57,7 +66,7 @@ const buildNavBarConfig = (): NavBarConfig => {
 		children: hobbyChildren,
 	};
 
-	// 4. 构建我的下拉菜单
+	// 5. 构建我的下拉菜单
 	const myChildren: (NavBarLink | LinkPreset)[] = [];
 	if (siteConfig.pages.gallery) {
 		myChildren.push(LinkPreset.Gallery);
@@ -75,11 +84,10 @@ const buildNavBarConfig = (): NavBarConfig => {
 		children: myChildren,
 	};
 
-	// 5. 统一组装导航栏链接（顺序：主页 → Touhou → 工具导航 → 文章 → 爱好 → 联系我 → 我的）
+	// 6. 统一组装导航栏链接（顺序：主页 → 工具 → 文章 → 爱好 → 联系我 → 我的）
 	const links: (NavBarLink | LinkPreset)[] = [
 		LinkPreset.Home,
-		LinkPreset.Feibichi,
-		...(siteConfig.pages.collections ? [LinkPreset.Collections] : []),
+		toolsNav,
 		postsNav,
 		hobbyNav,
 		...(contactNav ? [contactNav] : []),

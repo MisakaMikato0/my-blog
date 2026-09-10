@@ -475,6 +475,7 @@ enum I18nKey {
 	nextMonth = "nextMonth",
 
 	feibichi = "feibichi",
+	tools = "tools",
 	contactMe = "contactMe",
 	qqGroup = "qqGroup",
 	navPosts = "navPosts",

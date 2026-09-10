@@ -111,6 +111,11 @@ export const LinkPresets: { [key in LinkPreset]: NavBarLink } = {
 		url: "/hobby/",
 		icon: "material-symbols:favorite",
 	},
+	[LinkPreset.NavTools]: {
+		name: i18n(I18nKey.tools),
+		url: "/tools/",
+		icon: "material-symbols:build-rounded",
+	},
 	[LinkPreset.Books]: {
 		name: i18n(I18nKey.books),
 		url: "/books/",

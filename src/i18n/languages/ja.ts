@@ -428,6 +428,7 @@ export const ja: Translation = {
 
 	// カレンダーページ
 	[Key.calendar]: "カレンダー",
+	[Key.tools]: "ツール",
 	[Key.feibichi]: "THBWiki",
 	[Key.contactMe]: "お問い合わせ",
 	[Key.qqGroup]: "QQグループ",

@@ -58,7 +58,11 @@ export const LinkPresets: { [key in LinkPreset]: NavBarLink } = {
 		url: "/stats/",
 		icon: "material-symbols:bar-chart",
 	},
-	[LinkPreset.Categories]: { name: "图谱", url: "/categories/", icon: "material-symbols:hub-outline" },
+	[LinkPreset.Categories]: {
+		name: "图谱",
+		url: "/categories/",
+		icon: "material-symbols:hub-outline",
+	},
 	[LinkPreset.Tags]: {
 		name: i18n(I18nKey.tags),
 		url: "/tags/",

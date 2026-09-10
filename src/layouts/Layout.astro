@@ -44,11 +44,12 @@ interface Props {
 	description?: string;
 	lang?: string;
 	setOGTypeArticle?: boolean;
+	robots?: string;
 	postSlug?: string;
 	articleMeta?: ArticleMeta;
 }
 
-const { title, description, setOGTypeArticle, postSlug, articleMeta } =
+const { title, description, setOGTypeArticle, robots, postSlug, articleMeta } =
 	Astro.props;
 let { lang } = Astro.props;
 
@@ -125,6 +126,7 @@ const siteLang = lang.replace("_", "-");
 
     <title>{pageTitle}</title>
     <meta name="description" content={description || siteConfig.description || pageTitle} />
+    {robots && <meta name="robots" content={robots} />}
     {(() => {
         const keywords =
           (setOGTypeArticle && articleMeta?.tags && articleMeta.tags.length > 0)

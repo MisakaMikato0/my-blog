@@ -73,6 +73,8 @@ export type PlaybackState = {
 export type GraphStrings = {
 	loaded: string;
 	failed: string;
+	play: string;
+	pause: string;
 	tier: Record<GraphTier, string>;
 	posts: string;
 	sections: string;

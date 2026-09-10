@@ -132,8 +132,10 @@ const detailGroups = [
   import type {
     GraphController,
     GraphTier,
+    GraphStrings,
     KGSelection,
   } from "@/utils/graph/types";
+  import type { KGData } from "@/utils/knowledge-graph-data";
   import { bindKnowledgeGraphLifecycle } from "@/utils/knowledge-graph-lifecycle";
   import { url } from "@/utils/url-utils";
 
@@ -158,16 +160,16 @@ const detailGroups = [
     if (!surface || surface.dataset.state === "empty") return;
 
     const current = version;
-    const strings = JSON.parse(root.dataset.kgStrings || "{}");
+    const strings = JSON.parse(root.dataset.kgStrings || "{}") as GraphStrings;
     surface.dataset.state = "loading";
 
     try {
       // 控制器与数据并发拉取，两个请求不串行
       const [{ mountKnowledgeGraph }, graph] = await Promise.all([
         import("@/utils/graph"),
-        fetch(url("/api/knowledge-graph.json")).then((r) => {
+        fetch(url("/api/knowledge-graph.json")).then(async (r) => {
           if (!r.ok) throw new Error(`graph fetch failed: ${r.status}`);
-          return r.json();
+          return (await r.json()) as KGData;
         }),
       ]);
       if (current !== version || !root.isConnected) return;
@@ -193,7 +195,7 @@ const detailGroups = [
     const pauseIcon = root.querySelector<HTMLElement>('[data-kg-icon="pause"]');
     const stats = root.querySelector<HTMLElement>("[data-kg-stats]");
     const statsTpl = stats?.dataset.template ?? "";
-    const strings = JSON.parse(root.dataset.kgStrings || "{}");
+    const strings = JSON.parse(root.dataset.kgStrings || "{}") as GraphStrings;
 
     const onInput = (event: Event) => {
       const el = event.target as HTMLElement & { value?: string; checked?: boolean };
@@ -297,7 +299,7 @@ const detailGroups = [
             const a = document.createElement("a");
             a.href = item.url;
             a.textContent = item.name;
-            li.append(a);
+            li.appendChild(a);
             return li;
           }),
         );

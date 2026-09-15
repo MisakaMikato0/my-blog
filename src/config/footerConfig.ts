@@ -5,7 +5,7 @@ export const footerConfig: FooterConfig = {
 	socialLinks: [
 		{
 			label: "GitHub",
-			href: "hhttps://github.com/MisakaMikato0",
+			href: "https://github.com/MisakaMikato0",
 			icon: "fa7-brands:github",
 		},
 		{

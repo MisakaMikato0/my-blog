@@ -2,6 +2,8 @@
    Article list page
    ========================================================================== */
 
+@import '../components/skull-switch.css';
+
 .article-list-page {
 	width: 100%;
 }
@@ -1049,8 +1051,6 @@
 		width: 100%;
 	}
 }
-
-@import '../components/skull-switch.css';
 
 /* ==== 鼠标移入 3D 效果（从 HEAD 迁移，适配新架构：绑定 .article-list-card）==== */
 .article-list-card {

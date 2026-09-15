@@ -19,10 +19,14 @@ describe("工具导航接入", () => {
 
 		expect(navigation).toBeDefined();
 		expect(
-			navigation && typeof navigation !== "number" ? navigation.children : undefined,
+			navigation && typeof navigation !== "number"
+				? navigation.children
+				: undefined,
 		).toEqual([LinkPreset.Feibichi, LinkPreset.Collections]);
 		expect(
-			navigation && typeof navigation !== "number" ? navigation.name : undefined,
+			navigation && typeof navigation !== "number"
+				? navigation.name
+				: undefined,
 		).toBe("导航");
 		expect(links).not.toContain(LinkPreset.Collections);
 		expect(links).not.toContain(LinkPreset.Feibichi);
@@ -41,7 +45,9 @@ describe("工具导航接入", () => {
 		);
 
 		expect(
-			navigation && typeof navigation !== "number" ? navigation.name : undefined,
+			navigation && typeof navigation !== "number"
+				? navigation.name
+				: undefined,
 		).toBe("导航");
 		expect(LinkPresets[LinkPreset.Collections].url).toBe("/collections/");
 		expect(LinkPresets[LinkPreset.Feibichi].external).toBe(true);

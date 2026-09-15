@@ -1,31 +1,13 @@
 /* ============================================
    浮动工具栏 — 来自 FloatingDock.astro
-   可展开按钮堆栈、抽屉面板、标签列表
+   常驻按钮列、抽屉面板、标签列表
    ============================================ */
 
-.dock-stack {
-	display: flex;
-	flex-direction: column;
-	align-items: flex-end;
-	gap: 0.75rem;
-}
 .dock-buttons {
 	display: flex;
 	flex-direction: column;
 	gap: 0.75rem;
-	max-height: 0;
-	clip-path: inset(0 0 100% 0);
-	opacity: 0;
-	pointer-events: none;
-	transform: translateY(0.5rem);
-	transition: max-height 0.25s ease, opacity 0.2s ease, transform 0.25s ease, clip-path 0.25s ease;
-}
-.dock-stack[data-expanded="true"] .dock-buttons {
-	max-height: 50rem;
-	clip-path: inset(0);
-	opacity: 1;
 	pointer-events: auto;
-	transform: translateY(0);
 }
 .dock-btn.hide {
 	display: none !important;

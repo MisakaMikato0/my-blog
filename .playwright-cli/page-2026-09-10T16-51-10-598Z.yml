@@ -1,0 +1,164 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e4]:
+    - link "logo MmzMing的博客" [ref=e6] [cursor=pointer]:
+      - /url: /
+      - img "logo" [ref=e8]
+      - generic [ref=e9]: MmzMing的博客
+    - generic [ref=e11]:
+      - link "主页" [ref=e13] [cursor=pointer]:
+        - /url: /
+      - link "导航" [ref=e16] [cursor=pointer]:
+        - /url: /collections/
+      - button "文章" [ref=e19]
+      - button "联系" [ref=e24]
+      - button "其他" [ref=e29]
+    - button "工具" [ref=e34]
+  - generic [ref=e37]:
+    - main [ref=e39]:
+      - generic [ref=e41]:
+        - generic [ref=e43]:
+          - heading "的技术博客" [level=1] [ref=e60]
+          - complementary "B站：Mmz明崽" [ref=e62]:
+            - paragraph [ref=e63]:
+              - generic [ref=e64]:
+                - generic [ref=e65]: B站：
+                - generic [aria-hidden]:
+                  - generic: B
+                  - generic: 站
+                  - generic: ：
+              - generic [ref=e66]:
+                - generic [ref=e67]: Mmz明崽
+                - generic [aria-hidden]:
+                  - generic: M
+                  - generic: m
+                  - generic: z
+                  - generic: 明
+                  - generic: 崽
+          - navigation "快捷入口"
+        - generic "公告跑马灯" [ref=e68]:
+          - generic [ref=e70]:
+            - generic [ref=e72]:
+              - generic [ref=e73]:
+                - generic [ref=e74]: "[重构] 一口气全面统一博客样式，移除部分冗余导航页面，更专注内容展示。"
+                - generic [aria-hidden] [ref=e75]: ×
+              - generic [ref=e76]:
+                - generic [ref=e77]: "[优化] 统一Swup生命周期（BUG更少了、牺牲了首屏部分性能）、升级astro 7（构建速度翻倍）、文章封面图片加载（更流畅）、更换音乐播放器 API（更稳定）等多个问题，站点更稳了。"
+                - generic [aria-hidden] [ref=e78]: ×
+              - generic [ref=e79]:
+                - generic [ref=e80]: "[友链] 欢迎各位大佬互换友链，要求内容原创、稳定更新。申请前请先看友链页的说明，期待和你交换链接。"
+                - generic [aria-hidden] [ref=e81]: ×
+              - generic [ref=e82]:
+                - generic [ref=e83]: "[欢迎] 欢迎来到我的博客，我是深耕java、python和agent技术开发。热爱技术、持续学习，欢迎同好交流探讨。"
+                - generic [aria-hidden] [ref=e84]: ×
+            - generic [ref=e86]:
+              - generic [ref=e87]:
+                - generic [ref=e88]: "[重构] 一口气全面统一博客样式，移除部分冗余导航页面，更专注内容展示。"
+                - generic [aria-hidden] [ref=e89]: ×
+              - generic [ref=e90]:
+                - generic [ref=e91]: "[优化] 统一Swup生命周期（BUG更少了、牺牲了首屏部分性能）、升级astro 7（构建速度翻倍）、文章封面图片加载（更流畅）、更换音乐播放器 API（更稳定）等多个问题，站点更稳了。"
+                - generic [aria-hidden] [ref=e92]: ×
+              - generic [ref=e93]:
+                - generic [ref=e94]: "[友链] 欢迎各位大佬互换友链，要求内容原创、稳定更新。申请前请先看友链页的说明，期待和你交换链接。"
+                - generic [aria-hidden] [ref=e95]: ×
+              - generic [ref=e96]:
+                - generic [ref=e97]: "[欢迎] 欢迎来到我的博客，我是深耕java、python和agent技术开发。热爱技术、持续学习，欢迎同好交流探讨。"
+                - generic [aria-hidden] [ref=e98]: ×
+        - region "站点数据" [ref=e99]
+        - generic [ref=e104]:
+          - region "影像揭示" [ref=e105]
+          - region "横向影像叙事" [ref=e108]
+    - contentinfo [ref=e110]:
+      - generic [ref=e111]:
+        - generic [ref=e112]:
+          - region "MmzMing" [ref=e113]:
+            - generic [ref=e114]:
+              - img "MmzMing" [ref=e115]
+              - paragraph [ref=e118]: 且视他人之疑目如盏盏鬼火，大胆地去走你的夜路
+          - navigation "常用联系方式" [ref=e119]:
+            - paragraph [ref=e120]: 常用联系方式
+            - list [ref=e121]:
+              - listitem [ref=e122]:
+                - link "GitHub" [ref=e123] [cursor=pointer]:
+                  - /url: https://github.com/MmzMing
+              - listitem [ref=e126]:
+                - link "QQ" [ref=e127] [cursor=pointer]:
+                  - /url: https://qm.qq.com/q/2R07cjGTZ0
+              - listitem [ref=e130]:
+                - link "B站" [ref=e131] [cursor=pointer]:
+                  - /url: https://space.bilibili.com/15446538
+              - listitem [ref=e134]:
+                - link "邮箱" [ref=e135] [cursor=pointer]:
+                  - /url: mailto:784774835@qq.com
+            - generic [ref=e138]:
+              - link "Sitemap" [ref=e139] [cursor=pointer]:
+                - /url: /sitemap-index.xml
+              - generic [aria-hidden] [ref=e140]: /
+              - link "RSS" [ref=e141] [cursor=pointer]:
+                - /url: /rss/
+              - generic [aria-hidden] [ref=e142]: /
+              - button "隐私政策" [ref=e143] [cursor=pointer]
+              - generic [aria-hidden] [ref=e144]: /
+              - button "用户协议" [ref=e145] [cursor=pointer]
+        - generic [ref=e146]:
+          - generic [ref=e147]:
+            - generic [ref=e148]:
+              - paragraph [ref=e149]: © 2026 MmzMing
+              - generic [aria-hidden] [ref=e150]: ·
+              - generic [ref=e151]:
+                - generic [ref=e152]: 框架
+                - link "Astro" [ref=e153] [cursor=pointer]:
+                  - /url: https://astro.build
+              - generic [aria-hidden] [ref=e154]: ·
+              - generic [ref=e155]:
+                - generic [ref=e156]: 主题
+                - link "Firefly" [ref=e157] [cursor=pointer]:
+                  - /url: https://github.com/CuteLeaf/Firefly
+            - generic [ref=e158]:
+              - link "粤ICP备2026073665号-1" [ref=e159] [cursor=pointer]:
+                - /url: https://beian.miit.gov.cn/#/Integrated/index
+              - generic [aria-hidden] [ref=e160]: /
+              - link "公安网备 粤公网安备44060602003342号" [ref=e161] [cursor=pointer]:
+                - /url: https://beian.mps.gov.cn/#/query/webSearch?code=44060602003342
+                - img "公安网备" [ref=e162]
+                - generic [ref=e163]: 粤公网安备44060602003342号
+          - generic [ref=e164]:
+            - paragraph [ref=e165]:
+              - generic [ref=e168]: 本站已苟活 127 天 0 时 51 分 10 秒
+            - paragraph [ref=e169]:
+              - generic [ref=e174]: 最后更新于 14 天前
+  - region "音乐" [ref=e175]:
+    - generic:
+      - generic:
+        - generic:
+          - generic:
+            - button "列表"
+            - button "歌词"
+          - generic:
+            - generic:
+              - listbox "列表"
+    - generic [ref=e176]:
+      - generic [ref=e177]:
+        - paragraph: 暂未播放
+        - paragraph
+        - generic:
+          - generic [ref=e178]: 0:00
+          - slider "播放进度":
+            - generic [ref=e179] [cursor=pointer]
+          - generic [ref=e180]: 0:00
+      - generic:
+        - generic:
+          - generic:
+            - button "列表循环"
+            - button "歌词" [pressed]
+            - button "上一首"
+            - button "播放"
+            - button "下一首"
+            - button "列表"
+            - generic:
+              - button "音量"
+              - generic:
+                - generic: "70"
+                - slider "音量"
+      - button "音乐" [ref=e181] [cursor=pointer]
+  - generic: 目录
+  - paragraph [ref=e184]

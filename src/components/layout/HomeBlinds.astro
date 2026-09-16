@@ -141,7 +141,7 @@ const runtimeConfig = {
 		</div>
 
 		<!-- 全屏背景收缩成首幕画面的过渡层：元素恒为满屏，收缩靠 clip-path 收窗
-		     加图片等比 scale；2px 边框单独一层，不参与缩放也不被 clip 裁掉 -->
+		     加图片等比 scale -->
 		<div class="home-blinds__portal" data-scenes-portal>
 			<img
 				class="home-blinds__portal-image"
@@ -151,7 +151,6 @@ const runtimeConfig = {
 				data-scenes-portal-image
 			/>
 		</div>
-		<span class="home-blinds__portal-edge" data-scenes-portal-edge></span>
 	</div>
 
 	<section class="home-blinds-reveal" data-home-blinds-reveal aria-label="影像揭示">
@@ -189,7 +188,6 @@ const runtimeConfig = {
 					sceneItems.map((item, index) => (
 						<HomeBlindsScene
 							index={index}
-							total={sceneItems.length}
 							item={item}
 							composite={index === 0}
 						/>
@@ -266,12 +264,14 @@ const runtimeConfig = {
 	} from "@/utils/home-blinds-controller";
 	import { bindHomeLayer } from "@/utils/home-lifecycle";
 
+	// 这一层带 pin 与两条无限循环时间线，必须在 Swup 替换容器之前拆掉，
+	// 否则 kill() 会落在已经脱离文档的节点上（同 HomeHero）
 	bindHomeLayer({
-		id: "blinds",
-		boot: () => {
-			const root = document.getElementById("home-blinds");
-			bootHomeBlinds({ root: root ?? undefined, viewport: root ?? undefined });
-		},
-		teardown: teardownHomeBlinds,
-	});
+	id: "blinds",
+	boot: () => {
+		const root = document.getElementById("home-blinds");
+		bootHomeBlinds({ root: root ?? undefined, viewport: root ?? undefined });
+	},
+	teardown: teardownHomeBlinds,
+});
 </script>

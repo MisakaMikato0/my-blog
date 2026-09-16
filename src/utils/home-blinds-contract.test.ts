@@ -48,3 +48,45 @@ describe("HomeBlinds stage contract", () => {
 		);
 	});
 });
+
+describe("HomeBlinds postcard migration contract", () => {
+	it("uses one raised postcard layout without legacy caption variants", async () => {
+		const scene = await fs.promises.readFile(
+			path.resolve("src/components/layout/HomeBlindsScene.astro"),
+			"utf8",
+		);
+
+		expect(scene).toContain("home-blinds-scene--raised");
+		expect(scene).toContain("home-blinds-scene__card");
+		expect(scene).toContain("home-blinds-scene__string");
+		expect(scene).not.toContain("data-scene-variant");
+		expect(scene).not.toContain("CAPTION_VARIANTS");
+		expect(scene).not.toContain("data-scene-decor");
+	});
+
+	it("keeps the controller independent from removed scene variants", async () => {
+		const controller = await fs.promises.readFile(
+			path.resolve("src/utils/home-blinds-controller.ts"),
+			"utf8",
+		);
+
+		expect(controller).not.toContain("CAPTION_MOTION");
+		expect(controller).not.toContain("data-scene-variant");
+		expect(controller).not.toContain("data-scene-decor");
+		expect(controller).not.toContain("data-scenes-portal-edge");
+	});
+
+	it("declares postcard dates in the typed scene configuration", async () => {
+		const types = await fs.promises.readFile(
+			path.resolve("src/types/config.ts"),
+			"utf8",
+		);
+		const config = await fs.promises.readFile(
+			path.resolve("src/config/homeConfig.ts"),
+			"utf8",
+		);
+
+		expect(types).toContain("date?: string");
+		expect(config).toContain('date: "');
+	});
+});

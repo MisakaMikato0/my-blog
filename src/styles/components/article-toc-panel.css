@@ -3,7 +3,7 @@
 	display: none;
 }
 
-@media (min-width: 96rem) and (hover: hover) and (pointer: fine) {
+@media (min-width: 104rem) and (hover: hover) and (pointer: fine) {
 	.article-toc-panel {
 		--article-toc-active: #0e7490;
 		--article-toc-panel-bg: #dedede;
@@ -16,8 +16,8 @@
 
 		position: fixed;
 		top: 8rem;
-		/* 与旧轨道同位：正文卡宽 56.5rem（半宽 28.25rem），贴右缘再留 1rem 间距 */
-		left: calc(50% + 28.25rem + var(--space-4));
+		/* 贴当前正文右缘，避免正文宽度调整后侵入文章内容 */
+		left: calc(50% + (var(--page-width) / 2) + var(--space-4));
 		z-index: 30;
 		display: flex;
 		flex-direction: column;

@@ -826,7 +826,7 @@ function setupScenes(context: SetupContext) {
 				immediateRender: false,
 			},
 			0,
-		)
+		);
 
 	pinTrigger = ScrollTrigger.create({
 		id: "home-blinds-scenes-pin",

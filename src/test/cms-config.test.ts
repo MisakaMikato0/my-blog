@@ -4,30 +4,28 @@ import path from "node:path";
 import { describe, expect, it } from "vitest";
 
 const requireFromAstro = createRequire(require.resolve("astro"));
-const yaml = requireFromAstro("js-yaml") as { load(source: string): unknown };
+const yaml = requireFromAstro("js-yaml") as {
+	load(source: string): { collections?: Array<Record<string, unknown>> };
+};
 
 describe("Decap posts collection layout", () => {
-	it("uses a standard folder collection for each existing post directory", () => {
+	it("keeps the legacy posts collection URL backed by one non-nested folder collection", () => {
 		const configPath = path.resolve("public/admin/config.yml");
 		const config = fs.readFileSync(configPath, "utf8");
+		const parsed = yaml.load(config);
 
-		expect(() => yaml.load(config)).not.toThrow();
+		expect(parsed.collections).toEqual(
+			expect.arrayContaining([
+				expect.objectContaining({
+					name: "posts",
+					folder: "src/content/posts",
+				}),
+			]),
+		);
 		expect(config).not.toContain("nested:");
 		expect(config).not.toMatch(/^ {4}meta:$/m);
-
-		const expectedCollections = [
-			["posts-ai", "src/content/posts/ai"],
-			["posts-projects", "src/content/posts/projects"],
-			["posts-others", "src/content/posts/others"],
-			["posts-root", "src/content/posts"],
-		];
-
-		for (const [name, folder] of expectedCollections) {
-			expect(config).toMatch(
-				new RegExp(
-					`- name: ${name}[\\s\\S]*?folder: ${folder}[\\s\\S]*?name: body\\r?\\n\\s+widget: markdown`,
-				),
-			);
-		}
+		expect(config).toMatch(
+			/- name: posts[\s\S]*?name: body\r?\n\s+widget: markdown/,
+		);
 	});
 });

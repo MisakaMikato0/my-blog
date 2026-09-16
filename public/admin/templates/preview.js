@@ -188,7 +188,7 @@
   }
 
   if (window.CMS) {
-    window.CMS.registerPreviewStyle('/admin/templates/preview.css?v=60619bc9');
+    window.CMS.registerPreviewStyle('/admin/templates/preview.css?v=f5e6f5e7');
     window.CMS.registerPreviewTemplate('posts-ai', PostPreview);
     window.CMS.registerPreviewTemplate('posts-projects', PostPreview);
     window.CMS.registerPreviewTemplate('posts-others', PostPreview);

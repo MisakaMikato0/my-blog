@@ -1,8 +1,8 @@
-import { describe, expect, it } from "vitest";
 import {
 	getHolidayOccurrences,
 	milestoneFromOccurrences,
 } from "@utils/calendar-milestones";
+import { describe, expect, it } from "vitest";
 
 describe("日历里程碑", () => {
 	it("合并相邻的同名多日假期并过滤补班日", () => {

@@ -31,7 +31,9 @@ function getHeadingText(heading: HTMLElement): string {
 		.querySelectorAll(
 			"script, style, .anchor, .anchor-icon, [data-pagefind-ignore]",
 		)
-		.forEach((element) => element.remove());
+		.forEach((element) => {
+			element.remove();
+		});
 
 	const text = clone.textContent?.replace(/#+\s*$/, "").trim();
 	return text || heading.getAttribute("aria-label") || heading.id || "Heading";
@@ -81,7 +83,10 @@ export function collectTocTree(): TocTree | null {
 		const node = nodes[i];
 		if (node.parent < 0) continue;
 		const parentNode = nodes[node.parent];
-		parentNode.subtreeStart = Math.min(parentNode.subtreeStart, node.subtreeStart);
+		parentNode.subtreeStart = Math.min(
+			parentNode.subtreeStart,
+			node.subtreeStart,
+		);
 		parentNode.subtreeEnd = Math.max(parentNode.subtreeEnd, node.subtreeEnd);
 	}
 

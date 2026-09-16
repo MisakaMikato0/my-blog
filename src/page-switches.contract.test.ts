@@ -5,55 +5,50 @@ import { siteConfig } from "@/config";
 const read = (file: string) => readFileSync(`${process.cwd()}/${file}`, "utf8");
 
 describe("页面开关契约", () => {
-	it("默认启用音乐、文章列表、归档、关于和知识图谱页面", () => {
+	it("默认页面开关与当前页面模型一致", () => {
 		expect(siteConfig.pages).toMatchObject({
-			music: true,
-			postList: true,
-			archive: true,
-			about: true,
-			categories: true,
+			friends: true,
+			sponsor: false,
+			guestbook: true,
+			gallery: true,
+			collections: true,
+			dynamic: true,
+			bangumi: true,
+			books: true,
+			divination: true,
 		});
 	});
 
 	it.each([
-		["about", "src/pages/about.astro"],
-		["archive", "src/pages/archive.astro"],
-		["categories", "src/pages/categories.astro"],
-		["postList", "src/pages/list.astro"],
-		["music", "src/pages/music.astro"],
+		["friends", "src/pages/friends.astro"],
+		["sponsor", "src/pages/sponsor.astro"],
+		["guestbook", "src/pages/guestbook.astro"],
+		["gallery", "src/pages/gallery/index.astro"],
+		["dynamic", "src/pages/dynamic/index.astro"],
+		["bangumi", "src/pages/bangumi.astro"],
+		["books", "src/pages/books.astro"],
+		["divination", "src/pages/divination.astro"],
+		["collections", "src/pages/collections.astro"],
 	])("%s 页面关闭时重定向到 404", (page, file) => {
 		const source = read(file);
 		expect(source).toMatch(
 			new RegExp(
-				`!siteConfig\\.pages\\.${page}[^\\n]*\\n?[^\\n]*Astro\\.redirect\\(\"/404/\"\\)`,
+				`!siteConfig\\.pages\\.${page}[^\\n]*\\n?[^\\n]*Astro\\.redirect\\("/404/"\\)`,
 			),
 		);
 	});
 
-	it("知识图谱 API 在页面关闭时返回 404", () => {
-		expect(read("src/pages/api/knowledge-graph.json.ts")).toMatch(
-			/status:\s*404/,
-		);
-	});
-
-	it("文章列表分页在关闭时返回空数组", () => {
-		expect(read("src/pages/list/[page].astro")).toMatch(
-			/if\s*\(!siteConfig\.pages\.postList\)\s*\{\s*return\s*\[\]/s,
-		);
-	});
-
-	it("sitemap 过滤所有页面开关路径并保留 bangumi 过滤", () => {
+	it("sitemap 过滤所有带页面开关的路径", () => {
 		const config = read("astro.config.mjs");
 		for (const pathname of [
-			"/list/",
-			"/music/",
-			"/archive/",
-			"/about/",
-			"/categories/",
-			"/collections/",
+			"/friends/",
+			"/sponsor/",
+			"/guestbook/",
+			"/bangumi/",
+			"/gallery/",
+			"/dynamic/",
 		]) {
-			expect(config).toContain(`pathname === \"${pathname}\"`);
+			expect(config).toContain(`pathname === "${pathname}"`);
 		}
-		expect(config).toContain('pathname === "/bangumi/"');
 	});
 });

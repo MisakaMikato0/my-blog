@@ -3,8 +3,8 @@ import { buildKnowledgeGraphData } from "@/utils/knowledge-graph-data";
 
 const options = {
 	uncategorizedName: "Uncategorized",
-	categoryUrl: (name: string) => "/categories/" + name + "/",
-	tagUrl: (name: string) => "/tags/" + name + "/",
+	categoryUrl: (name: string) => `/categories/${name}/`,
+	tagUrl: (name: string) => `/tags/${name}/`,
 	siteStartDate: "2020-01-01T00:00:00.000Z",
 };
 

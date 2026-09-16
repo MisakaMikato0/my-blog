@@ -1,10 +1,9 @@
-import { describe, expect, it } from "vitest";
 import { collectTocTree } from "@utils/article-toc-tree";
+import { describe, expect, it } from "vitest";
 
 describe("文章 TOC 树", () => {
 	it("将 h2 → h3 → h2 归一化为同层根节点和子节点", () => {
-		document.body.innerHTML = 
-			`<article>
+		document.body.innerHTML = `<article>
 				<h1 class="post-hero__title">文章标题</h1>
 				<div class="custom-md">
 					<h2 id="intro">介绍</h2>

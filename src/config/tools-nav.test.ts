@@ -23,14 +23,16 @@ describe("导航配置接入", () => {
 				? navigation.name
 				: undefined,
 		).toBe("导航");
-		expect(navigation && typeof navigation !== "number" ? navigation.url : undefined).toBe("/collections/");
+		expect(
+			navigation && typeof navigation !== "number" ? navigation.url : undefined,
+		).toBe("/collections/");
 		expect(links).toContain(navigation);
 		expect(navBarConfig.personalSites).toEqual([
-		{
-			name: "个人主站",
-			url: "https://www.mmzhiku.xyz/",
-			icon: "material-symbols:link",
-		},
-	]);
+			{
+				name: "个人主站",
+				url: "https://www.mmzhiku.xyz/",
+				icon: "material-symbols:link",
+			},
+		]);
 	});
 });

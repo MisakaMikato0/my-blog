@@ -188,7 +188,10 @@
 
   if (window.CMS) {
     window.CMS.registerPreviewStyle('/admin/templates/preview.css');
-    window.CMS.registerPreviewTemplate('posts', PostPreview);
+    window.CMS.registerPreviewTemplate('posts-ai', PostPreview);
+    window.CMS.registerPreviewTemplate('posts-projects', PostPreview);
+    window.CMS.registerPreviewTemplate('posts-others', PostPreview);
+    window.CMS.registerPreviewTemplate('posts-root', PostPreview);
   } else {
     console.warn('[CMS] CMS 对象未就绪，预览模板注册失败');
   }

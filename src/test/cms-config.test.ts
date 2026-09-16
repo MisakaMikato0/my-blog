@@ -42,4 +42,21 @@ describe("Decap posts collection layout", () => {
 			/- name: posts-ai[\s\S]*?name: body\r?\n\s+widget: markdown/,
 		);
 	});
+
+	it("registers the article preview for every post collection", () => {
+		const previewPath = path.resolve("public/admin/templates/preview.js");
+		const preview = fs.readFileSync(previewPath, "utf8");
+		const postCollectionNames = [
+			"posts-ai",
+			"posts-projects",
+			"posts-others",
+			"posts-root",
+		];
+
+		for (const collectionName of postCollectionNames) {
+			expect(preview).toContain(
+				"window.CMS.registerPreviewTemplate('" + collectionName + "', PostPreview)",
+			);
+		}
+	});
 });

@@ -68,7 +68,6 @@ Firefly 项目中所有可复用组件的集中管理。组件按照功能和职
 侧边栏中使用的各种功能小部件。
 
 - `Announcement.astro` - 公告组件
-- `Calendar.astro` - 日历组件
 - `Categories.astro` - 分类组件
 - `Live2DWidget.astro` - Live2D 看板娘组件
 - `Music.astro` - 音乐播放器小部件

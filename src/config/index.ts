@@ -5,7 +5,7 @@
 export type {
 	AnnouncementConfig,
 	AnnouncementItem,
-	BirthdayItem,
+	AnniversaryItem,
 	CalendarConfig,
 	CollectionApiGroup,
 	CollectionApiItem,
@@ -36,6 +36,7 @@ export type {
 	LicenseConfig,
 	MusicPlayerConfig,
 	NavBarConfig,
+	PersonalSite,
 	PlantUMLConfig,
 	SidebarLayoutConfig,
 	SiteConfig,

@@ -3,8 +3,17 @@ import {
 	LinkPreset,
 	type NavBarConfig,
 	type NavBarLink,
+	type PersonalSite,
 } from "../types/config";
 import { siteConfig } from "./siteConfig";
+
+const personalSites: PersonalSite[] = [
+	{
+		name: "个人主站",
+		url: "https://www.mmzhiku.xyz/",
+		icon: "material-symbols:link",
+	},
+];
 
 /**
  * 构建导航栏链接配置
@@ -15,22 +24,14 @@ import { siteConfig } from "./siteConfig";
  * - 先依次构建各导航项，再统一组装到 links 数组
  */
 const buildNavBarConfig = (): NavBarConfig => {
-	// 1. 构建工具下拉菜单
-	const toolsNav: NavBarLink = {
-		...LinkPresets[LinkPreset.NavTools],
-		children: [
-			...(siteConfig.pages.collections ? [LinkPreset.Collections] : []),
-			LinkPreset.Feibichi,
-		],
-	};
-
-	// 2. 构建文章下拉菜单
+	// 1. 构建文章下拉菜单
 	const postsNav: NavBarLink = {
 		...LinkPresets[LinkPreset.NavPosts],
+		activePathPrefixes: ["/posts/"],
 		children: [LinkPreset.PostList, LinkPreset.Archive, LinkPreset.Categories],
 	};
 
-	// 3. 构建联系我下拉菜单
+	// 2. 构建联系我下拉菜单
 	const contactChildren: (NavBarLink | LinkPreset)[] = [];
 	if (siteConfig.pages.friends) {
 		contactChildren.push(LinkPreset.Friends);
@@ -39,7 +40,6 @@ const buildNavBarConfig = (): NavBarConfig => {
 		contactChildren.push(LinkPreset.Guestbook);
 	}
 	contactChildren.push(LinkPreset.QQGroup);
-
 	const contactNav: NavBarLink | null =
 		contactChildren.length > 0
 			? {
@@ -48,25 +48,7 @@ const buildNavBarConfig = (): NavBarConfig => {
 				}
 			: null;
 
-	// 4. 构建爱好下拉菜单
-	const hobbyChildren: (NavBarLink | LinkPreset)[] = [];
-	if (siteConfig.pages.bangumi) {
-		hobbyChildren.push(LinkPreset.Bangumi);
-	}
-	hobbyChildren.push(LinkPreset.Music);
-	if (siteConfig.pages.books) {
-		hobbyChildren.push(LinkPreset.Books);
-	}
-	if (siteConfig.pages.divination) {
-		hobbyChildren.push(LinkPreset.Divination);
-	}
-
-	const hobbyNav: NavBarLink = {
-		...LinkPresets[LinkPreset.Hobby],
-		children: hobbyChildren,
-	};
-
-	// 5. 构建我的下拉菜单
+	// 3. 构建我的下拉菜单
 	const myChildren: (NavBarLink | LinkPreset)[] = [];
 	if (siteConfig.pages.gallery) {
 		myChildren.push(LinkPreset.Gallery);
@@ -84,17 +66,33 @@ const buildNavBarConfig = (): NavBarConfig => {
 		children: myChildren,
 	};
 
-	// 6. 统一组装导航栏链接（顺序：主页 → 工具 → 文章 → 爱好 → 联系我 → 我的）
+	// 保留当前项目已有的兴趣导航，避免迁移资料卡时移除既有入口
+	const hobbyChildren: (NavBarLink | LinkPreset)[] = [];
+	if (siteConfig.pages.bangumi) hobbyChildren.push(LinkPreset.Bangumi);
+	hobbyChildren.push(LinkPreset.Music);
+	if (siteConfig.pages.books) hobbyChildren.push(LinkPreset.Books);
+	if (siteConfig.pages.divination) hobbyChildren.push(LinkPreset.Divination);
+	const hobbyNav: NavBarLink = {
+		...LinkPresets[LinkPreset.Hobby],
+		children: hobbyChildren,
+	};
+
+	// 4. 工具导航作为一级链接，个人主站收纳到 Logo 资料卡
+	const linksNav: NavBarLink | null = siteConfig.pages.collections
+		? LinkPresets[LinkPreset.NavLinks]
+		: null;
+
+	// 5. 统一组装导航栏链接
 	const links: (NavBarLink | LinkPreset)[] = [
 		LinkPreset.Home,
-		toolsNav,
+		...(linksNav ? [linksNav] : []),
 		postsNav,
 		hobbyNav,
 		...(contactNav ? [contactNav] : []),
 		myNav,
 	];
 
-	return { links };
+	return { links, personalSites };
 };
 
 export const navBarConfig: NavBarConfig = buildNavBarConfig();

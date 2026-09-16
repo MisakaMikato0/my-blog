@@ -1,5 +1,5 @@
 import type { SwupRuntimeState } from "@/types/swup";
-import type { ArticleOutlineRailRuntime } from "@/utils/article-outline-controller";
+import type { ArticleTocPanelRuntime } from "@/utils/article-toc-panel-controller";
 import type { TOCManager } from "@/utils/toc-utils";
 
 declare global {
@@ -32,7 +32,7 @@ declare global {
 			options?: Record<string, unknown>,
 		) => void;
 		floatingTOCListenersInitialized?: boolean;
-		__articleOutlineRailRuntime?: ArticleOutlineRailRuntime;
+		__articleTocPanelRuntime?: ArticleTocPanelRuntime;
 		__floatingDockTOC?: TOCManager | null;
 		__searchLoadersReady?: boolean;
 		__searchModalMounted?: boolean;

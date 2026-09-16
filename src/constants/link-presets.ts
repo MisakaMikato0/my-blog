@@ -68,12 +68,6 @@ export const LinkPresets: { [key in LinkPreset]: NavBarLink } = {
 		url: "/tags/",
 		icon: "material-symbols:label",
 	},
-	[LinkPreset.Feibichi]: {
-		name: i18n(I18nKey.feibichi),
-		url: "https://thbwiki.cc/%E9%A6%96%E9%A1%B5",
-		icon: "material-symbols:link",
-		external: true,
-	},
 	[LinkPreset.ContactMe]: {
 		name: i18n(I18nKey.contactMe),
 		url: "/contact/",
@@ -115,10 +109,10 @@ export const LinkPresets: { [key in LinkPreset]: NavBarLink } = {
 		url: "/hobby/",
 		icon: "material-symbols:favorite",
 	},
-	[LinkPreset.NavTools]: {
-		name: i18n(I18nKey.tools),
-		url: "/tools/",
-		icon: "material-symbols:build-rounded",
+	[LinkPreset.NavLinks]: {
+		name: i18n(I18nKey.navLinks),
+		url: "/collections/",
+		icon: "material-symbols:explore",
 	},
 	[LinkPreset.Books]: {
 		name: i18n(I18nKey.books),

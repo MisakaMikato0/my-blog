@@ -188,7 +188,6 @@ export enum LinkPreset {
 	Categories = 11,
 	Tags = 12,
 	PostList = 13,
-	Feibichi = 14,
 	ContactMe = 15,
 	QQGroup = 16,
 	NavPosts = 17,
@@ -199,7 +198,7 @@ export enum LinkPreset {
 	Hobby = 22,
 	Books = 23,
 	Divination = 24,
-	NavTools = 25,
+	NavLinks = 26,
 }
 
 export type NavBarLink = {
@@ -208,11 +207,19 @@ export type NavBarLink = {
 	external?: boolean;
 	icon?: string; // 菜单项图标
 	action?: string; // 可选：点击时触发的自定义事件名（不跳转页面）
+	activePathPrefixes?: string[]; // 额外激活路径前缀，用于聚合不直接对应菜单链接的页面
 	children?: (NavBarLink | LinkPreset)[]; // 支持子菜单，可以是NavBarLink或LinkPreset
+};
+
+export type PersonalSite = {
+	name: string;
+	url: string;
+	icon: string;
 };
 
 export type NavBarConfig = {
 	links: (NavBarLink | LinkPreset)[];
+	personalSites: PersonalSite[];
 };
 
 export type HomePortfolioShutterPanel = {
@@ -628,7 +635,6 @@ export type WidgetComponentType =
 	| "sidebarToc"
 	| "advertisement"
 	| "stats"
-	| "calendar"
 	| "music";
 
 export type WidgetComponentConfig = {
@@ -1009,8 +1015,8 @@ export type HolidayItem = {
 };
 
 // 生日 / 纪念日项（按年重复，公历或农历）
-export type BirthdayItem = {
-	name: string; // 人物名或事件名
+export type AnniversaryItem = {
+	name: string; // 事件名
 	date: SolarOrLunarDate;
 	icon?: string;
 	note?: string;
@@ -1029,6 +1035,6 @@ export type CalendarConfig = {
 	// 内置补充节日（如农历节、节气、个性化节日）
 	builtinHolidays: HolidayItem[];
 
-	// 生日 / 纪念日
-	birthdays: BirthdayItem[];
+	// 建站纪念日（Logo 资料卡右侧进度条展示）
+	siteAnniversary: AnniversaryItem;
 };

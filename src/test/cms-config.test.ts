@@ -9,23 +9,37 @@ const yaml = requireFromAstro("js-yaml") as {
 };
 
 describe("Decap posts collection layout", () => {
-	it("keeps the legacy posts collection URL backed by one non-nested folder collection", () => {
+	it("exposes every post directory as a CMS folder collection", () => {
 		const configPath = path.resolve("public/admin/config.yml");
 		const config = fs.readFileSync(configPath, "utf8");
 		const parsed = yaml.load(config);
+		const postCollections = (parsed.collections ?? []).filter((collection) =>
+			String(collection.name).startsWith("posts"),
+		);
 
-		expect(parsed.collections).toEqual(
+		expect(postCollections).toEqual(
 			expect.arrayContaining([
 				expect.objectContaining({
-					name: "posts",
+					name: "posts-ai",
+					folder: "src/content/posts/ai",
+				}),
+				expect.objectContaining({
+					name: "posts-projects",
+					folder: "src/content/posts/projects",
+				}),
+				expect.objectContaining({
+					name: "posts-others",
+					folder: "src/content/posts/others",
+				}),
+				expect.objectContaining({
+					name: "posts-root",
 					folder: "src/content/posts",
 				}),
 			]),
 		);
-		expect(config).not.toContain("nested:");
-		expect(config).not.toMatch(/^ {4}meta:$/m);
+		expect(postCollections).toHaveLength(4);
 		expect(config).toMatch(
-			/- name: posts[\s\S]*?name: body\r?\n\s+widget: markdown/,
+			/- name: posts-ai[\s\S]*?name: body\r?\n\s+widget: markdown/,
 		);
 	});
 });

@@ -245,7 +245,7 @@
       function loadPreviewTemplate() {
         return new Promise(function (resolve, reject) {
           var script = document.createElement('script');
-          script.src = '/admin/templates/preview.js';
+          script.src = '/admin/templates/preview.js?v=60619bc9';
           script.async = true;
           script.onload = function () { resolve(); };
           script.onerror = function () { reject(new Error('preview.js load failed')); };

@@ -67,4 +67,14 @@ describe("Decap posts collection layout", () => {
 		expect(preview).toContain("props.widgetFor('body')");
 		expect(preview).not.toContain("entry.getIn(['data', 'body'])");
 	});
+
+	it("cache-busts the preview assets after CMS template changes", () => {
+		const indexPath = path.resolve("public/admin/index.html");
+		const previewPath = path.resolve("public/admin/templates/preview.js");
+		const index = fs.readFileSync(indexPath, "utf8");
+		const preview = fs.readFileSync(previewPath, "utf8");
+
+		expect(index).toMatch(/\/admin\/templates\/preview\.js\?v=[0-9a-f]+/);
+		expect(preview).toMatch(/\/admin\/templates\/preview\.css\?v=[0-9a-f]+/);
+	});
 });

@@ -59,4 +59,12 @@ describe("Decap posts collection layout", () => {
 			);
 		}
 	});
+
+	it("renders the markdown body through Decap's widget preview", () => {
+		const previewPath = path.resolve("public/admin/templates/preview.js");
+		const preview = fs.readFileSync(previewPath, "utf8");
+
+		expect(preview).toContain("props.widgetFor('body')");
+		expect(preview).not.toContain("entry.getIn(['data', 'body'])");
+	});
 });

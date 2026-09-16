@@ -161,7 +161,8 @@
     var category = entry.getIn(['data', 'category']) || '';
     var tags = entry.getIn(['data', 'tags']) || [];
     var image = entry.getIn(['data', 'image']) || '';
-    var body = entry.getIn(['data', 'body']) || '';
+    // Markdown 正文由 Decap CMS 的 widgetFor 提供，避免从 frontmatter data 中读取不到正文。
+    var body = props.widgetFor('body');
 
     if (Array.isArray(tags)) {
       tags = tags.filter(function (t) { return !!t; });
@@ -182,7 +183,7 @@
         ])
       ]),
       image && h('figure', { className: 'cms-preview-cover' }, h('img', { src: image, alt: title })),
-      h('div', { className: 'cms-preview-body', dangerouslySetInnerHTML: { __html: renderMarkdown(body) } })
+      h('div', { className: 'cms-preview-body' }, body)
     ]);
   }
 

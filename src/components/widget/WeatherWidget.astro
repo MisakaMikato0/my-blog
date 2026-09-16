@@ -166,6 +166,15 @@ const extendedItems: ExtendedItem[] = [
 		iconColor: "#fca5a5",
 	},
 ];
+
+const weatherBackgroundApis = {
+	pc: "https://t.alcy.cc/pc",
+	mobile: "https://t.alcy.cc/mp",
+} as const;
+
+const pollutantAttrs = new Set(["data-pm25", "data-pm10", "data-o3", "data-no2", "data-so2", "data-co"]);
+const detailItems = extendedItems.filter((item) => !pollutantAttrs.has(item.attr));
+const pollutantItems = extendedItems.filter((item) => pollutantAttrs.has(item.attr));
 ---
 
 <!--
@@ -175,20 +184,29 @@ const extendedItems: ExtendedItem[] = [
 	构建期内联 SVG，运行时按 weather_icon 代码 + 昼夜切换显示。
 -->
 <section class="weather-widget" data-weather-init data-weather-theme="overcast" aria-label="天气预报">
-	<!-- 背景图：封面 API 作为氛围层，overlay 混合进渐变背景（不影响可读性） -->
-	{coverApis.length > 0 && (
-		<div class="weather-widget__visual" aria-hidden="true">
-			<img
-				src={coverApis[0]}
-				data-weather-cover
-				data-api-urls={JSON.stringify(coverApis)}
-				alt=""
-				loading="lazy"
-				decoding="async"
-				referrerpolicy="no-referrer"
-			/>
-		</div>
-	)}
+	<!-- /pc 与 /mp 使用不同构图；加载失败时保留组件主题渐变作为默认背景。 -->
+	<div class="weather-widget__visual" aria-hidden="true">
+		<img
+			src={weatherBackgroundApis.pc}
+			data-weather-cover
+			data-background-kind="pc"
+			data-api-urls={JSON.stringify([weatherBackgroundApis.pc, ...coverApis])}
+			alt=""
+			loading="lazy"
+			decoding="async"
+			referrerpolicy="no-referrer"
+		/>
+		<img
+			src={weatherBackgroundApis.mobile}
+			data-weather-cover-mobile
+			data-background-kind="mobile"
+			data-api-urls={JSON.stringify([weatherBackgroundApis.mobile, ...coverApis])}
+			alt=""
+			loading="lazy"
+			decoding="async"
+			referrerpolicy="no-referrer"
+		/>
+	</div>
 
 	<!-- 加载状态 -->
 	<div class="weather-widget__status weather-widget__status--loading" data-weather-loading>
@@ -207,11 +225,24 @@ const extendedItems: ExtendedItem[] = [
 
 	<!-- 天气数据 -->
 	<div class="weather-widget__content weather-hidden" data-weather-content>
-		<div class="weather-widget__header">
-			<div class="weather-widget__location">
-				<Icon name="lucide:map-pin" class="weather-widget__loc-icon" is:inline />
-				<span class="weather-widget__city" data-city>--</span>
-				<span class="weather-widget__district" data-district>--</span>
+		<div class="weather-widget__layout" data-weather-layout>
+			<div class="weather-widget__hero">
+				<div class="weather-widget__eyebrow">天气预报 <span>LIVE WEATHER</span></div>
+				<div class="weather-widget__location">
+					<Icon name="lucide:map-pin" class="weather-widget__loc-icon" is:inline />
+					<span class="weather-widget__city" data-city>--</span>
+					<span class="weather-widget__district" data-district>--</span>
+				</div>
+				<div class="weather-widget__temp-row">
+					<span class="weather-widget__temp" data-temperature>--</span>
+					<span class="weather-widget__unit">°C</span>
+					<span class="weather-widget__desc" data-weather>--</span>
+				</div>
+				<div class="weather-widget__range">
+					<span class="weather-widget__range-max">高温 <strong data-temp-max>--</strong>°</span>
+					<span class="weather-widget__range-divider">/</span>
+					<span class="weather-widget__range-min">低温 <strong data-temp-min>--</strong>°</span>
+				</div>
 			</div>
 			<div class="weather-widget__big-icon" aria-hidden="true">
 				{heroWeatherIcons.map((icon) => (
@@ -222,43 +253,54 @@ const extendedItems: ExtendedItem[] = [
 			</div>
 		</div>
 
-		<div class="weather-widget__temp-row">
-			<span class="weather-widget__temp" data-temperature>--</span>
-			<span class="weather-widget__unit">°C</span>
-			<span class="weather-widget__desc" data-weather>--</span>
-		</div>
+		<div class="weather-widget__details" data-weather-extended data-weather-details-state="collapsed">
+			<div class="weather-widget__details-header">
+				<div>
+					<span>今日气象</span>
+					<strong data-weather-location-label>--</strong>
+				</div>
+				<div class="weather-widget__details-meta">
+					<span><Icon name="lucide:clock" is:inline /><span data-report-time>--</span>发布</span>
+					<button class="weather-widget__retry weather-widget__retry--refresh" type="button" data-retry-btn title="刷新天气" aria-label="刷新天气">
+						<Icon name="lucide:refresh-cw" is:inline />
+					</button>
+				</div>
+			</div>
 
-		<div class="weather-widget__range">
-			<span class="weather-widget__range-min"><span data-temp-min>--</span>°</span>
-			<span class="weather-widget__range-divider">/</span>
-			<span class="weather-widget__range-max"><span data-temp-max>--</span>°</span>
-			<span class="weather-widget__update">
-				<Icon name="lucide:clock" is:inline />
-				<span data-report-time>--</span>
-			</span>
-			<button class="weather-widget__retry weather-widget__retry--refresh" type="button" data-retry-btn title="刷新天气" aria-label="刷新天气">
-				<Icon name="lucide:refresh-cw" is:inline />
+			<div class="weather-widget__details-grid" data-weather-details>
+				{detailItems.map((item) => (
+					<div class:list={["weather-widget__item", item.aqi && "weather-widget__item--aqi"]}>
+						<span class="weather-widget__item-icon" style={item.iconColor ? `color: ${item.iconColor}` : undefined}>
+							<Icon name={item.icon} is:inline />
+						</span>
+						<span class="weather-widget__item-label">{item.label}</span>
+						{item.aqi ? (
+							<span class="weather-widget__item-value">
+								<span data-aqi>--</span>
+								<span class="aqi-tag" data-aqi-category>--</span>
+							</span>
+						) : (
+							<span class="weather-widget__item-value" {...{ [item.attr]: "" }}>{item.placeholder}</span>
+						)}
+					</div>
+				))}
+			</div>
+
+			<div class="weather-widget__pollution" data-weather-pollution aria-label="污染物浓度">
+				{pollutantItems.map((item) => (
+					<div class="weather-widget__pollutant">
+						<span class="weather-widget__pollutant-label">{item.label}</span>
+						<span class="weather-widget__pollutant-value" style={item.iconColor ? `color: ${item.iconColor}` : undefined} {...{ [item.attr]: "" }}>{item.placeholder}</span>
+					</div>
+				))}
+			</div>
+
+			<button class="weather-widget__mobile-toggle" type="button" data-weather-mobile-toggle aria-expanded="false">
+				<span data-weather-toggle-label>打开完整数据</span>
+				<Icon name="lucide:chevron-down" is:inline />
 			</button>
 		</div>
 
-		<div class="weather-widget__extended" data-weather-extended>
-			{extendedItems.map((item) => (
-				<div class:list={["weather-widget__item", item.aqi && "weather-widget__item--aqi"]}>
-					<span class="weather-widget__item-icon" style={item.iconColor ? `color: ${item.iconColor}` : undefined}>
-						<Icon name={item.icon} is:inline />
-					</span>
-					<span class="weather-widget__item-label">{item.label}</span>
-					{item.aqi ? (
-						<span class="weather-widget__item-value">
-							<span data-aqi>--</span>
-							<span class="aqi-tag" data-aqi-category>--</span>
-						</span>
-					) : (
-						<span class="weather-widget__item-value" {...{ [item.attr]: "" }}>{item.placeholder}</span>
-					)}
-				</div>
-			))}
-		</div>
 	</div>
 </section>
 
@@ -274,7 +316,7 @@ const extendedItems: ExtendedItem[] = [
 		--wt-panel: rgb(255 255 255 / 0.1);
 		--wt-panel-border: rgb(255 255 255 / 0.18);
 		position: relative;
-		margin-top: var(--guide-gap);
+		margin-top: var(--guide-gap, 0.9rem);
 		border: 1px solid rgb(255 255 255 / 0.22);
 		border-radius: var(--guide-radius);
 		background: linear-gradient(155deg, var(--wt-top), var(--wt-bottom) 72%);
@@ -482,14 +524,6 @@ const extendedItems: ExtendedItem[] = [
 		}
 	}
 
-	/* 头部：位置 + 大图标 */
-	.weather-widget__header {
-		display: flex;
-		align-items: flex-start;
-		justify-content: space-between;
-		gap: 1rem;
-	}
-
 	.weather-widget__location {
 		display: flex;
 		align-items: center;
@@ -584,7 +618,7 @@ const extendedItems: ExtendedItem[] = [
 		font-weight: 800;
 	}
 
-	/* 最高/最低 + 更新时间 + 刷新 */
+	/* 最高/最低 */
 	.weather-widget__range {
 		display: flex;
 		align-items: center;
@@ -603,22 +637,6 @@ const extendedItems: ExtendedItem[] = [
 
 	.weather-widget__range-divider {
 		color: var(--wt-text-dim);
-	}
-
-	.weather-widget__update {
-		display: inline-flex;
-		align-items: center;
-		gap: 0.3rem;
-		margin-left: auto;
-		font-size: 0.72rem;
-		font-weight: 700;
-		color: var(--wt-text-dim);
-		opacity: 0.85;
-	}
-
-	.weather-widget__update svg {
-		width: 0.9em;
-		height: 0.9em;
 	}
 
 	.weather-widget__retry--refresh {
@@ -640,15 +658,6 @@ const extendedItems: ExtendedItem[] = [
 	.weather-widget__retry--refresh svg {
 		width: 0.9em;
 		height: 0.9em;
-	}
-
-	/* 扩展数据网格：玻璃拟态面板 */
-	.weather-widget__extended {
-		display: grid;
-		grid-template-columns: repeat(6, minmax(0, 1fr));
-		gap: 0.55rem;
-		border-top: 1px solid rgb(255 255 255 / 0.18);
-		padding-top: 0.9rem;
 	}
 
 	.weather-widget__item {
@@ -746,39 +755,362 @@ const extendedItems: ExtendedItem[] = [
 		color: #fff;
 	}
 
-	@media (max-width: 1200px) {
-		.weather-widget__extended {
-			grid-template-columns: repeat(4, minmax(0, 1fr));
-		}
-	}
-
-	@media (max-width: 768px) {
-		.weather-widget__extended {
-			grid-template-columns: repeat(2, minmax(0, 1fr));
-		}
-	}
-
-	@media (max-width: 480px) {
-		.weather-widget__header {
-			flex-direction: column;
-			align-items: flex-start;
-		}
-
-		.weather-widget__big-icon {
-			align-self: flex-end;
-			margin-top: -3.2rem;
-		}
-
-		.weather-widget__update {
-			display: none;
-		}
-	}
-
 	@media (prefers-reduced-motion: reduce) {
 		.weather-widget__spinner,
 		.weather-widget__big-icon,
 		.weather-widget__content {
 			animation: none;
+		}
+	}
+
+	/* ===== 新版天气场景：PC 横向，移动端竖向 ===== */
+	.weather-widget {
+		padding: 0;
+		border-radius: clamp(1rem, 2vw, 1.5rem);
+		background: linear-gradient(145deg, var(--wt-top), var(--wt-bottom) 76%);
+	}
+
+	.weather-widget__visual {
+		opacity: 0.48;
+		mix-blend-mode: normal;
+		mask-image: linear-gradient(90deg, #000 0%, rgb(0 0 0 / 0.85) 62%, transparent 100%);
+	}
+
+	.weather-widget__visual img {
+		position: absolute;
+		inset: 0;
+		display: block;
+		filter: brightness(0.58) saturate(1.18) contrast(1.05);
+	}
+
+	.weather-widget__visual img[data-background-kind="mobile"] {
+		display: none;
+	}
+
+	.weather-widget__content {
+		gap: 0;
+		padding: clamp(1rem, 2vw, 1.65rem);
+	}
+
+	.weather-widget__layout {
+		display: grid;
+		grid-template-columns: minmax(0, 1fr) auto;
+		align-items: center;
+		gap: clamp(0.7rem, 2.4vw, 2.2rem);
+		min-height: 0;
+	}
+
+	@media (min-width: 769px) {
+		.weather-widget.weather-widget--enter-from-right {
+			animation: weather-widget-enter-from-right 0.72s cubic-bezier(0.22, 0.8, 0.24, 1) both;
+		}
+	}
+
+	@keyframes weather-widget-enter-from-right {
+		from {
+			opacity: 0;
+			transform: translate3d(22%, 0, 0);
+		}
+		to {
+			opacity: 1;
+			transform: translate3d(0, 0, 0);
+		}
+	}
+
+	.weather-widget__hero {
+		min-width: 0;
+	}
+
+	.weather-widget__eyebrow {
+		display: flex;
+		align-items: center;
+		gap: 0.65rem;
+		margin-bottom: 0.45rem;
+		color: var(--wt-text-dim);
+		font-size: 0.72rem;
+		font-weight: 800;
+		letter-spacing: 0.08em;
+	}
+
+	.weather-widget__eyebrow span {
+		padding: 0.23rem 0.5rem;
+		border: 1px solid rgb(255 255 255 / 0.2);
+		border-radius: 999px;
+		font: 500 0.58rem var(--font-mono, monospace);
+		letter-spacing: 0.08em;
+	}
+
+	.weather-widget__location {
+		gap: 0.42rem;
+	}
+
+	.weather-widget__city,
+	.weather-widget__district {
+		font-size: clamp(1rem, 1.6vw, 1.25rem);
+	}
+
+	.weather-widget__temp-row {
+		margin-top: 0.4rem;
+	}
+
+	.weather-widget__temp {
+		font-size: clamp(2.9rem, 5.6vw, 4.6rem);
+		letter-spacing: -0.08em;
+		line-height: 0.86;
+	}
+
+	.weather-widget__desc {
+		font-size: clamp(1.2rem, 2.2vw, 1.75rem);
+	}
+
+	.weather-widget__range {
+		margin-top: 0.5rem;
+		font-size: 0.82rem;
+	}
+
+	.weather-widget__range strong {
+		font-weight: 900;
+	}
+
+	.weather-widget__big-icon {
+		width: clamp(5.2rem, 8vw, 7rem);
+		height: clamp(5.2rem, 8vw, 7rem);
+	}
+
+	.weather-widget__big-icon svg {
+		height: clamp(3rem, 5.2vw, 4.5rem);
+	}
+
+	.weather-widget__details {
+		position: relative;
+		margin-top: 0.75rem;
+		padding: 0.7rem 0.8rem;
+		border: 1px solid var(--wt-panel-border);
+		border-radius: 1rem;
+		background: rgb(10 15 31 / 0.24);
+		backdrop-filter: blur(12px);
+	}
+
+	.weather-widget__details-header {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 1rem;
+		margin-bottom: 0.5rem;
+	}
+
+	.weather-widget__details-header > div:first-child {
+		display: flex;
+		align-items: baseline;
+		gap: 0.6rem;
+	}
+
+	.weather-widget__details-header > div:first-child span {
+		color: var(--wt-text-dim);
+		font-size: 0.7rem;
+		font-weight: 750;
+	}
+
+	.weather-widget__details-header strong {
+		font-size: 0.9rem;
+	}
+
+	.weather-widget__details-meta {
+		display: flex;
+		align-items: center;
+		gap: 0.7rem;
+		color: var(--wt-text-dim);
+		font-size: 0.68rem;
+	}
+
+	.weather-widget__details-meta > span {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.3rem;
+	}
+
+	.weather-widget__details-meta svg {
+		width: 0.9em;
+		height: 0.9em;
+	}
+
+	.weather-widget__details-grid {
+		display: grid;
+		grid-template-columns: repeat(6, minmax(0, 1fr));
+		gap: 0.5rem;
+	}
+
+	.weather-widget__details .weather-widget__item {
+		padding: 0.55rem 0.6rem;
+		border-radius: 0.7rem;
+	}
+
+	.weather-widget__details .weather-widget__item-icon {
+		width: 1.55em;
+		height: 1.55em;
+	}
+
+	.weather-widget__details .weather-widget__item-label {
+		font-size: 0.58rem;
+		letter-spacing: 0.04em;
+	}
+
+	.weather-widget__details .weather-widget__item-value {
+		font-size: 0.76rem;
+	}
+
+	.weather-widget__pollution {
+		display: grid;
+		grid-template-columns: repeat(6, minmax(0, 1fr));
+		gap: 0.45rem;
+		margin-top: 0.65rem;
+	}
+
+	.weather-widget__pollutant {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 0.35rem;
+		min-width: 0;
+		padding: 0.48rem 0.6rem;
+		border: 1px solid rgb(255 255 255 / 0.14);
+		border-radius: 0.65rem;
+		background: rgb(255 255 255 / 0.07);
+	}
+
+	.weather-widget__pollutant-label,
+	.weather-widget__pollutant-value {
+		font: 700 0.62rem var(--font-mono, monospace);
+		white-space: nowrap;
+	}
+
+	.weather-widget__pollutant-label {
+		color: var(--wt-text-dim);
+	}
+
+	.weather-widget__pollutant-value {
+		color: var(--wt-text);
+	}
+
+	.weather-widget__mobile-toggle {
+		display: none;
+	}
+
+	@media (max-width: 1200px) {
+		.weather-widget__details-grid {
+			grid-template-columns: repeat(4, minmax(0, 1fr));
+		}
+	}
+
+	@media (max-width: 768px) {
+		.weather-widget__visual {
+			mask-image: linear-gradient(180deg, #000 0%, rgb(0 0 0 / 0.7) 58%, transparent 100%);
+		}
+
+		.weather-widget__visual img[data-background-kind="pc"] {
+			display: none;
+		}
+
+		.weather-widget__visual img[data-background-kind="mobile"] {
+			display: block;
+		}
+
+		.weather-widget__layout {
+			grid-template-columns: 1fr;
+			align-items: start;
+			min-height: 0;
+			gap: 0.15rem;
+		}
+
+		.weather-widget__big-icon {
+			align-self: end;
+			justify-self: end;
+			width: 5.6rem;
+			height: 5.6rem;
+			margin-top: -4.2rem;
+		}
+
+		.weather-widget__details {
+			margin-top: 0.7rem;
+			padding: 0.75rem 0.8rem 0.95rem;
+		}
+
+		.weather-widget__details-grid,
+		.weather-widget__pollution {
+			transition: max-height 260ms ease, opacity 220ms ease, margin 220ms ease;
+		}
+
+		.weather-widget__details[data-weather-details-state="collapsed"] .weather-widget__details-grid,
+		.weather-widget__details[data-weather-details-state="collapsed"] .weather-widget__pollution {
+			max-height: 0;
+			margin-top: 0;
+			overflow: hidden;
+			opacity: 0;
+			pointer-events: none;
+		}
+
+		.weather-widget__details[data-weather-details-state="expanded"] .weather-widget__details-grid,
+		.weather-widget__details[data-weather-details-state="expanded"] .weather-widget__pollution {
+			max-height: 50rem;
+			opacity: 1;
+		}
+
+		.weather-widget__details[data-weather-details-state="expanded"] {
+			padding-bottom: 1.1rem;
+		}
+
+		.weather-widget__details[data-weather-details-state="expanded"] .weather-widget__pollution {
+			margin-bottom: 0.2rem;
+		}
+
+		.weather-widget__pollution {
+			gap: 0.28rem;
+		}
+
+		.weather-widget__pollutant {
+			flex-direction: column;
+			align-items: flex-start;
+			gap: 0.12rem;
+			padding: 0.42rem 0.38rem;
+		}
+
+		.weather-widget__mobile-toggle {
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			gap: 0.35rem;
+			width: 100%;
+			margin-top: 0.85rem;
+			padding: 0.7rem 0 0.2rem;
+			border: 0;
+			border-top: 1px solid rgb(255 255 255 / 0.12);
+			background: transparent;
+			color: var(--wt-text-dim);
+			font-size: 0.7rem;
+			font-weight: 800;
+			cursor: pointer;
+		}
+
+		.weather-widget__mobile-toggle svg {
+			width: 1em;
+			height: 1em;
+			transition: transform 180ms ease;
+		}
+
+		.weather-widget__details[data-weather-details-state="expanded"] .weather-widget__mobile-toggle svg {
+			transform: rotate(180deg);
+		}
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.weather-widget,
+		.weather-widget__layout,
+		.weather-widget__big-icon,
+		.weather-widget__details-grid,
+		.weather-widget__pollution,
+		.weather-widget__mobile-toggle svg {
+			animation: none;
+			transition: none;
 		}
 	}
 </style>
@@ -1002,7 +1334,19 @@ const extendedItems: ExtendedItem[] = [
 	}
 
 	// 获取天气数据 - 支持 IP 自动定位
+	let weatherRequest: Promise<WeatherData> | null = null;
+
 	async function fetchWeather(): Promise<WeatherData> {
+		if (!weatherRequest) {
+			weatherRequest = loadWeatherData().catch((error) => {
+				weatherRequest = null;
+				throw error;
+			});
+		}
+		return weatherRequest;
+	}
+
+	async function loadWeatherData(): Promise<WeatherData> {
 		const params = new URLSearchParams();
 		if (adcode) {
 			params.set("adcode", adcode);
@@ -1069,32 +1413,41 @@ const extendedItems: ExtendedItem[] = [
 
 	// 封面背景图：按顺序重试 API，全部失败则隐藏背景层（天气数据不受影响）
 	function initWeatherCover(container: HTMLElement) {
-		const img = container.querySelector<HTMLImageElement>("[data-weather-cover]");
-		if (!img) return;
+		const images = Array.from(
+			container.querySelectorAll<HTMLImageElement>("[data-weather-cover], [data-weather-cover-mobile]"),
+		);
+		if (images.length === 0) return;
 
-		let urls: string[] = [];
-		try {
-			urls = JSON.parse(img.dataset.apiUrls || "[]");
-		} catch {
-			urls = [];
-		}
-
-		let index = 1; // 0 号已由服务端设为 src
-		const onError = () => {
-			if (index < urls.length) {
-				img.addEventListener("error", onError, { once: true });
-				img.src = urls[index];
-				index += 1;
-			} else {
-				img.closest(".weather-widget__visual")?.classList.add("weather-hidden");
+		let failedImages = 0;
+		images.forEach((img) => {
+			let urls: string[] = [];
+			try {
+				urls = JSON.parse(img.dataset.apiUrls || "[]");
+			} catch {
+				urls = [];
 			}
-		};
 
-		if (img.complete) {
-			if (img.naturalWidth === 0) onError();
-		} else {
-			img.addEventListener("error", onError, { once: true });
-		}
+			let index = 1; // 0 号已由服务端设为 src
+			const onError = () => {
+				if (index < urls.length) {
+					img.addEventListener("error", onError, { once: true });
+					img.src = urls[index];
+					index += 1;
+					return;
+				}
+				img.classList.add("weather-hidden");
+				failedImages += 1;
+				if (failedImages === images.length) {
+					img.closest(".weather-widget__visual")?.classList.add("weather-hidden");
+				}
+			};
+
+			if (img.complete) {
+				if (img.naturalWidth === 0) onError();
+			} else {
+				img.addEventListener("error", onError, { once: true });
+			}
+		});
 	}
 
 	// 更新 UI
@@ -1125,12 +1478,18 @@ const extendedItems: ExtendedItem[] = [
 
 		// 更新数据
 		const setData = (selector: string, value: unknown) => {
-			const el = container.querySelector(selector);
-			if (el) el.textContent = value == null || value === "" ? "--" : String(value);
+			const textValue = value == null || value === "" ? "--" : String(value);
+			container.querySelectorAll(selector).forEach((el) => {
+				el.textContent = textValue;
+			});
 		};
 
 		setData("[data-city]", data.city);
 		setData("[data-district]", data.district);
+		setData(
+			"[data-weather-location-label]",
+			[data.city, data.district].filter((value) => value != null && value !== "").join(" "),
+		);
 		setData("[data-temperature]", data.temperature);
 		setData("[data-weather]", data.weather);
 		setData("[data-wind]", `${data.wind_direction} ${data.wind_power}`);
@@ -1201,17 +1560,57 @@ const extendedItems: ExtendedItem[] = [
 		respectReducedMotion(container);
 	}
 
+
+	function setupDesktopEnter(container: HTMLElement): (() => void) | undefined {
+		if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+		if (!window.matchMedia("(min-width: 769px)").matches) return;
+
+		const play = () => {
+			container.classList.add("weather-widget--enter-from-right");
+		};
+
+		if (typeof IntersectionObserver === "undefined") {
+			play();
+			return;
+		}
+
+		const observer = new IntersectionObserver(
+			(entries) => {
+				if (entries.some((entry) => entry.isIntersecting)) {
+					play();
+					observer.disconnect();
+				}
+			},
+			{ threshold: 0.18 },
+		);
+		observer.observe(container);
+		return () => observer.disconnect();
+	}
+
 	// 初始化组件
 	function initWidget(container: HTMLElement): (() => void) | undefined {
 		if (container.dataset.weatherReady === "true") return;
 		container.dataset.weatherReady = "true";
 
 		initWeatherCover(container);
+		const stopEnter = setupDesktopEnter(container);
 
 		const retryBtns = Array.from(container.querySelectorAll("[data-retry-btn]"));
 		const content = container.querySelector("[data-weather-content]");
 		const loading = container.querySelector("[data-weather-loading]");
 		const errorEl = container.querySelector("[data-weather-error]");
+		const details = container.querySelector<HTMLElement>("[data-weather-extended]");
+		const mobileToggle = container.querySelector<HTMLButtonElement>("[data-weather-mobile-toggle]");
+		const mobileToggleLabel = container.querySelector<HTMLElement>("[data-weather-toggle-label]");
+
+		const onMobileToggle = () => {
+			if (!details || !mobileToggle || !mobileToggleLabel) return;
+			const expanded = details.dataset.weatherDetailsState === "expanded";
+			details.dataset.weatherDetailsState = expanded ? "collapsed" : "expanded";
+			mobileToggle.setAttribute("aria-expanded", String(!expanded));
+			mobileToggleLabel.textContent = expanded ? "打开完整数据" : "收起数据";
+		};
+		mobileToggle?.addEventListener("click", onMobileToggle);
 
 		async function loadWeather() {
 			// 显示加载状态，隐藏其他状态
@@ -1231,6 +1630,7 @@ const extendedItems: ExtendedItem[] = [
 		const onRetry = () => {
 			const cacheKey = adcode ? `adcode_${adcode}` : city ? `city_${city}` : "ip_location";
 			localStorage.removeItem(CACHE_KEY + cacheKey);
+			weatherRequest = null;
 			loadWeather();
 		};
 		retryBtns.forEach((btn) => btn.addEventListener("click", onRetry));
@@ -1240,6 +1640,8 @@ const extendedItems: ExtendedItem[] = [
 
 		return () => {
 			retryBtns.forEach((btn) => btn.removeEventListener("click", onRetry));
+			mobileToggle?.removeEventListener("click", onMobileToggle);
+			stopEnter?.();
 		};
 	}
 

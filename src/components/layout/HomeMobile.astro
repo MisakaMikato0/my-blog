@@ -2,6 +2,7 @@
 import { Picture } from "astro:assets";
 import * as path from "node:path";
 import Icon from "@components/common/Icon.astro";
+import WeatherWidget from "@components/widget/WeatherWidget.astro";
 import type { ImageMetadata } from "astro";
 import { homeConfig, siteConfig } from "@/config";
 import I18nKey from "@/i18n/i18nKey";
@@ -194,6 +195,8 @@ const statsShareId = umamiConfig?.shareId ?? "";
 			</div>
 		</div>
 	</section>
+
+	<WeatherWidget />
 
 	{/* 第二层：内容区 */}
 	<section class="home-mobile-content">

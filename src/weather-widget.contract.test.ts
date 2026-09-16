@@ -8,12 +8,20 @@ const source = fs.readFileSync(
 );
 
 describe("天气组件新版布局契约", () => {
-	it("保留原天气接口并提供横向/竖向响应式容器", () => {
-		expect(source).toContain('const API_URL = "https://uapis.cn/api/v1/misc/weather?"');
-		expect(source).toContain('class="weather-widget__layout"');
-		expect(source).toContain('data-weather-details');
-		expect(source).toContain('data-weather-pollution');
-		expect(source).toContain('data-weather-mobile-toggle');
+	it("保留原天气接口，并使用预览页同款横向/竖向场景骨架", () => {
+		expect(source).toContain(
+			'const API_URL = "https://uapis.cn/api/v1/misc/weather?"',
+		);
+		expect(source).toContain("layout-frame__wide-grid");
+		expect(source).toContain("layout-frame__portrait-art");
+		expect(source).toContain("layout-frame__mobile-data");
+		expect(source).toContain("layout-frame__pollution");
+		expect(source).toMatch(
+			/querySelectorAll<HTMLElement>\(\s*"\[data-aqi-category\]"/,
+		);
+		expect(source).toContain("data-weather-details");
+		expect(source).toContain("data-weather-pollution");
+		expect(source).toContain("data-weather-mobile-toggle");
 	});
 
 	it("在桌面数据层和移动端首页都挂载同一套天气组件", () => {
@@ -32,6 +40,7 @@ describe("天气组件新版布局契约", () => {
 	it("使用桌面右侧横移入场动画并提供减少动态效果回退", () => {
 		expect(source).toContain("weather-widget-enter-from-right");
 		expect(source).toContain("weather-widget--enter-from-right");
+		expect(source).toContain("1.25s cubic-bezier(0.22, 0.8, 0.24, 1)");
 		expect(source).not.toContain("weather-widget__legacy");
 		expect(source).not.toContain("weather-widget__header");
 		expect(source).not.toContain("weather-widget__extended");

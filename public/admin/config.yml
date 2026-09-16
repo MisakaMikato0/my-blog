@@ -32,10 +32,8 @@ collections:
       subfolders: false
     meta:
       path:
-        widget: hidden
+        widget: string
         label: 路径
-        name: path
-        default: ""
     format: yaml-frontmatter
     sortable_fields: [published, title, category]
     view_filters:

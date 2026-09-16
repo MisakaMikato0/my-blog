@@ -8,6 +8,8 @@ describe("Decap posts collection layout", () => {
 		const config = fs.readFileSync(configPath, "utf8");
 
 		expect(config).toContain("nested:\n      depth: 2\n      subfolders: false");
-		expect(config).toContain('name: path\n        default: ""');
+		expect(config).toContain("path:\n        widget: string\n        label: 路径");
+		expect(config).not.toContain("widget: hidden");
+		expect(config).not.toMatch(/path:\n        widget: string\n        label: 路径\n        default:/);
 	});
 });

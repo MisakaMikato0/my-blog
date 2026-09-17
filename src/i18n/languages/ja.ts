@@ -193,6 +193,8 @@ export const ja: Translation = {
 	[Key.paginationFirst]: "最初",
 	[Key.paginationPrev]: "前へ",
 	[Key.paginationNext]: "次へ",
+	[Key.prevPost]: "前の記事",
+	[Key.nextPost]: "次の記事",
 	[Key.paginationLast]: "最後",
 	[Key.paginationPage]: "",
 	[Key.paginationOf]: "ページ、全",

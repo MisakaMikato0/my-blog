@@ -28,6 +28,10 @@ html:has(.home-hero) #top-row {
 	contain: layout paint;
 }
 
+:root.dark .home-hero {
+	--home-hero-surface: var(--page-bg);
+}
+
 .home-hero__visual,
 .home-hero__backdrop,
 .home-hero__shade,

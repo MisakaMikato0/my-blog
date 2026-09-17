@@ -194,6 +194,8 @@ export const ru: Translation = {
 	[Key.paginationFirst]: "Первая",
 	[Key.paginationPrev]: "Предыдущая",
 	[Key.paginationNext]: "Следующая",
+	[Key.prevPost]: "Предыдущая статья",
+	[Key.nextPost]: "Следующая статья",
 	[Key.paginationLast]: "Последняя",
 	[Key.paginationPage]: "Страница",
 	[Key.paginationOf]: "из",

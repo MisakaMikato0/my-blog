@@ -191,6 +191,8 @@ export const zh_CN: Translation = {
 	[Key.paginationFirst]: "首页",
 	[Key.paginationPrev]: "上一页",
 	[Key.paginationNext]: "下一页",
+	[Key.prevPost]: "上一篇",
+	[Key.nextPost]: "下一篇",
 	[Key.paginationLast]: "末页",
 	[Key.paginationPage]: "第",
 	[Key.paginationOf]: "页，共",

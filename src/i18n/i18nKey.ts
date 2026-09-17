@@ -243,6 +243,10 @@ enum I18nKey {
 	paginationRecords = "paginationRecords",
 	paginationStatus = "paginationStatus",
 
+	// 文章详情上下篇
+	prevPost = "prevPost",
+	nextPost = "nextPost",
+
 	// 404页面
 	notFound = "notFound",
 	notFoundTitle = "notFoundTitle",

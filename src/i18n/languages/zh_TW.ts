@@ -193,6 +193,8 @@ export const zh_TW: Translation = {
 	[Key.paginationFirst]: "首頁",
 	[Key.paginationPrev]: "上一頁",
 	[Key.paginationNext]: "下一頁",
+	[Key.prevPost]: "上一篇",
+	[Key.nextPost]: "下一篇",
 	[Key.paginationLast]: "末頁",
 	[Key.paginationPage]: "第",
 	[Key.paginationOf]: "頁，共",

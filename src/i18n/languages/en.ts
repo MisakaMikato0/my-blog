@@ -194,6 +194,8 @@ export const en: Translation = {
 	[Key.paginationFirst]: "First",
 	[Key.paginationPrev]: "Previous",
 	[Key.paginationNext]: "Next",
+	[Key.prevPost]: "Previous post",
+	[Key.nextPost]: "Next post",
 	[Key.paginationLast]: "Last",
 	[Key.paginationPage]: "Page",
 	[Key.paginationOf]: "of",

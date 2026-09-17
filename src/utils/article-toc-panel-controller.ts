@@ -121,6 +121,9 @@ export class ArticleTocPanelController {
 	private railBaseTop = 0;
 	private railHeight = 0;
 	private appliedRailTop: number | null = null;
+	/* 停靠冻结：面板底边触到正文卡底后，阅读跟踪锁死在那一刻的有效位置 */
+	private clampLimit = Number.NaN;
+	private dockScrollY: number | null = null;
 
 	constructor(root: HTMLElement) {
 		this.root = root;
@@ -187,6 +190,7 @@ export class ArticleTocPanelController {
 		this.resizeObserver = null;
 		this.root.style.top = "";
 		this.appliedRailTop = null;
+		this.dockScrollY = null;
 		if (this.animationFrame !== null) cancelAnimationFrame(this.animationFrame);
 		if (this.measureFrame !== null) cancelAnimationFrame(this.measureFrame);
 		if (this.linesFrame !== null) cancelAnimationFrame(this.linesFrame);
@@ -623,13 +627,28 @@ export class ArticleTocPanelController {
 		);
 	}
 
+	private getEffectiveScrollY(): number {
+		const limit = this.clampLimit;
+		if (Number.isNaN(limit) || limit <= 0) {
+			this.dockScrollY = null;
+			return window.scrollY;
+		}
+		if (window.scrollY <= limit) {
+			this.dockScrollY = null;
+			return window.scrollY;
+		}
+		if (this.dockScrollY === null) this.dockScrollY = limit;
+		return this.dockScrollY;
+	}
+
 	private getProgress(): number {
+		const effectiveScrollY = this.getEffectiveScrollY();
 		const end = this.articleEnd - window.innerHeight + READING_OFFSET;
 		if (end <= this.articleStart) {
-			return window.scrollY + READING_OFFSET >= this.articleStart ? 1 : 0;
+			return effectiveScrollY + READING_OFFSET >= this.articleStart ? 1 : 0;
 		}
 		return clamp(
-			(window.scrollY - this.articleStart) / (end - this.articleStart),
+			(effectiveScrollY - this.articleStart) / (end - this.articleStart),
 			0,
 			1,
 		);
@@ -638,16 +657,22 @@ export class ArticleTocPanelController {
 	/* 每次滚动实时测正文卡底部（含 License/相关文章/上下篇），避免初始化时布局
 	   未稳导致的钳制点漂移；图片/字体加载引起的高度变化由 ResizeObserver 兜住 */
 	private syncDock(): void {
-		if (!this.railHeight) return;
+		if (!this.railHeight) {
+			this.clampLimit = Number.NaN;
+			return;
+		}
 		const anchor =
 			document.querySelector<HTMLElement>("#post-container") ?? this.article;
-		if (!anchor) return;
+		if (!anchor) {
+			this.clampLimit = Number.NaN;
+			return;
+		}
 
 		const anchorBottom = anchor.getBoundingClientRect().bottom + window.scrollY;
-		const limit =
+		this.clampLimit =
 			anchorBottom - this.railHeight - RAIL_BOTTOM_GAP - this.railBaseTop;
 		/* 面板底边不许越过正文卡底：正常时停在 CSS 的 top，越过后随文档滚走 */
-		const maxTop = limit + this.railBaseTop - window.scrollY;
+		const maxTop = this.clampLimit + this.railBaseTop - window.scrollY;
 		const nextTop = Math.min(this.railBaseTop, maxTop);
 		if (nextTop === this.appliedRailTop) return;
 
@@ -658,7 +683,7 @@ export class ArticleTocPanelController {
 	private getActiveIndex(): number {
 		const tree = this.tree;
 		if (!tree || this.headingTops.length === 0) return -1;
-		const readingPosition = window.scrollY + READING_OFFSET;
+		const readingPosition = this.getEffectiveScrollY() + READING_OFFSET;
 		let lower = 0;
 		let upper = this.headingTops.length - 1;
 		let result = 0;

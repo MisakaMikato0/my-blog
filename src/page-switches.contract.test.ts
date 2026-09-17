@@ -9,7 +9,7 @@ describe("页面开关契约", () => {
 		expect(siteConfig.pages).toMatchObject({
 			friends: true,
 			sponsor: false,
-			guestbook: true,
+			guestbook: false,
 			gallery: true,
 			collections: true,
 			dynamic: true,

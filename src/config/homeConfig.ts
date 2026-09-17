@@ -261,12 +261,6 @@ export const homeConfig: HomeConfig = {
 			showName: false,
 		},
 		{
-			name: "站内留言",
-			icon: "material-symbols:chat-rounded",
-			url: "/guestbook/",
-			showName: false,
-		},
-		{
 			name: "RSS",
 			icon: "fa7-solid:rss",
 			url: "/rss/",

@@ -68,7 +68,15 @@ describe("Decap posts collection layout", () => {
 		expect(preview).not.toContain("entry.getIn(['data', 'body'])");
 	});
 
-	it("cache-busts the preview assets after CMS template changes", () => {
+		it("gives Decap a full-height mount so the editor pane is visible", () => {
+		const indexPath = path.resolve("public/admin/index.html");
+		const index = fs.readFileSync(indexPath, "utf8");
+
+		expect(index).toMatch(/html,\s*body\s*\{[^}]*height:\s*100%/);
+		expect(index).toMatch(/#nc-root\s*\{[^}]*height:\s*100%/);
+	});
+
+it("cache-busts the preview assets after CMS template changes", () => {
 		const indexPath = path.resolve("public/admin/index.html");
 		const previewPath = path.resolve("public/admin/templates/preview.js");
 		const index = fs.readFileSync(indexPath, "utf8");

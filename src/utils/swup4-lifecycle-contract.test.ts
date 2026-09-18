@@ -9,7 +9,6 @@ describe("Swup 4 lifecycle contracts", () => {
 	it("does not register obsolete Swup 3 document events", () => {
 		const files = [
 			"src/components/common/VisitorCount.astro",
-			"src/components/features/FloatingLyrics.astro",
 			"src/components/layout/HomeDataLayer.astro",
 			"src/components/layout/HomeMobile.astro",
 			"src/components/widget/WeatherWidget.astro",

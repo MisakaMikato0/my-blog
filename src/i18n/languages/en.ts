@@ -79,7 +79,6 @@ export const en: Translation = {
 	[Key.musicCover]: "Cover",
 	[Key.musicNoCover]: "No cover available",
 	[Key.musicAudioPlayer]: "Audio Player",
-	[Key.musicFloatingLyrics]: "Floating Lyrics",
 
 	// Announcement
 	[Key.announcement]: "Announcement",

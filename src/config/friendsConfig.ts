@@ -85,7 +85,7 @@ export const friendsConfig: FriendLink[] = [
 		imgurl: 'https://hakugyokurou.fun/favicon/favicon.svg',
 		desc: '这里是白玉楼呀！',
 		siteurl: 'https://hakugyokurou.fun/',
-		image: '/assets/images/frihome/ends/hero-home2.jpg',
+		image: '/assets/images/home/hero-home2.jpg',
 		tags: ['Blog'],
 		weight: 5,
 		enabled: true,

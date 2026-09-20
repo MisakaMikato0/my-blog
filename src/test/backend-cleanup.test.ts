@@ -9,7 +9,7 @@ import {
 import os from "node:os";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
-import { loadPostFiles } from "../scripts/post-loader";
+import { loadPostFiles } from "../../scripts/post-loader";
 
 const root = process.cwd();
 

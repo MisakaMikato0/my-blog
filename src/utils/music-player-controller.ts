@@ -7,8 +7,9 @@ import { i18n } from "@/i18n/translation";
  * 本模块只负责三态形态机（disc / pill / bar）、上展歌单面板、拖拽与列表渲染。
  *
  * 形态转移约定：
- * - 鼠标移入组件：展开 bar 并显示歌单面板（未播放时从 disc 展开）；
- * - 鼠标移出组件：收起歌单面板，播放中回 pill / disc，未播放回 disc；
+ * - 鼠标移入组件：展开 bar 控制条（未播放时从 disc 展开）；
+ * - 鼠标移出组件：收起歌单面板与控制条，播放中回 pill / disc，未播放回 disc；
+ * - 歌单面板由歌单按钮点击切换，悬停不会自动弹出；
  * - 键盘触发唱片按钮时保留展开 / 收起能力，焦点移出组件后自动收起；
  * - bar 态分层显示：信息层（曲名 / 艺术家 / 进度）默认展开 + 工具栏层；
  *   信息层保持展开，歌单面板位于其上方。
@@ -152,9 +153,7 @@ export function setupMusicPlayerWidget(): void {
 	}
 
 	function expandWidget(): void {
-		ensureInit();
 		setShape("bar");
-		setPanelOpen(true);
 	}
 
 	function collapseWidget(): void {
@@ -684,7 +683,9 @@ export function setupMusicPlayerWidget(): void {
 	ui.btnPlaylist?.addEventListener(
 		"click",
 		() => {
-			setPanelOpen(true);
+			ensureInit();
+			setShape("bar");
+			setPanelOpen(!panelOpen);
 			setPanelTab("playlist");
 		},
 		{ signal },

@@ -1,14 +1,11 @@
 import { existsSync, readFileSync } from "node:fs";
+import path from "node:path";
 import { describe, expect, it } from "vitest";
 
-const readSource = (path: string) =>
-	readFileSync(
-		new URL(
-			path.startsWith("src/") ? `./${path.slice(4)}` : `../${path}`,
-			import.meta.url,
-		),
-		"utf8",
-	);
+const projectRoot = process.cwd();
+
+const readSource = (file: string) =>
+	readFileSync(path.join(projectRoot, file), "utf8");
 
 describe("AI search removal", () => {
 	it("keeps the ordinary Pagefind search flow wired", () => {
@@ -35,7 +32,7 @@ describe("AI search removal", () => {
 			"src/components/layout/MobileDock.astro",
 			"src/components/controls/SearchModal.svelte",
 			"src/layouts/Layout.astro",
-			"src/global.d.ts",
+			"src/types/global.d.ts",
 			"src/i18n/i18nKey.ts",
 			"src/i18n/languages/en.ts",
 			"src/i18n/languages/ja.ts",
@@ -61,10 +58,10 @@ describe("AI search removal", () => {
 		}
 
 		expect(
-			existsSync(new URL("./components/controls/ai-search", import.meta.url)),
+			existsSync(path.join(projectRoot, "src/components/controls/ai-search")),
 		).toBe(false);
 		expect(
-			existsSync(new URL("./styles/components/ai-search.css", import.meta.url)),
+			existsSync(path.join(projectRoot, "src/styles/components/ai-search.css")),
 		).toBe(false);
 	});
 });

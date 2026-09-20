@@ -44,7 +44,7 @@ afterEach(() => {
 });
 
 describe("music player hover contract", () => {
-	it("expands and opens the playlist on pointerenter, then hides on pointerleave", () => {
+	it("expands the control bar on hover while keeping the playlist click-toggle", () => {
 		document.body.innerHTML = widgetMarkup;
 		const init = vi.fn().mockResolvedValue(undefined);
 		window.__fireflyMusic = {
@@ -88,6 +88,12 @@ describe("music player hover contract", () => {
 
 		root.dispatchEvent(new Event("pointerenter"));
 		expect(root.dataset.state).toBe("bar");
+		expect(root.dataset.panel).toBe("closed");
+		expect(init).not.toHaveBeenCalled();
+
+		root
+			.querySelector<HTMLButtonElement>(".music-player__btn--playlist")
+			?.click();
 		expect(root.dataset.panel).toBe("open");
 		expect(init).toHaveBeenCalledTimes(1);
 

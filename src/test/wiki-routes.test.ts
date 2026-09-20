@@ -34,7 +34,7 @@ vi.mock("@/utils/llm-wiki", () => ({
 
 describe("Wiki static routes", () => {
 	it("prerenders the index and delegates public posts to the Wiki index converter", async () => {
-		const route = await import("./pages/wiki/index.json");
+		const route = await import("@/pages/wiki/index.json");
 
 		expect(route.prerender).toBe(true);
 		const response = await route.GET({
@@ -51,10 +51,10 @@ describe("Wiki static routes", () => {
 	});
 
 	it.each([
-		["json", "./articles/[...slug].json", "application/json"],
-		["markdown", "./articles/[...slug].md", "text/markdown"],
+		["json", "@/pages/wiki/articles/[...slug].json", "application/json"],
+		["markdown", "@/pages/wiki/articles/[...slug].md", "text/markdown"],
 	] as const)("prerenders the %s article route and preserves nested slugs in static paths", async (_name, modulePath, contentType) => {
-		const route = await import(modulePath.replace("./", "./pages/wiki/"));
+		const route = await import(modulePath);
 
 		expect(route.prerender).toBe(true);
 		expect(await route.getStaticPaths?.()).toEqual([

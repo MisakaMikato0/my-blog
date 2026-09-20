@@ -1,0 +1,324 @@
+<h2>二次元方向 · 友链分类卡片</h2>
+<p class="subtitle">
+  全部沿用项目现有 <code>friend-card</code> 结构与真实友链数据（2px 描边、波浪封面、圆形头像、分隔线），
+  只叠加分类视觉。每套都给出「本人 / 朋友 / 顶置」，并附浅色 + 深色两行。
+</p>
+
+<style>
+  .fc-demo {
+    --deep-text: oklch(0.10 0 0);
+    --page-bg: #fff7fb;
+    --content-meta: oklch(0.45 0 0);
+    --line-divider: oklch(0.85 0 0);
+    --fc-radius: 14px;
+    font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", "Microsoft YaHei", sans-serif;
+  }
+  .fc-demo.fc-dark {
+    --deep-text: #dadada;
+    --page-bg: #111827;
+    --content-meta: #999999;
+    --line-divider: #2e2e2e;
+  }
+  .fc-demo .fc-row {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 14px;
+    margin: 10px 0 4px;
+  }
+  @media (max-width: 900px) {
+    .fc-demo .fc-row { grid-template-columns: 1fr; }
+  }
+  .fc-demo .fc-label {
+    font-size: 11px;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    opacity: .6;
+    margin-top: 16px;
+  }
+
+  /* ===== 项目现有卡片基础样式（节选自 src/styles/pages/friends.css） ===== */
+  .fc-demo .friend-card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    border-radius: var(--fc-radius);
+    border: 2px solid var(--deep-text);
+    background: var(--page-bg);
+    color: var(--deep-text);
+    text-decoration: none;
+    overflow: hidden;
+    transition: border-color 300ms ease, box-shadow 300ms ease, background-color 300ms ease, transform 300ms ease;
+  }
+  .fc-demo .friend-card:hover {
+    box-shadow: 0 6px 22px rgba(0, 0, 0, .16);
+    transform: translateY(-3px);
+  }
+  .fc-demo.fc-dark .friend-card:hover { box-shadow: 0 6px 22px rgba(255, 255, 255, .16); }
+  .fc-demo .friend-card__cover { position: relative; display: block; height: 88px; overflow: hidden; }
+  .fc-demo .friend-card__cover-img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .fc-demo .friend-card__wave {
+    position: absolute; z-index: 2; left: 0; right: 0; bottom: -1px;
+    width: 100%; height: 20px; color: var(--page-bg); display: block; pointer-events: none;
+  }
+  .fc-demo .friend-card__body { display: flex; flex-direction: column; flex: 1; padding: 14px 16px; }
+  .fc-demo .friend-card__info { display: flex; align-items: center; gap: 12px; }
+  .fc-demo .friend-card__avatar {
+    position: relative; width: 44px; height: 44px; flex-shrink: 0;
+    border-radius: 999px; overflow: hidden; border: 2px solid var(--deep-text); background: var(--page-bg);
+  }
+  .fc-demo .friend-card__avatar img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .fc-demo .friend-card__meta { display: flex; flex-direction: column; gap: 3px; min-width: 0; flex: 1; }
+  .fc-demo .friend-card__name-row { display: flex; align-items: center; gap: 6px; min-width: 0; }
+  .fc-demo .friend-card__name {
+    font-size: 15px; font-weight: 700; line-height: 1.3; color: var(--deep-text);
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .fc-demo .friend-card__url { font-size: 11px; font-weight: 500; color: var(--content-meta); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .fc-demo .friend-card__divider { height: 1px; background: var(--line-divider); margin: 12px 0 10px; }
+  .fc-demo .friend-card__desc { font-size: 12px; line-height: 1.5; color: var(--content-meta); }
+
+  /* 分类徽章公共形态 */
+  .fc-demo .fc-badge {
+    position: absolute; z-index: 4; top: 8px; right: 8px;
+    display: inline-flex; align-items: center; gap: 4px;
+    padding: 3px 9px; border-radius: 999px;
+    font-size: 11px; font-weight: 700; letter-spacing: .04em; line-height: 1.4;
+  }
+  .fc-demo .fc-badge--seal {
+    top: 9px; right: 9px; width: 32px; height: 32px; padding: 0;
+    justify-content: center; border-radius: 7px; font-size: 12px;
+    transform: rotate(8deg);
+  }
+
+  /* =====================================================
+     A · 樱色和纸（和风二次元）
+     ===================================================== */
+  .scheme-a .friend-card--friend {
+    background:
+      repeating-linear-gradient(0deg, rgba(0,0,0,.028) 0 1px, transparent 1px 4px),
+      var(--page-bg);
+  }
+  .scheme-a.fc-dark .friend-card--friend {
+    background: repeating-linear-gradient(0deg, rgba(255,255,255,.035) 0 1px, transparent 1px 4px), var(--page-bg);
+  }
+
+  .scheme-a .friend-card--self {
+    border-color: #2c2c2c;
+    background:
+      radial-gradient(circle at 88% 8%, rgba(192,187,254,.38), transparent 44%),
+      linear-gradient(180deg, #fdfaf3, #fff7fb 70%);
+  }
+  .scheme-a.fc-dark .friend-card--self {
+    border-color: #dadada;
+    background: radial-gradient(circle at 88% 8%, rgba(192,187,254,.20), transparent 44%), linear-gradient(180deg, #1b1b22, #111827 70%);
+  }
+  .scheme-a .friend-card--self::after {
+    content: ""; position: absolute; inset: 5px; border-radius: 9px;
+    border: 1px solid rgba(199,150,60,.55); pointer-events: none; z-index: 2;
+  }
+  .scheme-a .friend-card--self .friend-card__avatar { border-color: #c7963c; box-shadow: 0 0 0 2px rgba(199,150,60,.22); }
+  .scheme-a .friend-card--self .fc-badge {
+    background: #c0392b; color: #fff; border-radius: 7px;
+    letter-spacing: .1em; box-shadow: 0 2px 0 rgba(0,0,0,.18);
+  }
+
+  .scheme-a .friend-card--pinned {
+    border-color: #ff8ba7;
+    background:
+      radial-gradient(circle at 12% 0%, rgba(255,139,167,.32), transparent 48%),
+      linear-gradient(180deg, #fff4f7, #fff7fb 72%);
+  }
+  .scheme-a.fc-dark .friend-card--pinned {
+    background: radial-gradient(circle at 12% 0%, rgba(255,139,167,.18), transparent 48%), linear-gradient(180deg, #1d1a20, #111827 72%);
+  }
+  .scheme-a .friend-card--pinned::before {
+    content: ""; position: absolute; z-index: 3; top: -12px; left: 16px;
+    width: 62px; height: 26px; background: rgba(255,221,161,.85);
+    border-left: 1px dashed rgba(0,0,0,.18); border-right: 1px dashed rgba(0,0,0,.18);
+    transform: rotate(-6deg); box-shadow: 0 2px 6px rgba(0,0,0,.10);
+  }
+  .scheme-a .friend-card--pinned .fc-badge { background: #ff8ba7; color: #4a1b28; }
+  .scheme-a .friend-card--pinned .friend-card__avatar { border-color: #ff8ba7; }
+
+  /* =====================================================
+     B · 星屑魔法（魔法少女）
+     ===================================================== */
+  .scheme-b .friend-card--friend {
+    border-color: rgba(120,120,150,.55);
+    background: linear-gradient(180deg, rgba(192,187,254,.12), transparent 42%), var(--page-bg);
+  }
+  .scheme-b .friend-card--friend .fc-badge { background: rgba(255,255,255,.88); color: #5b5b70; border: 1px solid rgba(0,0,0,.12); }
+  .scheme-b.fc-dark .friend-card--friend .fc-badge { background: rgba(255,255,255,.14); color: #cfcfe0; border-color: rgba(255,255,255,.22); }
+
+  .scheme-b .friend-card--self {
+    border-color: transparent;
+    background:
+      linear-gradient(var(--page-bg), var(--page-bg)) padding-box,
+      linear-gradient(135deg, #c0bbfe, #8fd6e8 50%, #c0bbfe) border-box;
+    box-shadow: 0 0 0 4px rgba(143,214,232,.16);
+  }
+  .scheme-b .friend-card--self .friend-card__avatar { border-color: #8fd6e8; }
+  .scheme-b .friend-card--self .fc-badge { background: linear-gradient(135deg, #c0bbfe, #8fd6e8); color: #23233a; }
+
+  .scheme-b .friend-card--pinned {
+    border-color: transparent;
+    background:
+      linear-gradient(var(--page-bg), var(--page-bg)) padding-box,
+      linear-gradient(120deg, #ffdf6c, #ff8ba7 34%, #c0bbfe 66%, #8fd6e8) border-box;
+    box-shadow: 0 8px 26px rgba(192,187,254,.32);
+  }
+  .scheme-b .friend-card--pinned .fc-badge { background: linear-gradient(135deg, #ffdf6c, #ff8ba7); color: #4a1b28; }
+  .scheme-b .friend-card--pinned .friend-card__avatar { border-color: #ffdf6c; }
+  .scheme-b .friend-card--pinned::after {
+    content: "✦"; position: absolute; z-index: 3; top: 6px; left: 10px;
+    font-size: 15px; color: #ffdf6c; text-shadow: 0 0 8px rgba(255,223,108,.95);
+    animation: fcTwinkle 2.4s ease-in-out infinite;
+  }
+  @keyframes fcTwinkle {
+    0%, 100% { opacity: .35; transform: scale(.9); }
+    50% { opacity: 1; transform: scale(1.15); }
+  }
+
+  /* =====================================================
+     C · 稀有度分级（抽卡图鉴）
+     ===================================================== */
+  .scheme-c .friend-card--friend { border-color: #9aa3b2; }
+  .scheme-c .friend-card--friend .fc-badge {
+    background: linear-gradient(180deg, #e8edf4, #c3ccd9); color: #37414f; border: 1px solid #9aa3b2;
+  }
+  .scheme-c .friend-card--friend .friend-card__avatar { border-color: #9aa3b2; }
+
+  .scheme-c .friend-card--self {
+    border-color: transparent;
+    background:
+      linear-gradient(var(--page-bg), var(--page-bg)) padding-box,
+      linear-gradient(150deg, #f3d17a, #c7963c 45%, #f3d17a) border-box;
+  }
+  .scheme-c .friend-card--self::after {
+    content: ""; position: absolute; inset: 4px; border-radius: 10px;
+    border: 1px solid rgba(243,209,122,.55); pointer-events: none; z-index: 2;
+  }
+  .scheme-c .friend-card--self .friend-card__avatar { border-color: #c7963c; }
+  .scheme-c .friend-card--self .fc-badge {
+    background: linear-gradient(180deg, #f8e3a3, #d8a940); color: #4a3510; border: 1px solid #b8892f;
+  }
+
+  .scheme-c .friend-card--pinned {
+    border-color: transparent;
+    background:
+      linear-gradient(var(--page-bg), var(--page-bg)) padding-box,
+      linear-gradient(120deg, #ff8ba7, #ffdf6c 30%, #c6e377 58%, #8fd6e8 82%, #c0bbfe) border-box;
+    box-shadow: 0 8px 24px rgba(143,214,232,.28);
+  }
+  .scheme-c .friend-card--pinned .friend-card__avatar { border-color: #ff8ba7; }
+  .scheme-c .friend-card--pinned .fc-badge {
+    background: linear-gradient(135deg, #ff8ba7, #c0bbfe); color: #fff; border: 1px solid rgba(255,255,255,.5);
+  }
+  .scheme-c .friend-card--pinned::before {
+    content: "SSR"; position: absolute; z-index: 3; top: 12px; left: -32px;
+    width: 104px; padding: 3px 0; text-align: center; transform: rotate(-38deg);
+    background: linear-gradient(90deg, #ff8ba7, #c0bbfe); color: #fff;
+    font-size: 10px; font-weight: 800; letter-spacing: .18em;
+    box-shadow: 0 2px 6px rgba(0,0,0,.18);
+  }
+</style>
+
+<div class="options">
+  <div class="option" data-choice="a" onclick="toggleSelect(this)">
+    <div class="letter">A</div>
+    <div class="content">
+      <h3>樱色和纸（推荐）</h3>
+      <p>和风纸纹 + 朱印「本人」+ 和纸胶带「置顶」。最克制，与当前站点中性底子最贴，长期看不腻。</p>
+      <div class="fc-demo scheme-a" data-scheme="a"><div class="fc-row"></div>
+        <div class="fc-demo fc-dark scheme-a" data-scheme="a"><p class="fc-label">深色主题</p><div class="fc-row"></div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="option" data-choice="b" onclick="toggleSelect(this)">
+    <div class="letter">B</div>
+    <div class="content">
+      <h3>星屑魔法</h3>
+      <p>渐变描边 + 星屑闪光 + 柔光外发光。魔法少女感最强，置顶卡片会有轻微呼吸闪烁。</p>
+      <div class="fc-demo scheme-b" data-scheme="b"><div class="fc-row"></div>
+        <div class="fc-demo fc-dark scheme-b" data-scheme="b"><p class="fc-label">深色主题</p><div class="fc-row"></div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="option" data-choice="c" onclick="toggleSelect(this)">
+    <div class="letter">C</div>
+    <div class="content">
+      <h3>稀有度分级</h3>
+      <p>朋友 = R 银框，本人 = UR 金框，置顶 = SSR 虹彩框 + 角标。游戏图鉴感最强，辨识度最高。</p>
+      <div class="fc-demo scheme-c" data-scheme="c"><div class="fc-row"></div>
+        <div class="fc-demo fc-dark scheme-c" data-scheme="c"><p class="fc-label">深色主题</p><div class="fc-row"></div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  const SITES = {
+    self: {
+      title: "幽幽子的小站",
+      url: "hakugyokurou.fun",
+      desc: "这里是白玉楼呀！",
+      cover: "https://hakugyokurou.fun/assets/images/home/hero-home2.jpg",
+      avatar: "https://hakugyokurou.fun/favicon/favicon.svg",
+    },
+    friend: {
+      title: "番茄主理人",
+      url: "fqzlr.com",
+      desc: "坐而言不如起而行。",
+      cover: "https://hakugyokurou.fun/assets/images/friends/fqzlr.webp",
+      avatar: "https://q1.qlogo.cn/g?b=qq&nk=20447289&s=640",
+    },
+    pinned: {
+      title: "Firefly Docs",
+      url: "docs-firefly.cuteleaf.cn",
+      desc: "Firefly 主题模板文档",
+      cover: "https://docs-firefly.cuteleaf.cn/logo.png",
+      avatar: "https://docs-firefly.cuteleaf.cn/logo.png",
+    },
+  };
+
+  const BADGES = {
+    a: {
+      self: '<span class="fc-badge fc-badge--seal">本人</span>',
+      friend: '<span class="fc-badge">朋友</span>',
+      pinned: '<span class="fc-badge">置顶</span>',
+    },
+    b: {
+      self: '<span class="fc-badge">✦ 本人</span>',
+      friend: '<span class="fc-badge">朋友</span>',
+      pinned: '<span class="fc-badge">✦ 置顶</span>',
+    },
+    c: {
+      self: '<span class="fc-badge">UR</span>',
+      friend: '<span class="fc-badge">R</span>',
+      pinned: '<span class="fc-badge">SSR</span>',
+    },
+  };
+
+  const WAVE = '<svg class="friend-card__wave" viewBox="0 0 400 24" preserveAspectRatio="none"><path d="M0,12 Q50,2 100,12 T200,12 T300,12 T400,12 V24 H0 Z" fill="currentColor"/></svg>';
+
+  function card(kind, scheme) {
+    const s = SITES[kind];
+    return '<a class="friend-card friend-card--' + kind + '" href="#">'
+      + BADGES[scheme][kind]
+      + '<span class="friend-card__cover"><img class="friend-card__cover-img" src="' + s.cover + '" alt="">' + WAVE + '</span>'
+      + '<span class="friend-card__body"><span class="friend-card__info"><span class="friend-card__avatar"><img src="' + s.avatar + '" alt=""></span>'
+      + '<span class="friend-card__meta"><span class="friend-card__name-row"><strong class="friend-card__name">' + s.title + '</strong></span>'
+      + '<span class="friend-card__url">' + s.url + '</span></span></span>'
+      + '<span class="friend-card__divider"></span><span class="friend-card__desc">' + s.desc + '</span></span></a>';
+  }
+
+  document.querySelectorAll(".fc-demo[data-scheme]").forEach(function (box) {
+    const scheme = box.getAttribute("data-scheme");
+    const row = box.querySelector(".fc-row");
+    if (row) row.innerHTML = card("self", scheme) + card("friend", scheme) + card("pinned", scheme);
+  });
+})();
+</script>

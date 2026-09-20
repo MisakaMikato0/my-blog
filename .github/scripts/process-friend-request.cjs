@@ -159,6 +159,11 @@ function extractTags(block) {
 	return tags.length ? tags : [DEFAULT_TAG];
 }
 
+function extractCategory(block) {
+	const match = block.match(/category:\s*["'](normal|friend|self|pinned)["']/);
+	return match ? match[1] : "";
+}
+
 function parseFriendsConfig(content) {
 	const listMatch = content.match(/export const friendsConfig: FriendLink\[\] = \[([\s\S]*?)\n\];/);
 	if (!listMatch) {
@@ -173,6 +178,7 @@ function parseFriendsConfig(content) {
 		siteurl: extractString(block, 'siteurl'),
 		image: extractString(block, 'image'),
 		tags: extractTags(block),
+		category: extractCategory(block),
 		weight: extractNumber(block, 'weight', 5),
 		enabled: extractBoolean(block, 'enabled', true),
 	}));
@@ -194,8 +200,12 @@ function renderFriend(friend, indent) {
 	if (friend.image) {
 		lines.push(`${indent}\timage: "${escapeString(friend.image)}",`);
 	}
+	lines.push(`${indent}\ttags: [${tags}],`);
+	// 分类视觉为可选字段：新申请默认不写，避免覆盖既有分类
+	if (friend.category && friend.category !== "normal") {
+		lines.push(`${indent}\tcategory: "${escapeString(friend.category)}",`);
+	}
 	lines.push(
-		`${indent}\ttags: [${tags}],`,
 		`${indent}\tweight: ${Number.isFinite(friend.weight) ? friend.weight : 5},`,
 		`${indent}\tenabled: ${friend.enabled !== false},`,
 		`${indent}},`,
@@ -230,6 +240,10 @@ function updateFriendsConfig(repoRoot, data) {
 		// 重复申请且未提交封面图时，保留旧数据中的封面图
 		if (!nextFriend.image && friends[existingIndex].image) {
 			nextFriend.image = friends[existingIndex].image;
+		}
+		// 自动申请不改写既有分类视觉字段
+		if (friends[existingIndex].category) {
+			nextFriend.category = friends[existingIndex].category;
 		}
 		friends[existingIndex] = nextFriend;
 	} else {

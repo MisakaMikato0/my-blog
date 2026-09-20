@@ -1,0 +1,178 @@
+<h2>友链分类卡片样式方案</h2>
+<p class="subtitle">
+  新增的 <code>category</code> 只控制卡片视觉效果，不参与 tags 分组与排序。
+  每套方案展示 本人 / 朋友 / 顶置 三种状态，点击选择你喜欢的一套。
+</p>
+
+<style>
+  .mc-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 14px;
+    margin-top: 14px;
+  }
+  @media (max-width: 860px) {
+    .mc-grid { grid-template-columns: 1fr; }
+  }
+  .mc {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    border-radius: 12px;
+    overflow: hidden;
+    background: #fff7fb;
+    color: #161616;
+    border: 2px solid #161616;
+    font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+    text-align: left;
+  }
+  .mc-cover {
+    height: 56px;
+    background:
+      radial-gradient(circle at 22% 30%, rgba(255,255,255,.55), transparent 40%),
+      linear-gradient(120deg, #c9d7e8, #e7d3df 55%, #cfe2da);
+  }
+  .mc-body { padding: 12px 13px 13px; }
+  .mc-top { display: flex; align-items: center; gap: 10px; }
+  .mc-avatar {
+    width: 36px; height: 36px; flex: none;
+    border-radius: 999px;
+    border: 2px solid #161616;
+    background: linear-gradient(135deg, #f0b7c8, #9fc7d8);
+  }
+  .mc-name { font-size: 14px; font-weight: 700; line-height: 1.3; }
+  .mc-url { font-size: 11px; color: #6b6b6b; margin-top: 2px; }
+  .mc-divider { height: 1px; background: #dedede; margin: 10px 0 8px; }
+  .mc-desc { font-size: 12px; line-height: 1.45; color: #5a5a5a; }
+  .mc-badge {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    z-index: 2;
+    padding: 3px 9px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .02em;
+  }
+
+  /* ---------- A 极简强调 ---------- */
+  .scheme-a .mc--self {
+    border-color: #161616;
+    box-shadow: inset 0 0 0 3px #fff7fb, inset 0 0 0 5px #161616;
+  }
+  .scheme-a .mc--self .mc-badge { background: #161616; color: #fff; }
+  .scheme-a .mc--friend .mc-badge { background: #ececec; color: #333; border: 1px solid #d5d5d5; }
+  .scheme-a .mc--pinned {
+    border-color: #b3392f;
+    background: linear-gradient(180deg, #fff0ee 0%, #fff7fb 62%);
+  }
+  .scheme-a .mc--pinned .mc-badge { background: #b3392f; color: #fff; }
+  .scheme-a .mc--pinned::before {
+    content: "";
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 5px;
+    background: #b3392f;
+    z-index: 2;
+  }
+
+  /* ---------- B 编辑部徽章 ---------- */
+  .scheme-b .mc--self {
+    background: #1b1b1b;
+    color: #fff;
+    border-color: #c9a227;
+  }
+  .scheme-b .mc--self .mc-url,
+  .scheme-b .mc--self .mc-desc { color: #cfcfcf; }
+  .scheme-b .mc--self .mc-divider { background: #3d3d3d; }
+  .scheme-b .mc--self .mc-avatar { border-color: #c9a227; }
+  .scheme-b .mc--self .mc-badge { background: #c9a227; color: #1b1b1b; }
+  .scheme-b .mc--friend { background: #f2f2f2; border-color: #161616; }
+  .scheme-b .mc--friend .mc-badge { background: #fff; color: #333; border: 1px solid #c9c9c9; }
+  .scheme-b .mc--pinned {
+    border-color: #161616;
+    border-top: 6px solid #b3392f;
+    background: #fff;
+  }
+  .scheme-b .mc--pinned .mc-badge {
+    background: #fff;
+    color: #b3392f;
+    border: 1px solid #b3392f;
+  }
+
+  /* ---------- C 柔光玻璃 ---------- */
+  .scheme-c .mc { border-width: 1px; }
+  .scheme-c .mc--self {
+    border-color: transparent;
+    background:
+      linear-gradient(#fff7fb, #fff7fb) padding-box,
+      linear-gradient(135deg, #008c8c, #4f9d8f 55%, #7cc4b4) border-box;
+    box-shadow: 0 0 0 4px rgba(0, 140, 140, .10);
+  }
+  .scheme-c .mc--self .mc-badge { background: #007d7d; color: #fff; }
+  .scheme-c .mc--friend {
+    border-color: rgba(22, 22, 22, .18);
+    background: rgba(255, 255, 255, .62);
+    backdrop-filter: blur(6px);
+  }
+  .scheme-c .mc--friend .mc-badge {
+    background: rgba(255,255,255,.8);
+    color: #444;
+    border: 1px solid rgba(0,0,0,.12);
+  }
+  .scheme-c .mc--pinned {
+    border-color: transparent;
+    background:
+      linear-gradient(180deg, #fff4f1, #fff7fb) padding-box,
+      linear-gradient(135deg, #e05a4a, #b3392f) border-box;
+    box-shadow: 0 10px 24px rgba(179, 57, 47, .20);
+    transform: translateY(-2px);
+  }
+  .scheme-c .mc--pinned .mc-badge { background: #b3392f; color: #fff; }
+</style>
+
+<div class="options">
+  <div class="option" data-choice="a" onclick="toggleSelect(this)">
+    <div class="letter">A</div>
+    <div class="content">
+      <h3>极简强调（推荐）</h3>
+      <p>最贴合当前站点的中性灰阶：本人双线描边，朋友保持常规，顶置用红色左条与浅暖背景。</p>
+      <div class="mc-grid scheme-a">
+        <div class="mc mc--self"><span class="mc-badge">本人</span><div class="mc-cover"></div><div class="mc-body"><div class="mc-top"><span class="mc-avatar"></span><div><div class="mc-name">幽幽子的小站</div><div class="mc-url">hakugyokurou.fun</div></div></div><div class="mc-divider"></div><div class="mc-desc">这里是白玉楼呀！</div></div></div>
+        <div class="mc mc--friend"><span class="mc-badge">朋友</span><div class="mc-cover"></div><div class="mc-body"><div class="mc-top"><span class="mc-avatar"></span><div><div class="mc-name">番茄主理人</div><div class="mc-url">fqzlr.com</div></div></div><div class="mc-divider"></div><div class="mc-desc">坐而言不如起而行。</div></div></div>
+        <div class="mc mc--pinned"><span class="mc-badge">顶置</span><div class="mc-cover"></div><div class="mc-body"><div class="mc-top"><span class="mc-avatar"></span><div><div class="mc-name">Firefly Docs</div><div class="mc-url">docs-firefly.cuteleaf.cn</div></div></div><div class="mc-divider"></div><div class="mc-desc">Firefly 主题模板文档</div></div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="option" data-choice="b" onclick="toggleSelect(this)">
+    <div class="letter">B</div>
+    <div class="content">
+      <h3>编辑部徽章</h3>
+      <p>本人使用深色实底反白，辨识度最高；顶置用顶部红条与描边徽章，气质更杂志化。</p>
+      <div class="mc-grid scheme-b">
+        <div class="mc mc--self"><span class="mc-badge">本人</span><div class="mc-cover"></div><div class="mc-body"><div class="mc-top"><span class="mc-avatar"></span><div><div class="mc-name">幽幽子的小站</div><div class="mc-url">hakugyokurou.fun</div></div></div><div class="mc-divider"></div><div class="mc-desc">这里是白玉楼呀！</div></div></div>
+        <div class="mc mc--friend"><span class="mc-badge">朋友</span><div class="mc-cover"></div><div class="mc-body"><div class="mc-top"><span class="mc-avatar"></span><div><div class="mc-name">番茄主理人</div><div class="mc-url">fqzlr.com</div></div></div><div class="mc-divider"></div><div class="mc-desc">坐而言不如起而行。</div></div></div>
+        <div class="mc mc--pinned"><span class="mc-badge">顶置</span><div class="mc-cover"></div><div class="mc-body"><div class="mc-top"><span class="mc-avatar"></span><div><div class="mc-name">Firefly Docs</div><div class="mc-url">docs-firefly.cuteleaf.cn</div></div></div><div class="mc-divider"></div><div class="mc-desc">Firefly 主题模板文档</div></div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="option" data-choice="c" onclick="toggleSelect(this)">
+    <div class="letter">C</div>
+    <div class="content">
+      <h3>柔光玻璃</h3>
+      <p>本人用青绿渐变描边，顶置用珊瑚红柔光与上浮；视觉更轻，但对深色主题的适配要求更高。</p>
+      <div class="mc-grid scheme-c">
+        <div class="mc mc--self"><span class="mc-badge">本人</span><div class="mc-cover"></div><div class="mc-body"><div class="mc-top"><span class="mc-avatar"></span><div><div class="mc-name">幽幽子的小站</div><div class="mc-url">hakugyokurou.fun</div></div></div><div class="mc-divider"></div><div class="mc-desc">这里是白玉楼呀！</div></div></div>
+        <div class="mc mc--friend"><span class="mc-badge">朋友</span><div class="mc-cover"></div><div class="mc-body"><div class="mc-top"><span class="mc-avatar"></span><div><div class="mc-name">番茄主理人</div><div class="mc-url">fqzlr.com</div></div></div><div class="mc-divider"></div><div class="mc-desc">坐而言不如起而行。</div></div></div>
+        <div class="mc mc--pinned"><span class="mc-badge">顶置</span><div class="mc-cover"></div><div class="mc-body"><div class="mc-top"><span class="mc-avatar"></span><div><div class="mc-name">Firefly Docs</div><div class="mc-url">docs-firefly.cuteleaf.cn</div></div></div><div class="mc-divider"></div><div class="mc-desc">Firefly 主题模板文档</div></div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<p class="subtitle" style="margin-top: 18px;">
+  预览地址：<strong>http://localhost:55740/?key=f6d07071dc59e5c7be3889b142dac93a5aff564c876bc7225d75c50724b8e79d</strong>
+</p>

@@ -10,6 +10,13 @@ const { friend } = Astro.props;
 
 const hasImage = Boolean(friend.image);
 
+// 分类视觉：只影响卡片样式，不参与 tags 分组
+const category = friend.category ?? "normal";
+const categoryClass =
+	category === "normal" ? undefined : `friend-card--${category}`;
+const categoryLabel =
+	category === "self" ? "本人" : category === "pinned" ? "置顶" : "朋友";
+
 // 头像加载失败时的首字母回退
 const initial = friend.title.trim().charAt(0).toUpperCase() || "?";
 
@@ -23,12 +30,26 @@ try {
 ---
 
 <a
-	class:list={["friend-card", hasImage && "friend-card--with-image"]}
+	class:list={[
+		"friend-card",
+		categoryClass,
+		hasImage && "friend-card--with-image",
+	]}
 	href={friend.siteurl}
 	target="_blank"
 	rel="noopener noreferrer"
 	data-friend-image={hasImage ? friend.image : undefined}
+	data-friend-category={category}
 >
+	{category !== "normal" && (
+		<span class="friend-card__badge" aria-hidden="true">{categoryLabel}</span>
+	)}
+	{category === "pinned" && hasImage && (
+		<span class="friend-card__ribbon" aria-hidden="true"></span>
+	)}
+	{category === "self" && hasImage && (
+		<span class="friend-card__star" aria-hidden="true">★</span>
+	)}
 	{hasImage && (
 		<span class="friend-card__cover image-pixel-reveal-host" data-friend-cover>
 			{/* 加载动效：图片加载完成后由脚本隐藏 */}

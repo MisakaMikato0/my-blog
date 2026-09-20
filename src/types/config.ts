@@ -768,6 +768,9 @@ export type Live2DModelConfig = {
 	};
 };
 
+// 友链分类：只控制卡片视觉，不影响 tags 分组与权重排序
+export type FriendCategory = "normal" | "friend" | "self" | "pinned";
+
 // 友链配置
 export type FriendLink = {
 	title: string; // 友链标题
@@ -776,6 +779,7 @@ export type FriendLink = {
 	siteurl: string; // 友链地址
 	image?: string; // 封面图片URL（可选，不填则卡片显示无图形态）
 	tags?: string[]; // 标签数组
+	category?: FriendCategory; // 分类视觉：normal=常规，friend=朋友，self=本人，pinned=置顶
 	weight: number; // 权重，数字越大排序越靠前
 	enabled: boolean; // 是否启用
 };

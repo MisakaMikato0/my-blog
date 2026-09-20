@@ -7,7 +7,7 @@ import { i18n } from "@/i18n/translation";
  * 桌面端左下角多态音乐组件（Swup 容器外持久存在）。
  * 三态：disc 收起唱片 → pill 播放中胶囊（唱片 + 歌词） → bar 展开 dock；
  * bar 态分层：信息层（曲名 / 艺术家 / 进度）+ 工具栏层两张独立表面，
- * 歌单按钮再向上展一层歌单面板（信息层保持不关）。
+ * 鼠标移入组件时向上展开歌单面板（信息层保持展开），移出后收起。
  * 引擎为 MusicManager 单例，逻辑见 src/utils/music-player-controller.ts，
  * 样式见 src/styles/components/music-player.css。移动端（≤768px）隐藏，由 MobileDock 承担。
  */
@@ -31,7 +31,7 @@ import { i18n } from "@/i18n/translation";
 				</div>
 				<div class="music-player__panel-views">
 					<div class="music-player__playlist-view is-active">
-						<div class="music-player__playlist-list custom-scrollbar" role="listbox" aria-label={i18n(I18nKey.musicPlaylist)}></div>
+						<div class="music-player__playlist-list custom-scrollbar" role="listbox" aria-label={i18n(I18nKey.musicPlaylist)} data-lenis-prevent></div>
 					</div>
 					<div class="music-player__lyrics-view">
 						<div class="music-player__lyrics-list custom-scrollbar" role="listbox" aria-label={i18n(I18nKey.musicLyrics)}>

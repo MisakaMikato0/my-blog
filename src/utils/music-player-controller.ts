@@ -7,11 +7,11 @@ import { i18n } from "@/i18n/translation";
  * 本模块只负责三态形态机（disc / pill / bar）、上展歌单面板、拖拽与列表渲染。
  *
  * 形态转移约定：
- * - 未播放：disc ⇄ bar（点击唱片切换；点击组件外收回 disc）；
- * - 播放中：默认 pill（唱片 + 胶囊歌词），悬停弹性变 bar，点击唱片展开 bar；
- *   bar 在鼠标离开组件一段延迟后自动收回 pill；暂停时 pill 收回 bar；
+ * - 鼠标移入组件：展开 bar 并显示歌单面板（未播放时从 disc 展开）；
+ * - 鼠标移出组件：收起歌单面板，播放中回 pill / disc，未播放回 disc；
+ * - 键盘触发唱片按钮时保留展开 / 收起能力，焦点移出组件后自动收起；
  * - bar 态分层显示：信息层（曲名 / 艺术家 / 进度）默认展开 + 工具栏层；
- *   歌单按钮在组件上方再展一层歌单面板，信息层保持不关。
+ *   信息层保持展开，歌单面板位于其上方。
  */
 
 type WidgetShape = "disc" | "pill" | "bar";
@@ -40,7 +40,6 @@ interface WidgetElement extends HTMLElement {
 	__musicSync?: () => void;
 }
 
-const BAR_COLLAPSE_DELAY = 160;
 const LYRICS_SCROLL_RESUME_DELAY = 3000;
 const PLAYLIST_BATCH_SIZE = 30;
 const PILL_LYRICS_STORAGE_KEY = "music-pill-lyrics";
@@ -128,12 +127,11 @@ export function setupMusicPlayerWidget(): void {
 
 	// ── 本地状态 ─────────────────────────────────────────────
 	let shape: WidgetShape = "disc";
-	let hovering = false;
+	let pointerInside = false;
 	let panelOpen = false;
 	let isPlaying = false;
 	let isSeeking = false;
 	let isUserScrollingLyrics = false;
-	let collapseTimer: number | null = null;
 	let lyricsScrollTimer: number | null = null;
 	let currentLrcIndex = -1;
 	let currentTrack: TrackInfo | null = null;
@@ -148,47 +146,43 @@ export function setupMusicPlayerWidget(): void {
 		root.dataset.state = next;
 	}
 
-	function clearCollapseTimer(): void {
-		if (collapseTimer !== null) {
-			window.clearTimeout(collapseTimer);
-			collapseTimer = null;
-		}
-	}
-
 	/** 播放中鼠标不在组件上时的静置形态：显示歌词时为胶囊，否则为唱片 */
 	function playingRestingShape(): WidgetShape {
 		return pillLyricsEnabled ? "pill" : "disc";
 	}
 
-	function scheduleBarCollapse(): void {
-		clearCollapseTimer();
-		collapseTimer = window.setTimeout(() => {
-			collapseTimer = null;
-			if (hovering || !isPlaying || shape !== "bar" || panelOpen) return;
-			setShape(playingRestingShape());
-		}, BAR_COLLAPSE_DELAY);
+	function expandWidget(): void {
+		ensureInit();
+		setShape("bar");
+		setPanelOpen(true);
+	}
+
+	function collapseWidget(): void {
+		setPanelOpen(false);
+		setShape(isPlaying ? playingRestingShape() : "disc");
 	}
 
 	function onPointerEnter(): void {
-		hovering = true;
-		clearCollapseTimer();
-		if (
-			isPlaying &&
-			(shape === "pill" || (shape === "disc" && !pillLyricsEnabled))
-		) {
-			setShape("bar");
-		}
+		pointerInside = true;
+		expandWidget();
 	}
 
 	function onPointerLeave(): void {
-		hovering = false;
-		if (isPlaying && shape === "bar" && !panelOpen) scheduleBarCollapse();
+		pointerInside = false;
+		collapseWidget();
 	}
 
-	function onDiscClick(): void {
-		ensureInit();
-		if (shape === "bar") setShape(isPlaying ? playingRestingShape() : "disc");
-		else setShape("bar");
+	function onDiscClick(event: MouseEvent): void {
+		// 鼠标展开由 hover 负责；detail === 0 保留键盘 / 辅助技术的切换能力
+		if (event.detail !== 0 || pointerInside) return;
+		if (panelOpen) collapseWidget();
+		else expandWidget();
+	}
+
+	function onFocusOut(event: FocusEvent): void {
+		const next = event.relatedTarget;
+		if (next instanceof Node && root.contains(next)) return;
+		if (!pointerInside) collapseWidget();
 	}
 
 	// ── 上展面板（歌单 / 歌词双 tab） ────────────────────────
@@ -203,7 +197,6 @@ export function setupMusicPlayerWidget(): void {
 		panelOpen = open;
 		root.dataset.panel = open ? "open" : "closed";
 		ui.btnPlaylist?.classList.toggle("is-active", open);
-		if (open) setPanelTab("playlist");
 	}
 
 	// ── UI 更新 ──────────────────────────────────────────────
@@ -230,11 +223,10 @@ export function setupMusicPlayerWidget(): void {
 		root.dataset.playing = playing ? "true" : "false";
 		updatePlayIcons(playing);
 		if (!playing) {
-			clearCollapseTimer();
 			if (shape === "pill") setShape("bar");
 		} else if (shape !== "bar") {
 			const resting = playingRestingShape();
-			if (shape !== resting) setShape(hovering ? "bar" : resting);
+			if (shape !== resting) setShape(pointerInside ? "bar" : resting);
 		}
 		updatePillText();
 	}
@@ -689,9 +681,14 @@ export function setupMusicPlayerWidget(): void {
 	ui.btnPrev?.addEventListener("click", () => mgr.playPrev(), { signal });
 	ui.btnMode?.addEventListener("click", () => mgr.cyclePlayMode(), { signal });
 	ui.btnVolume?.addEventListener("click", () => mgr.toggleMute(), { signal });
-	ui.btnPlaylist?.addEventListener("click", () => setPanelOpen(!panelOpen), {
-		signal,
-	});
+	ui.btnPlaylist?.addEventListener(
+		"click",
+		() => {
+			setPanelOpen(true);
+			setPanelTab("playlist");
+		},
+		{ signal },
+	);
 	ui.tabPlaylist?.addEventListener("click", () => setPanelTab("playlist"), {
 		signal,
 	});
@@ -725,7 +722,7 @@ export function setupMusicPlayerWidget(): void {
 			updatePillLyricsButton();
 			updatePillText();
 			if (isPlaying && shape !== "bar") {
-				setShape(hovering ? "bar" : playingRestingShape());
+				setShape(pointerInside ? "bar" : playingRestingShape());
 			}
 		},
 		{ signal },
@@ -733,24 +730,11 @@ export function setupMusicPlayerWidget(): void {
 
 	root.addEventListener("pointerenter", onPointerEnter, { signal });
 	root.addEventListener("pointerleave", onPointerLeave, { signal });
+	root.addEventListener("focusout", onFocusOut, { signal });
 	ui.playlistList?.addEventListener("scroll", onPlaylistScroll, {
 		passive: true,
 		signal,
 	});
-
-	// 点击组件外：收歌单面板并把 dock 缩放收回（播放中回胶囊，未播放回唱片）
-	document.addEventListener(
-		"click",
-		(event) => {
-			const target = event.target;
-			if (target instanceof Node && root.contains(target)) return;
-			if (panelOpen) setPanelOpen(false);
-			clearCollapseTimer();
-			if (shape !== "bar") return;
-			setShape(isPlaying ? playingRestingShape() : "disc");
-		},
-		{ signal },
-	);
 
 	window.addEventListener("resize", () => scheduleMarquee(), {
 		passive: true,

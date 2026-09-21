@@ -709,7 +709,7 @@
 	color: var(--guide-fg);
 	font-size: 1.9rem;
 	text-decoration: none;
-	background: var(--guide-bg);
+	background: var(--page-bg);
 	transition: background-color 180ms ease, color 180ms ease;
 }
 

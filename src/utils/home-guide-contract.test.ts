@@ -62,5 +62,8 @@ describe("home guide card structure and layout contracts", () => {
 
 		expect(source).not.toContain("guide-card__visual");
 		expect(css).toMatch(/\.guide-card\s*\{[^}]*background:\s*var\(--page-bg\)/);
+		expect(css).toMatch(
+			/\.guide-contact__region\s*\{[^}]*background:\s*var\(--page-bg\)/,
+		);
 	});
 });

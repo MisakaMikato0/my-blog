@@ -55,4 +55,12 @@ describe("home guide card structure and layout contracts", () => {
 		expect(source).toMatch(/regions\.length\s*(?:===?\s*0|<\s*1)/);
 		expect(source).toMatch(/if\s*\(\s*!mounted\b/);
 	});
+
+	it("uses the site page background on guide cards without photo fills", () => {
+		const source = readSource("src/components/layout/HomeDataLayer.astro");
+		const css = readSource("src/styles/components/home-data-layer.css");
+
+		expect(source).not.toContain("guide-card__visual");
+		expect(css).toMatch(/\.guide-card\s*\{[^}]*background:\s*var\(--page-bg\)/);
+	});
 });

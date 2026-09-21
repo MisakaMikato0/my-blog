@@ -174,7 +174,7 @@
 	padding: clamp(1rem, 1.7vw, 1.45rem);
 	border: 2px solid var(--guide-border);
 	border-radius: var(--guide-radius);
-	background: var(--guide-bg);
+	background: var(--page-bg);
 	color: var(--guide-fg);
 	overflow: hidden;
 	isolation: isolate;
@@ -198,7 +198,7 @@
 	transition: clip-path 580ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.guide-card--motion > :not(.guide-card__visual) {
+.guide-card--motion > * {
 	position: relative;
 	z-index: 1;
 }
@@ -224,33 +224,6 @@
 .guide-card button:focus-visible {
 	outline: 3px solid var(--guide-accent);
 	outline-offset: 3px;
-}
-
-.guide-card__visual {
-	position: absolute;
-	inset: 0;
-	z-index: -2;
-	opacity: 0.16;
-	pointer-events: none;
-	overflow: hidden;
-}
-
-.guide-card__visual img {
-	width: 100%;
-	height: 100%;
-	object-fit: cover;
-	transition: transform 240ms ease, opacity 240ms ease;
-}
-
-.guide-card:hover .guide-card__visual img {
-	transform: scale(1.06) translateX(1.5%);
-	opacity: 0.7;
-}
-
-/* 订阅与联系卡片背景图悬停时不缩放 */
-.guide-card--contact:hover .guide-card__visual img,
-.guide-card--contact:focus-within .guide-card__visual img {
-	transform: none;
 }
 
 .guide-card__icon {
@@ -846,7 +819,6 @@
 @media (prefers-reduced-motion: reduce) {
 	.guide-card,
 	.guide-card::after,
-	.guide-card__visual img,
 	.guide-rotator__slide,
 	.guide-rotator__dots button,
 	.guide-contact__region {

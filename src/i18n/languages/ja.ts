@@ -363,11 +363,13 @@ export const ja: Translation = {
 	[Key.galleryAdminNoAlbums]: "アルバムがありません、先に作成してください",
 	[Key.galleryAdminUpload]: "画像をアップロード",
 	[Key.galleryAdminUploadHint]:
-		"ここに画像をドラッグするか、クリックして選択（jpg/png/webp/gif、1枚5MBまで）",
+		"ここに画像をドラッグするか、クリックして選択（jpg/png/webp/gif、1枚20MBまで）",
 	[Key.galleryAdminDropHere]: "離して画像を追加",
 	[Key.galleryAdminUploading]: "アップロード中",
 	[Key.galleryAdminUploadSuccess]: "アップロードしました",
 	[Key.galleryAdminUploadFail]: "アップロードに失敗しました",
+	[Key.galleryAdminFileTooLarge]:
+		"画像が20MBを超えており、圧縮後も大きすぎます",
 	[Key.galleryAdminPreview]: "プレビュー",
 	[Key.galleryAdminCopyLink]: "リンクをコピー",
 	[Key.galleryAdminCopied]: "コピーしました",
@@ -474,11 +476,12 @@ export const ja: Translation = {
 	[Key.dynamicAdminDeleteSuccess]: "削除しました",
 	[Key.dynamicUpload]: "画像をアップロード",
 	[Key.dynamicUploadHint]:
-		"画像をドラッグまたはクリックで選択（jpg/png/webp/gif、1枚5MBまで）",
+		"画像をドラッグまたはクリックで選択（jpg/png/webp/gif、1枚20MBまで）",
 	[Key.dynamicDropHere]: "ドロップして画像を追加",
 	[Key.dynamicUploading]: "アップロード中",
 	[Key.dynamicUploadSuccess]: "アップロード完了",
 	[Key.dynamicUploadFail]: "アップロード失敗",
+	[Key.dynamicFileTooLarge]: "画像が20MBを超えており、圧縮後も大きすぎます",
 	[Key.copyPrefix]: "コピー",
 	[Key.copyTemplate]: "テンプレートをコピー",
 	[Key.copyNotice]: "コピーしました。転載の際は本文のURLを明記してください",

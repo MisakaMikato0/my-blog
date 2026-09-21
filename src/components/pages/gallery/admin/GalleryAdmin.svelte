@@ -3,7 +3,11 @@ import I18nKey from "@i18n/i18nKey";
 import { i18n } from "@i18n/translation";
 import Icon from "@/components/common/Icon.svelte";
 import { galleryConfig } from "@/config/galleryConfig";
-import { normalizeImageOrientation } from "@/utils/image-orientation";
+import {
+	FILE_TOO_LARGE,
+	getUpyunUploadError,
+	prepareUploadImage,
+} from "@/utils/prepare-upload-image";
 import { url } from "@/utils/url-utils";
 import type { GalleryIndexDto, UploadTokenDto } from "../types";
 import AlbumForm from "./AlbumForm.svelte";
@@ -216,19 +220,14 @@ function xhrUpload(
 			if (e.lengthComputable) onProgress(e.loaded / e.total);
 		};
 		xhr.onload = () => {
-			if (xhr.status >= 200 && xhr.status < 300) {
+			const err = getUpyunUploadError(xhr.status, xhr.responseText);
+			if (err) reject(err);
+			else {
 				try {
-					const data = JSON.parse(xhr.responseText);
-					if (data && typeof data.code === "number" && data.code !== 200) {
-						reject(new Error(`upyun code ${data.code}`));
-					} else {
-						resolve(data);
-					}
+					resolve(JSON.parse(xhr.responseText));
 				} catch {
 					resolve(null);
 				}
-			} else {
-				reject(new Error(`HTTP ${xhr.status}`));
 			}
 		};
 		xhr.onerror = () => reject(new Error("network error"));
@@ -259,8 +258,7 @@ async function handleFiles(files: File[]) {
 		const item = items[i];
 		updateUpload(item.id, { status: "uploading", progress: 0 });
 		try {
-			// 上传前按 EXIF 方向转正，避免 CDN 转码丢方向导致图片横过来
-			file = await normalizeImageOrientation(file);
+			file = await prepareUploadImage(file);
 			const tok = await api<UploadTokenDto>("/api/gallery/upload-token", {
 				method: "POST",
 				body: JSON.stringify({ albumId, filename: file.name }),
@@ -278,11 +276,18 @@ async function handleFiles(files: File[]) {
 			});
 			updateUpload(item.id, { status: "success", progress: 1 });
 		} catch (e) {
+			const message = e instanceof Error ? e.message : String(e);
+			const tooLarge = message === FILE_TOO_LARGE;
 			updateUpload(item.id, {
 				status: "error",
-				error: e instanceof Error ? e.message : String(e),
+				error: tooLarge ? i18n(I18nKey.galleryAdminFileTooLarge) : message,
 			});
-			toast("error", `${i18n(I18nKey.galleryAdminUploadFail)}: ${item.name}`);
+			toast(
+				"error",
+				tooLarge
+					? `${item.name}: ${i18n(I18nKey.galleryAdminFileTooLarge)}`
+					: `${i18n(I18nKey.galleryAdminUploadFail)}: ${item.name}`,
+			);
 		}
 	}
 

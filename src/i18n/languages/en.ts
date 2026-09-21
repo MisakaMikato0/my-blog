@@ -364,11 +364,13 @@ export const en: Translation = {
 	[Key.galleryAdminNoAlbums]: "No albums yet, create one first",
 	[Key.galleryAdminUpload]: "Upload images",
 	[Key.galleryAdminUploadHint]:
-		"Drag images here or click to select (jpg/png/webp/gif, up to 5MB each)",
+		"Drag images here or click to select (jpg/png/webp/gif, up to 20MB each)",
 	[Key.galleryAdminDropHere]: "Drop to add images",
 	[Key.galleryAdminUploading]: "Uploading",
 	[Key.galleryAdminUploadSuccess]: "Uploaded",
 	[Key.galleryAdminUploadFail]: "Upload failed",
+	[Key.galleryAdminFileTooLarge]:
+		"Image is larger than 20MB even after compression",
 	[Key.galleryAdminPreview]: "Preview",
 	[Key.galleryAdminCopyLink]: "Copy link",
 	[Key.galleryAdminCopied]: "Copied",
@@ -477,11 +479,12 @@ export const en: Translation = {
 	[Key.dynamicAdminDeleteSuccess]: "Deleted",
 	[Key.dynamicUpload]: "Upload images",
 	[Key.dynamicUploadHint]:
-		"Drag images here or click to select (jpg/png/webp/gif, up to 5MB each)",
+		"Drag images here or click to select (jpg/png/webp/gif, up to 20MB each)",
 	[Key.dynamicDropHere]: "Drop to add images",
 	[Key.dynamicUploading]: "Uploading",
 	[Key.dynamicUploadSuccess]: "Uploaded",
 	[Key.dynamicUploadFail]: "Upload failed",
+	[Key.dynamicFileTooLarge]: "Image is larger than 20MB even after compression",
 	[Key.copyPrefix]: "Copy",
 	[Key.copyTemplate]: "Copy template",
 	[Key.copyNotice]: "Copied. Please credit this article's URL when reposting.",

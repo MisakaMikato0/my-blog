@@ -6,15 +6,13 @@
  * 参考：https://docs.upyun.com/api/rest_api/  https://docs.upyun.com/api/form_api/
  */
 
+import { MAX_UPLOAD_FILE_SIZE } from "../../../constants/upload";
 import { md5 } from "./md5";
 import type { GalleryIndex } from "./types";
 
 const UPYUN_API_BASE = "https://v0.api.upyun.com";
 const UPYUN_FORM_API_BASE = "https://v0.api.upyun.com";
 const INDEX_KEY = "gallery-index.json";
-
-/** 单文件上传大小上限（字节）：5MB */
-export const MAX_FILE_SIZE = 5 * 1024 * 1024;
 
 export interface UpyunEnv {
 	UPYUN_BUCKET?: string;
@@ -313,7 +311,7 @@ export function createUploadTokenFor(
 		bucket: config.bucket,
 		"save-key": path,
 		expiration: Math.floor(Date.now() / 1000) + 600, // 10 分钟有效
-		"content-length-range": `0,${MAX_FILE_SIZE}`,
+		"content-length-range": `0,${MAX_UPLOAD_FILE_SIZE}`,
 		"allow-file-type": "jpg,jpeg,png,webp,gif",
 	};
 	const policy = b64encodeUtf8(JSON.stringify(policyObj));

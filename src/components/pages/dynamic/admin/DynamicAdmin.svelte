@@ -3,11 +3,13 @@ import I18nKey from "@i18n/i18nKey";
 import { i18n } from "@i18n/translation";
 import dayjs from "dayjs";
 import Icon from "@/components/common/Icon.svelte";
+import { UPLOAD_CONCURRENCY } from "@/constants/upload";
 import {
 	FILE_TOO_LARGE,
 	getUpyunUploadError,
 	prepareUploadImage,
 } from "@/utils/prepare-upload-image";
+import { createMutex, runWithConcurrency } from "@/utils/run-with-concurrency";
 import { url } from "@/utils/url-utils";
 import ConfirmDialog from "./ConfirmDialog.svelte";
 import UploadZone from "./UploadZone.svelte";
@@ -252,10 +254,14 @@ async function handleFiles(files: File[]) {
 		progress: 0,
 	}));
 	uploads = [...uploads, ...itemsUpload];
+	const lockImages = createMutex();
+	const succeeded = new Set<number>();
+	let failed = false;
 
-	for (let i = 0; i < files.length; i++) {
-		let file = files[i];
+	await runWithConcurrency(files, UPLOAD_CONCURRENCY, async (raw, i) => {
 		const item = itemsUpload[i];
+		if (!item) return;
+		let file = raw;
 		updateUpload(item.id, { status: "uploading", progress: 0 });
 		try {
 			file = await prepareUploadImage(file);
@@ -270,16 +276,20 @@ async function handleFiles(files: File[]) {
 			await xhrUpload(tok.uploadUrl, form, (p) =>
 				updateUpload(item.id, { progress: p }),
 			);
-			formImages = [
-				...formImages,
-				{
-					path: tok.path,
-					alt: file.name.replace(/\.[^.]+$/, ""),
-					cdnUrl: tok.cdnUrl,
-				},
-			];
+			await lockImages(async () => {
+				formImages = [
+					...formImages,
+					{
+						path: tok.path,
+						alt: file.name.replace(/\.[^.]+$/, ""),
+						cdnUrl: tok.cdnUrl,
+					},
+				];
+			});
 			updateUpload(item.id, { status: "success", progress: 1 });
+			succeeded.add(item.id);
 		} catch (e) {
+			failed = true;
 			const message = e instanceof Error ? e.message : String(e);
 			const tooLarge = message === FILE_TOO_LARGE;
 			updateUpload(item.id, {
@@ -293,16 +303,15 @@ async function handleFiles(files: File[]) {
 					: `${i18n(I18nKey.dynamicUploadFail)}: ${item.name}`,
 			);
 		}
-	}
+	});
 
-	if (!itemsUpload.some((i) => i.status === "error")) {
+	if (!failed) {
 		toast("success", i18n(I18nKey.dynamicUploadSuccess));
 	}
 	setTimeout(() => {
-		const ids = new Set(
-			itemsUpload.filter((i) => i.status === "success").map((i) => i.id),
-		);
-		if (ids.size > 0) uploads = uploads.filter((u) => !ids.has(u.id));
+		if (succeeded.size > 0) {
+			uploads = uploads.filter((u) => !succeeded.has(u.id));
+		}
 	}, 4000);
 }
 

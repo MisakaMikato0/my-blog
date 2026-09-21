@@ -3,11 +3,13 @@ import I18nKey from "@i18n/i18nKey";
 import { i18n } from "@i18n/translation";
 import Icon from "@/components/common/Icon.svelte";
 import { galleryConfig } from "@/config/galleryConfig";
+import { UPLOAD_CONCURRENCY } from "@/constants/upload";
 import {
 	FILE_TOO_LARGE,
 	getUpyunUploadError,
 	prepareUploadImage,
 } from "@/utils/prepare-upload-image";
+import { createMutex, runWithConcurrency } from "@/utils/run-with-concurrency";
 import { url } from "@/utils/url-utils";
 import type { GalleryIndexDto, UploadTokenDto } from "../types";
 import AlbumForm from "./AlbumForm.svelte";
@@ -252,10 +254,14 @@ async function handleFiles(files: File[]) {
 		progress: 0,
 	}));
 	uploads = [...uploads, ...items];
+	const lockComplete = createMutex();
+	const succeeded = new Set<number>();
+	let failed = false;
 
-	for (let i = 0; i < files.length; i++) {
-		let file = files[i];
+	await runWithConcurrency(files, UPLOAD_CONCURRENCY, async (raw, i) => {
 		const item = items[i];
+		if (!item) return;
+		let file = raw;
 		updateUpload(item.id, { status: "uploading", progress: 0 });
 		try {
 			file = await prepareUploadImage(file);
@@ -270,12 +276,16 @@ async function handleFiles(files: File[]) {
 			await xhrUpload(tok.uploadUrl, form, (p) =>
 				updateUpload(item.id, { progress: p }),
 			);
-			await api("/api/gallery/complete", {
-				method: "POST",
-				body: JSON.stringify({ albumId, path: tok.path, size: file.size }),
+			await lockComplete(async () => {
+				await api("/api/gallery/complete", {
+					method: "POST",
+					body: JSON.stringify({ albumId, path: tok.path, size: file.size }),
+				});
 			});
 			updateUpload(item.id, { status: "success", progress: 1 });
+			succeeded.add(item.id);
 		} catch (e) {
+			failed = true;
 			const message = e instanceof Error ? e.message : String(e);
 			const tooLarge = message === FILE_TOO_LARGE;
 			updateUpload(item.id, {
@@ -289,18 +299,17 @@ async function handleFiles(files: File[]) {
 					: `${i18n(I18nKey.galleryAdminUploadFail)}: ${item.name}`,
 			);
 		}
-	}
+	});
 
 	await loadIndex();
-	if (!items.some((i) => i.status === "error")) {
+	if (!failed) {
 		toast("success", i18n(I18nKey.galleryAdminUploadSuccess));
 	}
 	// 短暂保留成功项后清理
 	setTimeout(() => {
-		const ids = new Set(
-			items.filter((i) => i.status === "success").map((i) => i.id),
-		);
-		if (ids.size > 0) uploads = uploads.filter((u) => !ids.has(u.id));
+		if (succeeded.size > 0) {
+			uploads = uploads.filter((u) => !succeeded.has(u.id));
+		}
 	}, 4000);
 }
 

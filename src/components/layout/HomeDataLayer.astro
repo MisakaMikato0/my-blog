@@ -39,7 +39,7 @@ const visitPills = [
 		tone: "outline" as const,
 	},
 ];
-const contactItems = homeConfig.links.map((link) => ({
+const contactItems = homeConfig.links.slice(0, 5).map((link) => ({
 	name: link.name,
 	icon: link.icon,
 	href: link.url,
@@ -838,8 +838,8 @@ const statsShareId = umamiConfig?.shareId ?? "";
 			if (removeTimer !== undefined) { window.clearTimeout(removeTimer); removeTimer = undefined; }
 			if (mounted) return;
 			loadOverlay();
-			// 新布局固定为四个角区和中央区；链接数量不匹配时不挂载。
-			if (!overlay || lines.length !== 4 || regions.length !== 5) return;
+			// 十字分区最多 5 个入口：有链接即可挂载，数量不足时空出对应区域。
+			if (!overlay || lines.length !== 4 || regions.length < 1) return;
 			mounted = true;
 			resetVisuals();
 			contact.appendChild(overlay);
@@ -859,7 +859,7 @@ const statsShareId = umamiConfig?.shareId ?? "";
 				// 先挂载（内部会取消待执行的移除），再判断是否需要播进场，
 				// 避免快速进出时标记与视觉状态不同步导致卡在空白态
 				mount();
-				if (!overlay || active) return;
+				if (!mounted || !overlay || active) return;
 				active = true;
 				const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
 				if (reduceMotion.matches) {

@@ -45,4 +45,14 @@ describe("home guide card structure and layout contracts", () => {
 		expect(source).not.toContain("I18nKey.openPostPrefix");
 		expect(source).toContain("I18nKey.viewLatestPostPrefix");
 	});
+
+	it("mounts the subscribe-contact overlay without requiring exactly 5 links", () => {
+		const source = readSource("src/components/layout/HomeDataLayer.astro");
+		const config = readSource("src/config/homeConfig.ts");
+
+		expect(config).toMatch(/links:\s*\[[\s\S]*\{[\s\S]*url:/);
+		expect(source).not.toMatch(/regions\.length\s*!==\s*5/);
+		expect(source).toMatch(/regions\.length\s*(?:===?\s*0|<\s*1)/);
+		expect(source).toMatch(/if\s*\(\s*!mounted\b/);
+	});
 });
